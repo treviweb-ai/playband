@@ -63,7 +63,16 @@ h2{font-size:15px} h3{font-size:13px;color:var(--muted)}
 .pitem svg{width:72px;height:auto;border-radius:4px;display:block}
 .pname{font-weight:600;line-height:1.2;overflow-wrap:anywhere}
 .pmeta{font-size:12px;color:var(--muted)}
-.pacts{display:flex;gap:4px;margin-top:4px}
+.pacts{display:none;gap:4px;margin-top:4px}
+.pitem.on .pacts{display:flex}
+.formbar{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:6px 10px;background:var(--panel-2);border:1px solid var(--rule);border-radius:8px;font-size:13px}
+.formbar .fb-name{display:inline-flex;align-items:baseline;gap:6px;margin-right:4px}
+.formbar .fb-name b{font-family:var(--display);font-size:16px;letter-spacing:.02em}
+.btn.sm{padding:4px 10px;font-size:13px}
+#fbName{width:190px;max-width:100%;padding:4px 8px}
+#npSize{align-self:flex-start}
+#npSize button{padding:6px 9px;font-size:12.5px;color:var(--ink)}
+#npSize button[aria-pressed="true"]{color:var(--panel)}
 .mini{border:0;background:transparent;color:var(--muted);font-size:12px;padding:2px 4px;border-radius:4px}
 .mini:hover{color:var(--ink);background:var(--panel)}
 .mini.danger{color:var(--accent)}
@@ -179,7 +188,6 @@ textarea.inp{resize:vertical;min-height:70px}
   <button class="btn" id="helpBtn">How to use</button>
   <button class="btn" id="dataBtn">Back up / Restore</button>
   <button class="btn" id="printBtn">Print sheets</button>
-  <button class="btn" id="resetBtn">Reset sample</button>
 </header>
 
 <div class="app">
@@ -187,7 +195,11 @@ textarea.inp{resize:vertical;min-height:70px}
     <div class="plays-head"><h2>Plays</h2><button class="btn primary" id="newPlayBtn">+ New play</button></div>
     <form id="newPlayForm" hidden>
       <label class="f">Play name<input class="inp" id="npName" placeholder="e.g. Inside Zone Left" required></label>
-      <label class="f">Formation<select class="inp" id="npForm"></select></label>
+      <div class="f"><span id="npSizeLbl">Game type</span>
+        <div class="seg" id="npSize" role="group" aria-labelledby="npSizeLbl">
+          <button type="button" data-size="5">5v5 flag</button><button type="button" data-size="7">7v7</button><button type="button" data-size="11">11-man</button>
+        </div></div>
+      <label class="f">Starting formation<select class="inp" id="npForm"></select></label>
       <label class="f">Category<select class="inp" id="npCat"></select></label>
       <div class="row"><button class="btn primary" type="submit">Create play</button><button class="btn" type="button" id="npCancel">Cancel</button></div>
     </form>
@@ -210,6 +222,7 @@ textarea.inp{resize:vertical;min-height:70px}
       <label class="tool"><input type="checkbox" id="snapChk"> Snap</label>
       <button class="btn primary" id="animBtn">Run play</button>
     </div>
+    <div class="formbar" id="formbar"></div>
     <div class="hint" id="hint"></div>
     <div class="fieldwrap"><svg id="field" viewBox="-1.6 -26 56.53 38" aria-label="Play diagram"></svg></div>
   </main>
@@ -222,15 +235,11 @@ textarea.inp{resize:vertical;min-height:70px}
     <div class="help-head"><h2 id="helpTitle">Welcome to PlayBand</h2><button class="btn" id="helpClose">Got it</button></div>
     <p class="help-intro">Draw football plays, then print wristbands and coach sheets. PlayBand is free while it is in beta. Here is how it works:</p>
     <ol class="help-steps">
-      <li><b>Pick a play</b> from the list on the left, or tap <b>+ New play</b>. Choose 11-man, 7v7 or 5v5 flag, a formation and a category.</li>
-      <li><b>Move players.</b> With <b>Move</b> on, drag any player to line them up how you want.</li>
-      <li><b>Draw routes.</b> Tap <b>Draw</b>, tap a player, then tap points on the field. Tap the last point again (or press Enter) to finish.</li>
-      <li><b>Style a route.</b> In Move, tap a route. In the right panel pick solid, dashed or zigzag, an arrow, block (T) or dot end, straight or smooth, and a color. Drag the white handles to reshape it.</li>
-      <li><b>Add notes.</b> Tap <b>Text</b> and tap the field to drop a label. Coaching notes go in the right panel.</li>
-      <li><b>Show a defense</b> with the Defense menu, <b>Flip</b> to mirror the play, and <b>Run play</b> to watch the routes animate.</li>
-      <li><b>Save a formation.</b> Line players up, type a name under Formations in the right panel and tap Save formation. It appears at the top of the New play menu.</li>
-      <li><b>Print.</b> Tap <b>Print sheets</b> for play sheets, wristbands (pick a size, grid and copies) or a coach call sheet. Numbers on the wristbands match the coach sheet.</li>
-      <li><b>Back up your plays.</b> Plays are saved only in this browser. Tap <b>Back up / Restore</b> to save a backup file, or to move your plays to another device.</li>
+      <li><b>Start a play.</b> Tap <b>+ New play</b>, pick your game type (5v5 flag, 7v7 or 11-man) and a starting formation.</li>
+      <li><b>Line up.</b> Drag players where you want them. Tap <b>Save as formation</b> above the field to reuse that lineup on other plays.</li>
+      <li><b>Draw routes.</b> Tap <b>Draw</b>, tap a player, then tap points on the field. Tap the last point again to finish. Tap any route to change its style.</li>
+      <li><b>Print.</b> <b>Print sheets</b> gives you play sheets, wristbands and a coach call sheet with matching numbers.</li>
+      <li><b>Back up.</b> Plays are saved only in this browser. Use <b>Back up / Restore</b> to keep a copy or move to another device.</li>
     </ol>
     <p class="help-note">Your plays save automatically in this browser on this device. Undo and redo are in the toolbar (Ctrl/Cmd Z). This is a beta, so tell us what feels clumsy or missing: <span class="sel">info@treviweb.com</span></p>
   </div>
@@ -255,6 +264,10 @@ textarea.inp{resize:vertical;min-height:70px}
       <input type="file" id="rsFile" accept=".json,application/json,text/plain" aria-label="Backup file">
       <label class="f">Backup text<textarea class="inp" id="rsText" placeholder="Paste backup text here" spellcheck="false"></textarea></label>
       <div class="row"><button class="btn" id="rsGo">Restore</button><span class="pmeta" id="rsMsg" role="status"></span></div>
+    </div>
+    <div class="isec"><h3>Start over</h3>
+      <p class="help-note">Replace everything with the sample plays. Back up first if you want to keep your work.</p>
+      <div class="row"><button class="btn" id="resetBtn">Reset to sample plays</button></div>
     </div>
   </div>
 </div>
@@ -555,13 +568,86 @@ function renderToolbar(){
   $('snapChk').checked=st.snap;
   let h='';
   if(st.anim)h='Running the play. Players follow their first route.';
-  else if(st.mode==='select')h='Drag players or labels to move them. Tap a route to edit its style or drag its points.';
+  else if(st.mode==='select')h=c.lines.length?'Drag players or labels to move them. Tap a route to edit its style or drag its points.'
+    :'<b>Step 1:</b> drag players to set your lineup. <b>Step 2:</b> tap <b>Draw</b> to add routes.';
   else if(st.mode==='draw')h=st.drawing?'Tap the field to add points. Tap the last point again, double-tap, or press Enter to finish. <button class="btn primary" id="finishBtn">Finish route</button>'
     :'Tap a player, then tap the field to draw their route. You can also drag from a player. Tap empty field to draw a free line.';
   else h='Tap the field to place a text label.';
   $('hint').innerHTML=h;
   const fb=$('finishBtn');if(fb)fb.onclick=finishDrawing;
+  renderFormbar();
 }
+/* ---------- formation bar ---------- */
+function formationList(size){
+  const mine=(pb.customFormations||[]).filter(f=>f.size===size);
+  return {mine,std:Object.keys(FORMATIONS[size])};
+}
+function renderFormbar(){
+  const c=cur(),el=$('formbar');
+  if(st.fbSaving){
+    if(!$('fbName'))el.innerHTML=`<label class="tool" for="fbName">Name this formation</label><input class="inp" id="fbName" maxlength="30" placeholder="e.g. Trips Right Tight"><button class="btn primary sm" data-fb="doSave">Save</button><button class="btn sm" data-fb="cancel">Cancel</button><span class="pmeta">Saves where the players are lined up, not the routes.</span>`;
+    return;
+  }
+  const {mine,std}=formationList(c.size);
+  el.innerHTML=`<span class="fb-name"><span class="pmeta">Formation</span><b>${esc(c.formation)}</b><span class="pmeta">${SIZE_NAME[c.size]}</span></span>
+    <button class="btn sm" data-fb="save">Save as formation</button>
+    <label class="tool">Switch to <select id="fbSwitch"><option value="">Choose…</option>${mine.length?`<optgroup label="Your formations">${mine.map(f=>`<option value="custom:${f.id}">${esc(f.name)}</option>`).join('')}</optgroup>`:''}<optgroup label="Standard">${std.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('')}</optgroup></select></label>
+    <button class="btn sm" data-fb="add">+ Add player</button>
+    <span class="pmeta" id="fbMsg" role="status">${esc(st.fbMsg||'')}</span>`;
+}
+function fbFlash(m){st.fbMsg=m;clearTimeout(st.fbT);st.fbT=setTimeout(()=>{st.fbMsg='';const e=$('fbMsg');if(e)e.textContent='';},7000);}
+function saveFormation(){
+  const c=cur(),nm=($('fbName').value||'').trim();if(!nm){$('fbName').focus();return;}
+  pushUndo();pb.customFormations=pb.customFormations||[];
+  const players=c.players.filter(p=>p.kind!=='def').map(({label,x,y,kind,shape})=>({label,x,y,kind,shape}));
+  const ex=pb.customFormations.find(f=>f.name.toLowerCase()===nm.toLowerCase()&&f.size===c.size);
+  if(ex)ex.players=players;else pb.customFormations.push({id:uid(),name:nm,size:c.size,players});
+  c.formation=nm;st.fbSaving=false;$('formbar').innerHTML='';
+  fbFlash(ex?'Updated "'+nm+'".':'Saved "'+nm+'". Pick it under + New play, or Switch to.');
+  buildFormOpts();commit({insp:true});
+}
+function applyFormation(key){
+  const c=cur();let target,name;
+  if(key.startsWith('custom:')){const f=(pb.customFormations||[]).find(x=>'custom:'+x.id===key);if(!f)return;target=f.players.map(p=>({...p}));name=f.name;}
+  else{if(!FORMATIONS[c.size][key])return;target=FORMATIONS[c.size][key]();name=key;}
+  pushUndo();
+  const off=c.players.filter(p=>p.kind!=='def'),def=c.players.filter(p=>p.kind==='def'),used=new Set(),next=[];
+  for(const t of target){
+    const m=off.find(p=>p.label===t.label&&!used.has(p.id));
+    if(m){used.add(m.id);const dx=t.x-m.x,dy=t.y-m.y;
+      c.lines.forEach(l=>{if(l.playerId===m.id)l.pts=l.pts.map(q=>[r2(q[0]+dx),r2(q[1]+dy)]);});
+      m.x=t.x;m.y=t.y;m.kind=t.kind;m.shape=t.shape;next.push(m);}
+    else next.push({id:uid(),label:t.label,x:t.x,y:t.y,kind:t.kind,shape:t.shape});
+  }
+  const gone=new Set(off.filter(p=>!used.has(p.id)).map(p=>p.id));
+  c.lines=c.lines.filter(l=>!gone.has(l.playerId));
+  c.players=[...next,...def];c.formation=name;st.sel=null;
+  fbFlash('Switched to "'+name+'". Routes moved with their players. Undo puts it back.');
+  commit({insp:true});
+}
+function addPlayer(){
+  const c=cur(),off=c.players.filter(p=>p.kind!=='def');
+  if(off.length>=12){fbFlash('A play can have up to 12 offensive players.');renderFormbar();return;}
+  pushUndo();
+  const taken=new Set(off.map(p=>p.label)),label=['A','B','T','R','S','W','J','K'].find(l=>!taken.has(l))||'A';
+  let x=r2(fwOf(c)/2+4),y=6;while(off.some(p=>Math.hypot(p.x-x,p.y-y)<2)&&y<10)y+=2;
+  const p={id:uid(),label,x,y,kind:'skill',shape:'circle'};
+  c.players.unshift(p);st.mode='select';st.sel={type:'player',id:p.id};
+  fbFlash('Player '+label+' added. Drag it into place. Rename it in the panel on the right.');
+  commit({insp:true});
+}
+$('formbar').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-fb]');if(!b)return;const a=b.dataset.fb;
+  if(a==='save'){if(st.drawing)finishDrawing();st.fbSaving=true;$('formbar').innerHTML='';renderFormbar();const i=$('fbName');const c=cur();
+    if((pb.customFormations||[]).some(f=>f.name===c.formation&&f.size===c.size))i.value=c.formation;i.focus();i.select();}
+  else if(a==='cancel'){st.fbSaving=false;$('formbar').innerHTML='';renderFormbar();}
+  else if(a==='doSave')saveFormation();
+  else if(a==='add'){if(st.drawing)finishDrawing();addPlayer();}
+});
+$('formbar').addEventListener('keydown',e=>{if(e.target.id!=='fbName')return;
+  if(e.key==='Enter'){e.preventDefault();saveFormation();}
+  else if(e.key==='Escape'){e.stopPropagation();st.fbSaving=false;$('formbar').innerHTML='';renderFormbar();}});
+$('formbar').addEventListener('change',e=>{if(e.target.id==='fbSwitch'&&e.target.value){if(st.drawing)finishDrawing();applyFormation(e.target.value);}});
 function seg(set,opts,val){return `<div class="seg" role="group">${opts.map(([v,t])=>`<button data-set="${set}" data-val="${v}" aria-pressed="${String(v===val)}">${t}</button>`).join('')}</div>`;}
 function lineControls(l){
   return `<div class="isec"><h3>Line style</h3>${seg('style',[['solid','Solid'],['dashed','Dashed'],['zigzag','Zigzag']],l.style)}</div>
@@ -588,10 +674,7 @@ function renderInspector(){
     <label class="f">Category<select class="inp" id="playCat">${CATS.map(k=>`<option${k===c.category?' selected':''}>${k}</option>`).join('')}</select></label>
     <label class="f">Coaching notes<textarea class="inp" id="playNotes" placeholder="Reads, blocking rules, coaching points">${esc(c.notes||'')}</textarea></label>
     <span class="pmeta">${esc(c.formation)} · ${SIZE_NAME[c.size]}</span></div>
-    <div class="isec"><h2>Formations</h2>
-    <label class="f">Save this alignment as a formation<input class="inp" id="fmName" maxlength="30" placeholder="e.g. Trips Right Tight"></label>
-    <div class="row"><button class="btn" data-do="saveForm">Save formation</button><span class="pmeta" id="fmMsg"></span></div>
-    ${(pb.customFormations||[]).filter(f=>f.size===c.size).map(f=>`<div class="row" style="justify-content:space-between;align-items:center"><span>${esc(f.name)}</span><button class="mini danger" data-do="delForm" data-id="${f.id}">Delete</button></div>`).join('')||'<span class="pmeta">Saved formations show up under New play.</span>'}</div>
+    ${(pb.customFormations||[]).some(f=>f.size===c.size)?`<div class="isec"><h2>Your formations</h2>${pb.customFormations.filter(f=>f.size===c.size).map(f=>`<div class="row" style="justify-content:space-between;align-items:center"><span>${esc(f.name)}</span><button class="mini danger" data-do="delForm" data-id="${f.id}">Delete</button></div>`).join('')}</div>`:''}
     <div class="isec"><h2>Next line</h2><span class="pmeta">New routes start with these settings.</span></div>${lineControls(st.lineDefaults)}
     <div class="isec"><h2>Quick keys</h2><ul class="tips"><li><span class="kbd">Enter</span> finishes a route</li><li><span class="kbd">Delete</span> removes the selected item</li><li><span class="kbd">Ctrl/Cmd Z</span> undo</li></ul></div>`;
   }
@@ -701,14 +784,6 @@ $('inspector').addEventListener('click',e=>{
   }
   const act=b.dataset.do;
   if(act==='delSel')deleteSel();
-  if(act==='saveForm'){
-    const nm=($('fmName').value||'').trim();if(!nm){$('fmMsg').textContent='Give it a name first.';$('fmName').focus();return;}
-    pushUndo();pb.customFormations=pb.customFormations||[];
-    const players=c.players.filter(p=>p.kind!=='def').map(({label,x,y,kind,shape})=>({label,x,y,kind,shape}));
-    const ex=pb.customFormations.find(f=>f.name.toLowerCase()===nm.toLowerCase()&&f.size===c.size);
-    if(ex)ex.players=players;else pb.customFormations.push({id:uid(),name:nm,size:c.size,players});
-    c.formation=nm;buildFormOpts();commit({insp:true});const m=$('fmMsg');if(m)m.textContent=ex?'Formation updated.':'Formation saved.';
-  }
   if(act==='delForm'){pushUndo();pb.customFormations=(pb.customFormations||[]).filter(f=>f.id!==b.dataset.id);buildFormOpts();commit({insp:true});}
   if(act==='clearRoutes'){pushUndo();c.lines=c.lines.filter(l=>l.playerId!==st.sel.id);commit({insp:true});}
   if(act==='drawFrom'){const pid=st.sel.id;st.mode='draw';startLineFrom(pid);st.justStarted=false;commit({insp:true});}
@@ -790,30 +865,33 @@ $('playList').addEventListener('click',e=>{
   }
   const li=e.target.closest('[data-play]');if(!li)return;
   if(st.anim)runPlay();if(st.drawing)finishDrawing();
-  pb.currentId=li.dataset.play;st.sel=null;save();renderAll();
+  pb.currentId=li.dataset.play;st.sel=null;st.fbSaving=false;$('formbar').innerHTML='';save();renderAll();
 });
 const npForm=$('newPlayForm');
 function buildFormOpts(){
-  const mine=pb.customFormations||[];
-  $('npForm').innerHTML=(mine.length?`<optgroup label="Your formations">${mine.map(f=>`<option value="${f.size}|custom:${f.id}">${esc(f.name)} (${SIZE_NAME[f.size]})</option>`).join('')}</optgroup>`:'')+
-    [11,7,5].map(n=>`<optgroup label="${SIZE_NAME[n]}">${Object.keys(FORMATIONS[n]).map(f=>`<option value="${n}|${f}">${f}</option>`).join('')}</optgroup>`).join('');
+  const size=st.npSize||cur().size,{mine,std}=formationList(size);
+  $('npForm').innerHTML=(mine.length?`<optgroup label="Your formations">${mine.map(f=>`<option value="custom:${f.id}">${esc(f.name)}</option>`).join('')}</optgroup>`:'')+
+    `<optgroup label="Standard">${std.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('')}</optgroup>`;
+  document.querySelectorAll('#npSize button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.size===size)));
 }
+$('npSize').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;st.npSize=+b.dataset.size;buildFormOpts();});
 buildFormOpts();
 $('npCat').innerHTML=CATS.map(c=>`<option>${c}</option>`).join('');
-$('newPlayBtn').onclick=()=>{npForm.hidden=!npForm.hidden;if(!npForm.hidden)$('npName').focus();};
+$('newPlayBtn').onclick=()=>{npForm.hidden=!npForm.hidden;if(!npForm.hidden){if(!st.npSize)st.npSize=cur().size;buildFormOpts();$('npName').focus();}};
 $('npCancel').onclick=()=>{npForm.hidden=true;};
 npForm.addEventListener('submit',e=>{
-  e.preventDefault();const v=$('npForm').value,n=v.slice(0,v.indexOf('|')),f=v.slice(v.indexOf('|')+1);
+  e.preventDefault();const f=$('npForm').value,n=st.npSize||cur().size;
   pushUndo();const p=makePlay($('npName').value.trim()||'New play',$('npCat').value,+n,f);
-  pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='draw';markEdited();save();npForm.reset();npForm.hidden=true;renderAll();
+  pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='select';st.fbSaving=false;$('formbar').innerHTML='';markEdited();save();npForm.reset();npForm.hidden=true;renderAll();
 });
 
 /* ---------- reset ---------- */
 let resetArmed=false;
 $('resetBtn').onclick=e=>{
-  if(!resetArmed){resetArmed=true;e.target.textContent='Click again to reset';e.target.classList.add('warn');
-    setTimeout(()=>{resetArmed=false;e.target.textContent='Reset sample';e.target.classList.remove('warn');},3000);return;}
-  pushUndo();pb=samplePlaybook();st.sel=null;resetArmed=false;e.target.textContent='Reset sample';e.target.classList.remove('warn');save();renderAll();
+  const b=e.currentTarget;
+  if(!resetArmed){resetArmed=true;b.textContent='Tap again to replace all plays';b.classList.add('warn');
+    setTimeout(()=>{resetArmed=false;b.textContent='Reset to sample plays';b.classList.remove('warn');},4000);return;}
+  pushUndo();pb=samplePlaybook();st.sel=null;st.npSize=null;resetArmed=false;b.textContent='Reset to sample plays';b.classList.remove('warn');save();renderAll();$('dataView').hidden=true;
 };
 
 /* ---------- print ---------- */
