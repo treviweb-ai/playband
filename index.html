@@ -4,1700 +4,253 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>PlayBand | Free football play designer and wristband maker</title>
-<meta name="description" content="Draw football plays for 11-man, 7v7 and 5v5 flag, then print wristbands and coach call sheets. Free while in beta. By Trevi Web Co.">
-<meta property="og:title" content="PlayBand: free football play designer">
-<meta property="og:description" content="Draw plays for tackle, 7v7 and 5v5 flag football. Print wristbands and coach sheets. Free beta.">
+<meta name="description" content="Draw football plays for 5v5 flag, 7v7 and 11-man in minutes. Print wristbands and a matching coach call sheet, and share plays with your team. Free while in beta.">
+<link rel="canonical" href="https://sports.treviweb.com/">
+<meta property="og:title" content="PlayBand: draw the play, print the wristband">
+<meta property="og:description" content="A free football play designer for flag, 7v7 and tackle coaches. Draw plays, print wristbands and coach sheets, share with your team.">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#d9480f">
+<meta property="og:url" content="https://sports.treviweb.com/">
+<meta property="og:image" content="https://sports.treviweb.com/img/editor.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#15211b">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23d9480f'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Arial Narrow,Arial,sans-serif' font-weight='700' font-size='20' fill='%23fff'%3EP%3C/text%3E%3C/svg%3E">
-<style>[hidden]{display:none!important}html{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}</style>
+<script>
+/* People who already use the app, and links that belong to it, go straight to the editor. */
+(function(){try{var s=location.search,h=location.hash;
+  if(/[?&]home\b/.test(s))return;
+  var used=localStorage.getItem('playcard.helpSeen')||localStorage.getItem('playband.owner');
+  var auth=/access_token=|type=recovery|error_code=|[?&]code=/.test(h+s);
+  if(/[?&]share=/.test(s)||auth||used)location.replace('/app'+s+h);
+}catch(e){}})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"SoftwareApplication","name":"PlayBand","applicationCategory":"SportsApplication","operatingSystem":"Web","url":"https://sports.treviweb.com/",
+  "description":"Football play designer and wristband maker for 5v5 flag, 7v7 and 11-man coaches.",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "publisher":{"@type":"Organization","name":"Trevi Web Co.","url":"https://treviweb.com"}},
+ {"@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"Is PlayBand free?","acceptedAnswer":{"@type":"Answer","text":"Yes. PlayBand is free while it is in beta. Every feature on this page is included."}},
+  {"@type":"Question","name":"Do I need an account?","acceptedAnswer":{"@type":"Answer","text":"No. You can draw and print without one, and your plays stay in your browser. A free account saves your plays online so they follow you to any phone or computer."}},
+  {"@type":"Question","name":"Does it work on a phone?","acceptedAnswer":{"@type":"Answer","text":"Yes. PlayBand runs in the browser on phones, tablets and computers. There is nothing to install."}},
+  {"@type":"Question","name":"What wristband sizes can I print?","acceptedAnswer":{"@type":"Answer","text":"Youth 3 by 2 inch up to QB and coach 5 by 3 inch, plus a custom size. You choose the grid, and print diagrams or a play list."}},
+  {"@type":"Question","name":"Which kinds of football does it cover?","acceptedAnswer":{"@type":"Answer","text":"5v5 flag, 7v7 and 11-man tackle, each with its own field, formations and starter plays."}}]}
+]}
+</script>
+<style>
+:root{--ink:#15211b;--muted:#5b6a62;--bg:#f3f6f3;--panel:#ffffff;--rule:#d3dcd5;--accent:#d9480f;--accent-d:#b93a08;--field:#1c2b23;--chalk:#e9eee9;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;--body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:max(20px,env(safe-area-inset-left,0px)) max(20px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.05;margin:0;letter-spacing:.01em}
+h1{font-size:clamp(42px,5.6vw,68px);text-transform:uppercase}
+h2{font-size:clamp(30px,4.2vw,46px);text-transform:uppercase}
+h3{font-size:24px}
+p{margin:0}
+.eyebrow{font-family:var(--display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:14px;color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;
+  padding:14px 26px;border-radius:10px;border:2px solid transparent;min-height:52px}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-d)}
+.btn.ghost{border-color:rgba(255,255,255,.35);color:#fff}
+.btn.ghost:hover{border-color:#fff}
+:focus-visible{outline:3px solid #f9c74f;outline-offset:3px}
+
+/* header + hero share the dark field */
+.top{background:var(--field);color:#fff;position:relative;overflow:hidden}
+.top::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(to bottom,transparent 0 79px,rgba(233,238,233,.09) 79px 81px)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px;position:relative}
+.logo{font-family:var(--display);font-weight:700;font-size:30px;text-decoration:none;letter-spacing:.02em;color:#fff}
+.logo span{color:#ff7b39}
+.nav .btn{font-size:16px;padding:8px 16px;min-height:42px}
+.hero{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.3fr);gap:40px;align-items:center;padding-block:36px 0;position:relative}
+.hero-copy{padding-bottom:64px}
+.hero h1 em{font-style:normal;color:#ff7b39}
+.lede{font-size:20px;color:#cfd8d1;margin-top:18px;max-width:34em}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;align-items:center}
+.cta small{color:#aebbb2;font-size:15px;flex-basis:100%}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px;padding:0;list-style:none}
+.chips li{font-family:var(--display);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:14px;border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:4px 12px;color:#e9eee9}
+.shot{border-radius:14px 14px 0 0;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);border-bottom:0;align-self:end;background:#e9eee9}
+
+section{padding-block:76px}
+.sec-head{max-width:40em;margin-bottom:36px}
+.sec-head p{color:var(--muted);margin-top:12px;font-size:19px}
+
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:24px;counter-increment:s;display:flex;flex-direction:column;gap:10px}
+.steps li::before{content:counter(s);font-family:var(--display);font-weight:700;font-size:26px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:3px solid var(--accent);color:var(--accent)}
+.steps p{color:var(--muted)}
+
+.band{background:var(--panel);border-block:1px solid var(--rule)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.split.flip>:first-child{order:2}
+.split ul{margin:18px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.split li{padding-left:30px;position:relative}
+.split li::before{content:"";position:absolute;left:0;top:.45em;width:16px;height:9px;border-left:3px solid var(--accent);border-bottom:3px solid var(--accent);transform:rotate(-45deg)}
+.split p.sub{color:var(--muted);margin-top:12px;font-size:19px}
+.paper{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:14px;box-shadow:0 14px 34px rgba(21,33,27,.12);transform:rotate(-1.2deg)}
+.phone{max-width:300px;margin-inline:auto;border:10px solid var(--ink);border-radius:36px;overflow:hidden;box-shadow:0 18px 40px rgba(21,33,27,.22);background:#e9eee9}
+
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;list-style:none;padding:0;margin:0}
+.grid li{border-top:3px solid var(--ink);padding-top:14px}
+.grid h3{font-size:21px;text-transform:uppercase;letter-spacing:.03em}
+.grid p{color:var(--muted);font-size:16px;margin-top:6px}
+
+.faq{max-width:760px}
+.faq details{border-bottom:1px solid var(--rule);padding-block:16px}
+.faq summary{font-family:var(--display);font-weight:600;font-size:23px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--accent);font-weight:700}
+.faq details[open] summary::after{content:"\2212"}
+.faq p{color:var(--muted);margin-top:8px}
+
+.final{background:var(--field);color:#fff;text-align:center}
+.final p{color:#cfd8d1;margin:14px auto 26px;max-width:32em;font-size:19px}
+footer{background:#111a15;color:#aebbb2;font-size:15px;padding-block:22px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;gap:28px;padding-top:20px}
+  .hero-copy{padding-bottom:0}
+  .steps,.split{grid-template-columns:1fr}
+  .split{gap:28px}
+  .split.flip>:first-child{order:0}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  section{padding-block:54px}
+}
+@media (max-width:480px){
+  body{font-size:16px}
+  .grid{grid-template-columns:1fr}
+  .btn{width:100%}
+  .nav .btn{width:auto}
+  .lede{font-size:18px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
 </head>
 <body>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
-<style>
-/* Layout: coach's sideline tablet. Play list left, laminated play card center, tools right; stacks on phones. */
-:root{
-  --bg:#e9eee9; --panel:#ffffff; --panel-2:#f3f6f3; --ink:#15211b; --muted:#5b6a62; --rule:#d3dcd5;
-  --accent:#d9480f; --accent-ink:#ffffff; --accent-soft:#fde4d6; --sel:#24407a;
-  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
-  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0d1411; --panel:#151f1a; --panel-2:#1b2721; --ink:#e5ece7; --muted:#93a39a; --rule:#2b3a32;
-  --accent:#ff7b39; --accent-ink:#1a0d05; --accent-soft:#3a2216; --sel:#9db6ef; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0d1411; --panel:#151f1a; --panel-2:#1b2721; --ink:#e5ece7; --muted:#93a39a; --rule:#2b3a32;
-  --accent:#ff7b39; --accent-ink:#1a0d05; --accent-soft:#3a2216; --sel:#9db6ef; color-scheme:dark}
-html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  padding-block:0;box-sizing:border-box;display:flex;flex-direction:column}
-*,*::before,*::after{box-sizing:border-box}
-button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin:0}
-h2{font-size:15px} h3{font-size:13px;color:var(--muted)}
-
-.bar{display:flex;align-items:center;gap:12px;padding-block:10px;flex-wrap:wrap}
-.brand{display:flex;align-items:baseline;gap:8px}
-.brand b{font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.02em}
-.brand b span{color:var(--accent)}
-.chip{font-family:var(--display);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:99px;padding:2px 8px;color:var(--muted)}
-#pbName{border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 8px;font-family:var(--display);font-size:18px;font-weight:600;min-width:0;width:220px;max-width:100%}
-#pbName:hover,#pbName:focus{border-color:var(--rule);background:var(--panel)}
-.spacer{flex:1}
-.btn{border:1px solid var(--rule);background:var(--panel);border-radius:8px;padding:7px 12px;font-weight:600;white-space:nowrap}
-.btn:hover{border-color:var(--muted)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.warn{border-color:var(--accent);color:var(--accent)}
-.btn:disabled{opacity:.45;cursor:default}
-
-.app{flex:1;min-height:0;display:grid;grid-template-columns:230px minmax(0,1fr) 270px;gap:12px;padding-bottom:10px}
-.panel{background:var(--panel);border:1px solid var(--rule);border-radius:12px;min-height:0;display:flex;flex-direction:column}
-.plays-head{display:flex;justify-content:space-between;align-items:center;padding:12px 12px 8px}
-#playList{list-style:none;margin:0;padding:0 8px 8px;overflow:auto;display:flex;flex-direction:column;gap:6px}
-.pitem{border:1px solid var(--rule);border-radius:10px;padding:6px;display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px;align-items:center;background:var(--panel-2);cursor:pointer}
-.pitem.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.pitem svg{width:72px;height:auto;border-radius:4px;display:block}
-.pname{font-weight:600;line-height:1.2;overflow-wrap:anywhere}
-.pmeta{font-size:12px;color:var(--muted)}
-.pacts{display:none;gap:4px;margin-top:4px}
-.pitem.on .pacts{display:flex}
-.formbar{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:6px 10px;background:var(--panel-2);border:1px solid var(--rule);border-radius:8px;font-size:13px}
-.formbar .fb-name{display:inline-flex;align-items:baseline;gap:6px;margin-right:4px}
-.formbar .fb-name b{font-family:var(--display);font-size:16px;letter-spacing:.02em}
-.btn.sm{padding:4px 10px;font-size:13px}
-.qr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-.qr .btn{padding:6px 4px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:12.5px;min-height:0}
-.qr .btn svg{color:var(--sel)}
-.qr .btn[aria-pressed="true"] svg{color:inherit}
-.qr .btn[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
-#fbName{width:190px;max-width:100%;padding:4px 8px}
-#npSize{align-self:flex-start}
-#npSize button{padding:6px 9px;font-size:12.5px;color:var(--ink)}
-#npSize button[aria-pressed="true"]{color:var(--panel)}
-.mini{border:0;background:transparent;color:var(--muted);font-size:12px;padding:2px 4px;border-radius:4px}
-.mini:hover{color:var(--ink);background:var(--panel)}
-.mini.danger{color:var(--accent)}
-.pl-tools{display:flex;gap:6px;padding:0 8px 8px}
-.pl-tools .inp{padding:6px 8px;min-width:0}
-.pl-tools select.inp{flex:0 0 auto;width:auto;max-width:52%}
-.pnum{color:var(--muted);font-weight:500;margin-right:3px;font-variant-numeric:tabular-nums}
-.pacts{flex-wrap:wrap}
-#newPlayForm{padding:0 12px 12px;display:flex;flex-direction:column;gap:8px}
-label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:500}
-.inp{border:1px solid var(--rule);background:var(--panel-2);border-radius:8px;padding:7px 9px;width:100%}
-textarea.inp{resize:vertical;min-height:70px}
-
-.editor{padding:10px;gap:8px}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--panel-2)}
-.seg button{border:0;background:transparent;padding:6px 11px;font-weight:600;font-size:13px}
-.seg button+button{border-left:1px solid var(--rule)}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
-.tsep{width:1px;align-self:stretch;background:var(--rule)}
-.tool{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
-.tool select{border:1px solid var(--rule);background:var(--panel-2);border-radius:8px;padding:5px 6px;color:var(--ink)}
-.hint{display:flex;align-items:center;gap:10px;min-height:30px;font-size:13px;color:var(--muted);flex-wrap:wrap}
-.hint .btn{padding:3px 10px;font-size:12px}
-.fieldwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
-#field{width:100%;height:100%;max-height:100%;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:8px;display:block}
-#field.draw{cursor:crosshair}
-#field.text{cursor:text}
-
-.inspector{padding:14px;gap:14px;overflow:auto}
-.isec{display:flex;flex-direction:column;gap:8px}
-.isec .seg{align-self:flex-start;flex-wrap:wrap}
-.swatches{display:flex;gap:8px}
-.sw{width:26px;height:26px;border-radius:50%;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--rule)}
-.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
-.tips{margin:0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.5}
-.kbd{font-family:ui-monospace,Menlo,monospace;font-size:11px;border:1px solid var(--rule);border-radius:4px;padding:0 4px}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-
-#printView{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;
-  padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.pv-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-.pv-note{font-size:13px;color:var(--muted);max-width:65ch}
-.sheet{background:#fff;color:#111;width:100%;max-width:1000px;aspect-ratio:11/8.5;margin:0 auto 16px;padding:2.5%;display:flex;flex-direction:column;gap:1.2%;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
-.sh-head{display:flex;align-items:center;gap:10px;font:700 18px var(--display);letter-spacing:.02em;border-bottom:2px solid #111;padding-bottom:4px}
-.sh-head img,.call h3 img{height:34px;width:auto;max-width:90px;object-fit:contain}
-.sh-head span{margin-left:auto;font:500 11px var(--body);color:#666}
-.sh-grid{flex:1;min-height:0;display:grid;gap:2%}
-.cell .asg{margin:3px 0 0;font-size:10.5px;line-height:1.3;color:#222}
-.cell .asg b{font-family:var(--display)}
-.cell{display:flex;flex-direction:column;min-height:0;border:1px solid #cfd6d1;border-radius:4px;padding:6px}
-.cell h4{margin:0 0 4px;font-family:var(--display);font-size:15px;display:flex;justify-content:space-between;gap:8px}
-.cell h4 span{color:#666;font-weight:500}
-.cell svg{flex:1;min-height:0;width:100%}
-.num{width:64px;border:1px solid var(--rule);background:var(--panel-2);border-radius:8px;padding:5px 6px;color:var(--ink)}
-#sheets{overflow-x:auto;padding-bottom:8px}
-#pickPanel{padding:12px;gap:10px;margin-bottom:12px}
-#pickPanel[hidden]{display:none}
-#pickList{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 12px;max-height:40vh;overflow:auto}
-.pk{display:flex;gap:8px;align-items:flex-start;padding:6px 4px;border-radius:6px;cursor:pointer;min-height:40px}
-.pk:hover{background:var(--panel-2)}
-.pk input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--accent)}
-.pk span{font-weight:600;line-height:1.25;overflow-wrap:anywhere}
-.pk small{display:block;font-weight:400;color:var(--muted);font-size:12px}
-.page{background:#fff;color:#111;width:10.3in;height:7.7in;margin:0 auto 16px;box-shadow:0 1px 4px rgba(0,0,0,.15);overflow:hidden;position:relative}
-.page-cap{position:absolute;right:.1in;bottom:.05in;font-size:7pt;color:#888}
-.wb-page{display:flex;flex-wrap:wrap;align-content:flex-start;gap:0}
-.wb{border:1px dashed #9aa5a0;display:grid;padding:.04in;gap:.03in;box-sizing:border-box}
-.win{border:.5pt solid #222;position:relative;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
-.win b{position:absolute;left:0;top:0;background:#111;color:#fff;font:700 7pt/1 var(--display);padding:1.5pt 3pt;z-index:1}
-.win svg{width:100%;height:100%;display:block}
-.wl{display:flex;align-items:center;gap:4pt;padding:0 3pt;line-height:1.25;font-family:var(--display);font-weight:600;white-space:nowrap;overflow:hidden;border-bottom:.5pt solid #ccc}
-.wl i{font-style:normal;font-weight:700;min-width:1.6em}
-.call{padding:.3in;display:flex;flex-direction:column;gap:.12in}
-.call h3{color:#111;font-size:16pt;letter-spacing:.02em;display:flex;gap:10px;align-items:center}
-.call h3 span{margin-left:auto}
-.call h3 span{font-size:9pt;color:#666;font-family:var(--body);text-transform:none;letter-spacing:0}
-.call-cols{columns:3;column-gap:.25in;column-rule:.5pt solid #ddd;flex:1;min-height:0}
-.cgroup{break-inside:avoid;margin-bottom:.14in}
-.cgroup h4{margin:0 0 3pt;font:700 10pt var(--display);text-transform:uppercase;letter-spacing:.06em;background:#111;color:#fff;padding:2pt 5pt}
-.crow{display:grid;grid-template-columns:2.2em 1fr;gap:4pt;font-size:9pt;padding:2pt 0;border-bottom:.5pt solid #e3e3e3}
-.crow b{font-family:var(--display)}
-.crow small{display:block;color:#666;font-size:7.5pt}
-.cdiag{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:1fr;gap:.08in;flex:1;min-height:0}
-.cdiag .win{border-color:#bbb}
-.cell p{margin:4px 0 0;font-size:11px;color:#333}
-
-#helpView,#dataView,#authView,#libView{position:fixed;inset:0;z-index:30;background:rgba(10,18,14,.55);display:flex;align-items:flex-start;justify-content:center;overflow:auto;
-  padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
-#helpView[hidden],#dataView[hidden],#authView[hidden],#libView[hidden]{display:none}
-#authView [hidden]{display:none}
-#syncChip{text-transform:none;letter-spacing:.02em;font-size:12px}
-#syncChip[data-s=error]{border-color:var(--accent);color:var(--accent)}
-.help-intro{margin:0;line-height:1.5;max-width:65ch}
-.sel{user-select:all;-webkit-user-select:all;font-weight:600;color:var(--ink)}
-.chip.beta{border-color:var(--accent);color:var(--accent)}
-.foot{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;font-size:12px;color:var(--muted);padding-block:0 12px}
-.foot b{font-family:var(--display);font-size:14px;color:var(--ink);letter-spacing:.02em}
-.foot a{color:var(--ink)}
-#rsFile{font-size:13px;max-width:100%}
-#rsText{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:11px}
-.help-card{background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:14px;max-width:620px;width:100%;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
-.help-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.help-head h2{font-size:20px}
-.help-steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;line-height:1.5;max-width:65ch}
-.help-steps b{color:var(--ink)}
-.help-steps li::marker{font-family:var(--display);font-weight:700;color:var(--accent)}
-.help-note{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
-.promo{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--accent);border-left-width:5px;border-radius:10px;padding:8px 12px;margin-bottom:10px;line-height:1.35}
-.promo[hidden]{display:none}
-.promo p{margin:0;flex:1 1 220px}
-.promo b{font-family:var(--display);font-size:16px;letter-spacing:.02em;margin-right:4px}
-.m-only{display:none}
-.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
-.lib-item{border:1px solid var(--rule);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:5px;background:var(--panel-2)}
-.lib-item svg{width:100%;display:block;border-radius:6px;border:1px solid var(--rule)}
-.lib-item .btn{margin-top:auto}
-.tour{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;border:1px solid var(--accent);border-left-width:5px;border-radius:10px;padding:8px 12px;background:var(--panel);line-height:1.35}
-.tour[hidden]{display:none}
-.tour .tour-t{flex:1;min-width:200px}
-.kb-only{position:absolute;left:-9999px}
-.kb-only:focus-within{position:static}
-#field:focus{outline:none}
-#field:focus-visible{outline:3px solid var(--sel);outline-offset:2px}
-.nudge .btn{min-width:40px;justify-content:center}
-a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center}
-a.btn.primary{color:var(--accent-ink)}
-.vnotes{margin:0;white-space:pre-wrap;line-height:1.45}
-.inspector .asg{margin:0;line-height:1.6}
-body.viewer #modeSeg,body.viewer #undoBtn,body.viewer #moreBtn,body.viewer #redoBtn,body.viewer #flipBtn,body.viewer .toolbar .tsep,body.viewer .toolbar .tool:not(.spd),
-body.viewer #formbar,body.viewer #newPlayBtn,body.viewer #newPlayForm,body.viewer #libRow,body.viewer #helpBtn,body.viewer #dataBtn,body.viewer #acctBtn,body.viewer #promo,
-body.viewer #syncChip,body.viewer #sampleChip,body.viewer #footSave,body.viewer #footData,body.viewer #tour,body.viewer .pacts,body.viewer #logoBtn,body.viewer #logoDel,
-body.viewer #setName,body.viewer #setSave,body.viewer #setDel,body.viewer #setSel{display:none!important}
-body.viewer.vloading .app{visibility:hidden}
-body.viewer #field{cursor:default}
-.n{display:none}
-#pbSlot{display:none}
-#pbHome{display:contents}
-#scrim{display:none}
-.fieldwrap{position:relative}
-#zoomBtn{position:absolute;top:6px;right:6px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-#zoomBtn[hidden]{display:none}
-@media (max-width:960px){
-  html,body{height:auto}
-  .m-only{display:inline-flex;align-items:center}
-  .app{grid-template-columns:minmax(0,1fr)}
-  .fieldwrap{flex:none}
-  #field{height:auto;aspect-ratio:56.6/38;max-height:none}
-  .plays{position:fixed;top:0;bottom:0;left:0;width:min(86vw,340px);z-index:26;border-radius:0 12px 12px 0;border-left:0;
-    transform:translateX(-105%);visibility:hidden;transition:transform .2s ease,visibility .2s;
-    padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:4px 0 24px rgba(0,0,0,.25)}
-  body.plays-open .plays{transform:none;visibility:visible}
-  body.plays-open #scrim{display:block;position:fixed;inset:0;z-index:25;background:rgba(10,18,14,.5)}
-  body.plays-open{overflow:hidden}
-  #playList{max-height:none;flex:1}
-  #pbSlot{display:flex;gap:8px;align-items:center;padding:12px 12px 0}
-  #pbSlot #pbName{flex:1;width:auto;border-color:var(--rule);background:var(--panel-2)}
-  .plays-head{gap:8px}
-  .plays-head h2{margin-right:auto}
-}
-@media (max-width:700px){
-  body{padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
-  input,select,textarea{font-size:16px!important}
-  .bar{gap:6px;padding-block:8px}
-  .brand b{font-size:21px}
-  .bar .chip.beta{display:none}
-  .w{display:none}.n{display:inline}
-  .btn,.seg button{min-height:40px}
-  .btn.sm{min-height:36px}
-  .mini{min-height:32px;padding:4px 8px;font-size:13px}
-  .bar .btn{padding:6px 10px}
-  .app{display:flex;flex-direction:column;gap:8px}
-  .editor{display:contents}
-  .toolbar{order:1;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px;margin-inline:-8px;padding-inline:8px;
-    -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
-  .toolbar::-webkit-scrollbar{display:none}
-  .toolbar>*{flex:none}
-  .toolbar::after{content:"";flex:none;width:22px}
-  .tsep{display:none}
-  #modeSeg{order:-2} #animBtn{order:-1}
-  .tour{order:2;font-size:14px}
-  body.touring .hint{display:none}
-  .hint{order:2;min-height:0;font-size:12.5px;line-height:1.35;padding-inline:2px}
-  .fieldwrap{order:3;margin-inline:-8px}
-  #field{border-radius:0}
-  .formbar{order:5;background:var(--panel);border-radius:12px;padding:10px}
-  .inspector{order:6;padding:12px;gap:12px;overflow:visible}
-  .inspector[data-sel=player],.inspector[data-sel=line],.inspector[data-sel=label]{order:4}
-  .plays{order:7}
-  .qr .btn{padding:8px 4px}
-  .sw{width:34px;height:34px}
-  .help-card{padding:16px}
-  #helpView,#dataView,#authView,#libView{padding-left:8px;padding-right:8px}
-  .bar #dataBtn{display:none}
-}
-.tb-more{display:contents}
-.p-only{display:none}
-@media (max-width:700px){
-  .p-only{display:inline-flex;align-items:center}
-  .toolbar{flex-wrap:wrap;overflow:visible;-webkit-mask-image:none;mask-image:none;margin-inline:0;padding-inline:0}
-  .toolbar::after{display:none}
-  .toolbar .seg button{padding-inline:9px}
-  .toolbar .btn{padding-inline:10px}
-  .tb-more{display:none}
-  .toolbar.more .tb-more{display:contents}
-  #moreBtn{order:5} .tb-more>*{order:6}
-}
-@media (max-width:360px){
-  .bar{gap:4px}
-  .brand b{font-size:18px}
-  .bar .btn{padding:6px 7px;font-size:13px}
-}
-@media print{
-  @page{size:letter landscape;margin:.35in}
-  body{padding:0;background:#fff;display:block}
-  body>*:not(#printView){display:none!important}
-  #printView{position:static;padding:0;background:#fff}
-  .pv-bar,#pickPanel{display:none!important}
-  .sheet{box-shadow:none;margin:0;max-width:none;width:100%;break-after:page;padding:0;border-radius:0}
-  #sheets{overflow:visible}
-  .page{box-shadow:none;margin:0;break-after:page}
-  .page:last-child,.sheet:last-child{break-after:auto}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
-
-<header class="bar">
-  <button class="btn primary m-only" id="playsBtn" aria-expanded="false" aria-controls="playsPanel">Plays</button>
-  <div class="brand"><b>Play<span>Band</span></b><span class="chip beta">Free beta</span></div>
-  <span id="pbHome"><input id="pbName" aria-label="Playbook name" value="Sample Playbook">
-  <span class="chip" id="sampleChip">Sample plays</span><span class="chip" id="syncChip" role="status">On this device only</span></span>
-  <div class="spacer"></div>
-  <button class="btn" id="helpBtn"><span class="w">How to use</span><span class="n">Help</span></button>
-  <button class="btn" id="dataBtn"><span class="w">Back up / Restore</span><span class="n">Backup</span></button>
-  <button class="btn" id="printBtn"><span class="w">Print sheets</span><span class="n">Print</span></button>
-  <button class="btn primary" id="acctBtn">Sign in</button>
-</header>
-
-<div class="promo" id="promo" hidden>
-  <p><b>Don't lose your playbook.</b> <span class="w">Create a free account to save your plays online and open them on any phone or computer.</span><span class="n">A free account saves your plays online, on any device.</span></p>
-  <button class="btn primary" id="promoGo">Create free account</button>
-  <button class="mini" id="promoX" aria-label="Hide this message">Not now</button>
-</div>
-
-<div class="promo" id="viewBar" hidden><span id="viewTxt" style="flex:1;min-width:200px"></span><a class="btn primary" id="viewGo" href="./">Make your own playbook</a></div>
-<div id="scrim"></div>
-<div class="app">
-  <aside class="panel plays" id="playsPanel" aria-label="Plays">
-    <div id="pbSlot"></div>
-    <div class="plays-head"><h2>Plays</h2><button class="btn primary" id="newPlayBtn">+ New play</button><button class="btn m-only" id="playsClose">Close</button></div>
-    <div class="row" id="libRow" style="padding:0 12px 8px"><button class="btn sm" id="libBtn">Browse starter plays</button></div>
-    <form id="newPlayForm" hidden>
-      <label class="f">Play name<input class="inp" id="npName" placeholder="e.g. Inside Zone Left" required></label>
-      <div class="f"><span id="npSizeLbl">Game type</span>
-        <div class="seg" id="npSize" role="group" aria-labelledby="npSizeLbl">
-          <button type="button" data-size="5">5v5 flag</button><button type="button" data-size="7">7v7</button><button type="button" data-size="11">11-man</button>
-        </div></div>
-      <label class="f">Starting formation<select class="inp" id="npForm"></select></label>
-      <label class="f">Category<select class="inp" id="npCat"></select></label>
-      <div class="row"><button class="btn primary" type="submit">Create play</button><button class="btn" type="button" id="npCancel">Cancel</button></div>
-    </form>
-    <div class="pl-tools" id="plTools" hidden>
-      <input class="inp" id="plSearch" type="search" placeholder="Search plays" aria-label="Search plays">
-      <select class="inp" id="plFolder" aria-label="Show folder"></select>
-    </div>
-    <ul id="playList"></ul>
-    <p class="pmeta" id="plEmpty" hidden style="padding:0 12px 12px">No plays match.</p>
-  </aside>
-
-  <main class="panel editor">
-    <div class="toolbar">
-      <label class="tool kb-only">Player <select id="selPick" aria-label="Select a player, then use the arrow keys to move them"></select></label>
-      <div class="seg" id="modeSeg" role="group" aria-label="Tool">
-        <button data-mode="select" aria-pressed="true">Move</button>
-        <button data-mode="draw" aria-pressed="false">Draw</button>
-        <button data-mode="text" aria-pressed="false">Text</button>
+<div class="top">
+  <div class="wrap">
+    <header class="nav">
+      <a class="logo" href="/?home" aria-label="PlayBand home">Play<span>Band</span></a>
+      <a class="btn ghost" href="/app">Open the app</a>
+    </header>
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow" style="color:#ff7b39">Free football play designer</p>
+        <h1>Draw the play.<br><em>Print the wristband.</em></h1>
+        <p class="lede">PlayBand helps flag, 7v7 and tackle coaches build a playbook in minutes, on a phone or a laptop. Then it prints wristbands and a coach call sheet with matching numbers.</p>
+        <div class="cta">
+          <a class="btn primary" href="/app">Start drawing free</a>
+          <a class="btn ghost" href="#how">See how it works</a>
+          <small>Free while in beta. No account needed to try it.</small>
+        </div>
+        <ul class="chips" aria-label="Game types"><li>5v5 flag</li><li>7v7</li><li>11-man</li></ul>
       </div>
-      <span class="tsep"></span>
-      <button class="btn" id="undoBtn" title="Undo (Ctrl/Cmd+Z)">Undo</button>
-      <button class="btn p-only" id="moreBtn" aria-expanded="false" aria-controls="tbMore">More</button>
-      <span class="tb-more" id="tbMore">
-      <button class="btn" id="redoBtn" title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
-      <button class="btn" id="flipBtn" title="Mirror the play left to right">Flip</button>
-      <span class="tsep"></span>
-      <label class="tool">Defense <select id="defSel"></select></label>
-      <label class="tool"><input type="checkbox" id="snapChk"> Snap</label>
-      <label class="tool spd"><span class="p-only">Speed</span><select id="animSpeed" aria-label="Animation speed" title="Animation speed"><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="1.8">2x</option></select></label>
-      </span>
-      <button class="btn primary" id="animBtn">Run play</button>
+      <div class="shot"><img src="/img/editor.png" width="2560" height="1520" alt="The PlayBand editor showing a 5v5 flag play called Mesh, a list of plays on the left and ready-made routes on the right" fetchpriority="high"></div>
     </div>
-    <div class="tour" id="tour" hidden></div>
-    <div class="formbar" id="formbar"></div>
-    <div class="hint" id="hint"></div>
-    <div class="fieldwrap"><svg id="field" viewBox="-1.6 -26 56.53 38" tabindex="0" role="application" aria-label="Play diagram. With a player selected, arrow keys move them one yard."></svg><button class="btn sm" id="zoomBtn" hidden>Zoom in</button></div>
-  </main>
-
-  <aside class="panel inspector" id="inspector"></aside>
+  </div>
 </div>
 
-<div id="helpView" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle">
-  <div class="help-card">
-    <div class="help-head"><h2 id="helpTitle">Welcome to PlayBand</h2><button class="btn" id="helpClose">Got it</button></div>
-    <p class="help-intro">Draw football plays, then print wristbands and coach sheets. PlayBand is free while it is in beta. Here is how it works:</p>
-    <ol class="help-steps">
-      <li><b>Start a play.</b> Tap <b>+ New play</b>, pick your game type (5v5 flag, 7v7 or 11-man) and a starting formation.</li>
-      <li><b>Line up.</b> Drag players where you want them. Tap <b>Save as formation</b> above the field to reuse that lineup on other plays.</li>
-      <li><b>Add routes.</b> Tap a player and pick a ready-made route like Slant, Out or Post. Or tap <b>Draw</b>, tap a player, and tap points on the field to draw your own.</li>
-      <li><b>Print.</b> <b>Print sheets</b> gives you play sheets, wristbands and a coach call sheet with matching numbers.</li>
-      <li><b>Save.</b> Tap <b>Sign in</b> and create a free account. Your plays then save online and follow you to any phone or computer. Without an account they stay in this browser only.</li>
+<main>
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head"><p class="eyebrow">How it works</p><h2>From idea to wristband in three steps</h2></div>
+    <ol class="steps">
+      <li><h3>Draw</h3><p>Pick a formation and drag players into place. Tap a player and choose a ready-made route like Slant, Out or Post, or draw your own.</p></li>
+      <li><h3>Print</h3><p>Choose the plays for this week. Print wristband inserts in your size, play sheets for practice, and a coach call sheet where every number matches.</p></li>
+      <li><h3>Share</h3><p>Send players and parents a view-only link. They can watch each play run on their phone before practice.</p></li>
     </ol>
-    <p class="help-note">Your plays save automatically in this browser on this device. Undo and redo are in the toolbar (Ctrl/Cmd Z). This is a beta, so tell us what feels clumsy or missing: <span class="sel">info@treviweb.com</span></p>
-    <div class="row"><button class="btn" id="tourGo">Show me on the field</button><button class="btn" id="helpLib">Browse starter plays</button></div>
   </div>
-</div>
+</section>
 
-<div id="libView" hidden role="dialog" aria-modal="true" aria-labelledby="libTitle">
-  <div class="help-card" style="max-width:900px">
-    <div class="help-head"><h2 id="libTitle">Starter plays</h2><button class="btn" id="libClose">Done</button></div>
-    <p class="help-intro">Proven plays to get you going. Add one, then move players and change routes to fit your team.</p>
-    <div class="row" style="align-items:center"><div class="seg" id="libSize" role="group" aria-label="Game type"><button data-size="5">5v5 flag</button><button data-size="7">7v7</button><button data-size="11">11-man</button></div><span class="pmeta" id="libMsg" role="status"></span></div>
-    <div class="lib-grid" id="libGrid"></div>
+<section class="band">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow">Wristbands</p>
+      <h2>Inserts that fit the band you already own</h2>
+      <p class="sub">Print on plain paper, cut on the dashed line and slide it in.</p>
+      <ul>
+        <li>Youth 3 by 2 inch up to QB and coach 5 by 3 inch, or a custom size</li>
+        <li>Diagrams or a numbered play list, in the grid you pick</li>
+        <li>Leave plays off for a game and save that selection for next time</li>
+        <li>Coach call sheet with the same numbers the players see</li>
+      </ul>
+    </div>
+    <div class="paper"><img src="/img/wristband.png" width="770" height="480" loading="lazy" alt="A printed wristband insert with six numbered 5v5 flag play diagrams"></div>
   </div>
-</div>
+</section>
 
-<footer class="foot">
-  <span><b>PlayBand</b> free beta</span>
-  <span><span id="footSave">Your plays are saved only in this browser. Sign in to save them to a free account.</span> <button class="mini" id="footData">Back up / Restore</button></span>
-  <span>Feedback or want launch updates? <a href="mailto:info@treviweb.com?subject=PlayBand%20feedback" id="fbLink">info@treviweb.com</a> <button class="mini" id="fbCopy">Copy</button></span>
-  <span>Made by <a href="https://treviweb.com" target="_blank" rel="noopener">Trevi Web Co.</a></span>
+<section>
+  <div class="wrap split flip">
+    <div>
+      <p class="eyebrow">On the sideline</p>
+      <h2>Built for the phone in your pocket</h2>
+      <p class="sub">Nothing to install. Open it in the browser and fix a play between drills.</p>
+      <ul>
+        <li>Big touch targets for dragging players and picking routes</li>
+        <li>Press Run play to watch the routes develop, with pre-snap motion</li>
+        <li>A free account keeps your plays in sync across devices</li>
+      </ul>
+    </div>
+    <div class="phone"><img src="/img/phone.png" width="1170" height="1992" loading="lazy" alt="PlayBand on a phone showing a Trips Flood play for 5v5 flag"></div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="sec-head"><p class="eyebrow">What you get</p><h2>Everything a volunteer coach needs</h2></div>
+    <ul class="grid">
+      <li><h3>Starter plays</h3><p>19 proven plays for flag, 7v7 and tackle. Add one, then make it yours.</p></li>
+      <li><h3>12 ready-made routes</h3><p>Tap once to assign a route. Tap again to flip its direction.</p></li>
+      <li><h3>Formations</h3><p>Standard sets for every game type, plus your own saved lineups.</p></li>
+      <li><h3>Defenses</h3><p>Drop in a front or coverage to show players what they will see.</p></li>
+      <li><h3>Play animation</h3><p>Run any play at half, normal or double speed.</p></li>
+      <li><h3>Player names</h3><p>Put a name on each position so kids find their own job fast.</p></li>
+      <li><h3>Team logo</h3><p>Add your logo to printed play sheets and the coach sheet.</p></li>
+      <li><h3>Save as image</h3><p>Send a single play to the group chat as a picture.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head"><p class="eyebrow">Questions</p><h2>Good to know</h2></div>
+    <div class="faq">
+      <details><summary>Is PlayBand free?</summary><p>Yes. PlayBand is free while it is in beta. Every feature on this page is included.</p></details>
+      <details><summary>Do I need an account?</summary><p>No. You can draw and print without one, and your plays stay in your browser. A free account saves your plays online so they follow you to any phone or computer.</p></details>
+      <details><summary>Does it work on a phone?</summary><p>Yes. PlayBand runs in the browser on phones, tablets and computers. There is nothing to install.</p></details>
+      <details><summary>What wristband sizes can I print?</summary><p>Youth 3 by 2 inch up to QB and coach 5 by 3 inch, plus a custom size. You choose the grid, and print diagrams or a play list.</p></details>
+      <details><summary>Which kinds of football does it cover?</summary><p>5v5 flag, 7v7 and 11-man tackle, each with its own field, formations and starter plays.</p></details>
+      <details><summary>Who makes it?</summary><p>PlayBand is built by Trevi Web Co. in Birmingham, Michigan. Tell us what is missing at <a href="mailto:info@treviweb.com?subject=PlayBand%20feedback">info@treviweb.com</a>.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Your first play takes about a minute</h2>
+    <p>Open the editor, drag a player, pick a route and press Run play.</p>
+    <a class="btn primary" href="/app">Start drawing free</a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><b style="color:#fff">PlayBand</b> free beta</span>
+    <span>Made by <a href="https://treviweb.com" rel="noopener">Trevi Web Co.</a></span>
+    <span><a href="mailto:info@treviweb.com?subject=PlayBand%20feedback">info@treviweb.com</a></span>
+  </div>
 </footer>
-
-<div id="dataView" hidden role="dialog" aria-modal="true" aria-labelledby="dataTitle">
-  <div class="help-card">
-    <div class="help-head"><h2 id="dataTitle">Back up / Restore</h2><button class="btn" id="dataClose">Close</button></div>
-    <div class="isec"><h3>Back up</h3>
-      <p class="help-note">Save a copy of every play and saved formation in this playbook. Keep the file somewhere safe, or use it to move your plays to another device.</p>
-      <div class="row"><button class="btn primary" id="bkDownload">Download backup file</button><button class="btn" id="bkCopy">Copy backup text</button><span class="pmeta" id="bkMsg" role="status"></span></div>
-    </div>
-    <div class="isec"><h3>Restore</h3>
-      <p class="help-note">Choose a backup file, or paste backup text below. Restoring replaces the plays you have now.</p>
-      <input type="file" id="rsFile" accept=".json,application/json,text/plain" aria-label="Backup file">
-      <label class="f">Backup text<textarea class="inp" id="rsText" placeholder="Paste backup text here" spellcheck="false"></textarea></label>
-      <div class="row"><button class="btn" id="rsGo">Restore</button><span class="pmeta" id="rsMsg" role="status"></span></div>
-    </div>
-    <div class="isec"><h3>Start over</h3>
-      <p class="help-note">Replace everything with the sample plays. Back up first if you want to keep your work.</p>
-      <div class="row"><button class="btn" id="resetBtn">Reset to sample plays</button></div>
-    </div>
-  </div>
-</div>
-
-<div id="authView" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
-  <div class="help-card">
-    <div class="help-head"><h2 id="authTitle">Your account</h2><button class="btn" id="authClose">Close</button></div>
-    <div id="authOut" class="isec">
-      <p class="help-note">A free account saves your plays online, so they are on every phone and computer you sign in on. Plays already in this browser move into your account.</p>
-      <div class="seg" id="authSeg" role="group" aria-label="Sign in or create account"><button type="button" data-auth="in" aria-pressed="true">Sign in</button><button type="button" data-auth="up" aria-pressed="false">Create account</button></div>
-      <form id="authForm" class="isec">
-        <label class="f">Email<input class="inp" id="auEmail" type="email" autocomplete="email" required></label>
-        <label class="f">Password<input class="inp" id="auPass" type="password" minlength="8" autocomplete="current-password" required></label>
-        <div class="row"><button class="btn primary" type="submit" id="auGo">Sign in</button><button type="button" class="mini" id="auForgot">Forgot password?</button></div>
-      </form>
-    </div>
-    <div id="authIn" class="isec" hidden>
-      <p class="help-intro">Signed in as <b id="auWho"></b></p>
-      <p class="help-note" id="auSync"></p>
-      <div class="row"><button class="btn" id="auBackup">Back up / Restore</button><button class="btn" id="auPw">Change password</button><button class="btn" id="auOut">Sign out</button></div>
-      <div class="isec" id="shareBox" style="border-top:1px solid var(--rule);padding-top:12px">
-        <h3>Share with players and parents</h3>
-        <p class="help-note">Makes a view-only link. Anyone who has the link can see your plays and run the animations, but cannot change anything.</p>
-        <label class="tool"><input type="checkbox" id="shNames"> Include player names</label>
-        <div class="row"><button class="btn primary" id="shGo">Create share link</button><button class="btn" id="shStop" hidden>Stop sharing</button></div>
-        <div class="row" id="shRow" hidden><input class="inp" id="shUrl" readonly aria-label="Share link" style="flex:1;min-width:0;width:auto"><button class="btn" id="shCopy">Copy</button></div>
-        <p class="help-note" id="shMsg" role="status"></p>
-      </div>
-    </div>
-    <form id="authNew" class="isec" hidden>
-      <p class="help-note">Choose a new password for your account.</p>
-      <label class="f">New password<input class="inp" id="auNewPass" type="password" minlength="8" autocomplete="new-password" required></label>
-      <div class="row"><button class="btn primary" type="submit">Save new password</button><button class="btn" type="button" id="auPwCancel">Cancel</button></div>
-    </form>
-    <p class="help-note" id="auMsg" role="status"></p>
-  </div>
-</div>
-
-<div id="printView" hidden>
-  <div class="pv-bar">
-    <h2>Print sheets</h2>
-    <div class="seg" id="sheetSeg" role="group" aria-label="Sheet type">
-      <button data-sheet="plays" aria-pressed="true">Play sheets</button>
-      <button data-sheet="wrist" aria-pressed="false">Wristbands</button>
-      <button data-sheet="call" aria-pressed="false">Coach sheet</button>
-    </div>
-    <span class="pv-opts" data-for="plays"><label class="tool">Plays per page
-      <select id="perPage"><option>1</option><option>2</option><option selected>4</option><option>6</option></select></label></span>
-    <span class="pv-opts" data-for="wrist" hidden>
-      <label class="tool">Size <select id="wbSize">
-        <option value="3x2">Youth 3 × 2 in</option><option value="3.5x2.25">Youth large 3.5 × 2.25 in</option>
-        <option value="4x2.5" selected>Adult 4 × 2.5 in</option><option value="4.5x3">Adult large 4.5 × 3 in</option>
-        <option value="5x3">QB / coach 5 × 3 in</option><option value="custom">Custom…</option></select></label>
-      <span id="wbCustom" hidden><label class="tool">W <input id="wbW" type="number" min="1.5" max="8" step="0.25" value="4" class="num"></label>
-        <label class="tool">H <input id="wbH" type="number" min="1" max="6" step="0.25" value="2.5" class="num"> in</label></span>
-      <label class="tool">Show <select id="wbMode"><option value="diagram">Diagrams</option><option value="list">Play list</option></select></label>
-      <label class="tool">Grid <select id="wbGrid"><option value="2x2">2 × 2</option><option value="3x2" selected>3 × 2</option><option value="3x3">3 × 3</option><option value="4x2">4 × 2</option><option value="4x3">4 × 3</option><option value="1x8">1 × 8 (list)</option><option value="2x6">2 × 6 (list)</option><option value="2x8">2 × 8 (list)</option></select></label>
-      <label class="tool">Copies <input id="wbCopies" type="number" min="1" max="30" value="2" class="num"></label>
-    </span>
-    <span class="pv-opts" data-for="call" hidden>
-      <label class="tool"><input type="checkbox" id="callDiag" checked> Add diagram page</label>
-    </span>
-    <button class="btn" id="logoBtn">Add team logo</button><button class="mini" id="logoDel" hidden>Remove logo</button><input type="file" id="logoFile" accept="image/png,image/jpeg" hidden>
-    <button class="btn" id="pickBtn" aria-expanded="false" aria-controls="pickPanel">Choose plays</button>
-    <button class="btn primary" id="doPrint">Print / Save as PDF</button>
-    <button class="btn" id="closePrint">Back to editor</button>
-    <span class="pv-note" id="pvNote"></span>
-  </div>
-  <div class="panel" id="pickPanel" hidden>
-    <div class="row" style="align-items:center"><h3>Plays to print</h3><button class="btn sm" id="pickAll">Select all</button><button class="btn sm" id="pickNone">Clear all</button><span class="pv-note">Unticked plays are left off every sheet. Numbers stay matched between wristbands and the coach sheet.</span></div>
-    <div class="row" style="align-items:center"><select class="inp" id="setSel" aria-label="Saved sets" style="width:auto"></select><button class="btn sm" id="setDel" hidden>Delete set</button>
-      <input class="inp" id="setName" maxlength="30" placeholder="Name this selection, e.g. Game day" aria-label="Set name" style="width:auto;flex:1 1 200px;max-width:280px"><button class="btn sm" id="setSave">Save as set</button><span class="pmeta" id="setMsg" role="status"></span></div>
-    <div id="pickList"></div>
-  </div>
-  <div id="sheets"></div>
-</div>
-
-<script>
-(()=>{
-const FW=53.33, CX=26.67;
-const COLORS={ink:'#1f2f57',red:'#c92a2a',blue:'#1971c2',green:'#2b8a3e'};
-const KIND_STROKE={qb:'#d9480f',skill:'#24407a',ol:'#5f6b73',def:'#8f2d2d'};
-const CATS=['Run','Pass','Screen','Play-action','Special'];
-const uid=()=>Math.random().toString(36).slice(2,10);
-const r2=n=>Math.round(n*100)/100;
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const CX5=15, FWS={11:53.33,7:53.33,5:30}, SIZE_NAME={11:'11-man',7:'7v7',5:'5v5 flag'};
-const fwOf=p=>FWS[p.size]||53.33, vbOf=p=>`-1.6 -26 ${r2(fwOf(p)+3.2)} 38`;
-
-/* ---------- formations ---------- */
-const P=(label,x,y,kind='skill',shape='circle')=>({id:uid(),label,x,y,kind,shape});
-const D=(label,x,y)=>P(label,x,y,'def','def');
-const OL=()=>[P('LT',CX-4,1,'ol'),P('LG',CX-2,1,'ol'),P('C',CX,1,'ol','square'),P('RG',CX+2,1,'ol'),P('RT',CX+4,1,'ol')];
-const FORMATIONS={
- 11:{
-  'I-Form Right':()=>[...OL(),P('Y',CX+6,1),P('X',5,1),P('Z',46,2.2),P('Q',CX,2.4,'qb'),P('F',CX,4.6),P('H',CX,6.8)],
-  'Singleback Ace':()=>[...OL(),P('Y',CX+6,1),P('F',CX-6,1),P('X',5,2.2),P('Z',47.5,2.2),P('Q',CX,2.4,'qb'),P('H',CX,6.6)],
-  'Spread 2x2':()=>[...OL(),P('X',5,1),P('F',15,2.2),P('Y',38,2.2),P('Z',47.5,1),P('Q',CX,5,'qb'),P('H',CX+2.4,5)],
-  'Trips Right':()=>[...OL(),P('X',5,1),P('Y',34.5,2.2),P('F',40.5,2.2),P('Z',47.5,1),P('Q',CX,5,'qb'),P('H',CX-2.4,5)],
-  'Empty 3x2':()=>[...OL(),P('X',5,1),P('F',13,2.2),P('H',34.5,2.2),P('Y',40.5,2.2),P('Z',47.5,1),P('Q',CX,5,'qb')]
- },
- 7:{
-  'Spread 2x2':()=>[P('C',CX,1,'ol','square'),P('X',6,1),P('F',15,2.2),P('Y',38,2.2),P('Z',47,1),P('Q',CX,5,'qb'),P('H',CX+2.4,5)],
-  'Trips Right':()=>[P('C',CX,1,'ol','square'),P('X',6,1),P('Y',34.5,2.2),P('F',40.5,2.2),P('Z',47,1),P('Q',CX,5,'qb'),P('H',CX-2.4,5)],
-  'Bunch Left':()=>[P('C',CX,1,'ol','square'),P('X',10,1),P('F',12.2,2.6),P('Y',7.8,2.6),P('Z',47,1),P('Q',CX,5,'qb'),P('H',CX+2.4,5)]
- },
- 5:{
-  'Spread':()=>[P('C',CX5,1,'skill','square'),P('X',3,1),P('Y',21,2.2),P('Z',27,1),P('Q',CX5,4,'qb')],
-  'Trips Right':()=>[P('C',CX5,1,'skill','square'),P('Z',19.5,2.2),P('Y',23.5,2.2),P('X',27.5,1),P('Q',CX5,4,'qb')],
-  'Bunch Right':()=>[P('C',CX5,1,'skill','square'),P('X',22,1),P('Y',24,2.6),P('Z',20,2.6),P('Q',CX5,4,'qb')],
-  'Stack Left':()=>[P('C',CX5,1,'skill','square'),P('X',5,1),P('Y',5,3.2),P('Z',26,1),P('Q',CX5,4,'qb')],
-  'RB Offset':()=>[P('C',CX5,1,'skill','square'),P('X',3,1),P('Z',27,1),P('Q',CX5,4,'qb'),P('H',CX5+2.6,4)]
- }
-};
-const DEFENSES={
- 11:{
-  '4-3':()=>[D('E',CX-5.5,-1.4),D('T',CX-1.2,-1.4),D('T',CX+1.8,-1.4),D('E',CX+5.5,-1.4),D('W',CX-5,-5),D('M',CX,-5),D('S',CX+5,-5),D('C',5,-6),D('C',47.5,-6),D('FS',CX-8,-12),D('SS',CX+8,-11)],
-  '3-4':()=>[D('E',CX-3.5,-1.4),D('N',CX,-1.4),D('E',CX+3.5,-1.4),D('B',CX-7.5,-2.5),D('M',CX-2.5,-5),D('M',CX+2.5,-5),D('B',CX+7.5,-2.5),D('C',5,-6),D('C',47.5,-6),D('FS',CX-8,-12),D('SS',CX+8,-11)],
-  'Nickel':()=>[D('E',CX-5.5,-1.4),D('T',CX-1.2,-1.4),D('T',CX+1.8,-1.4),D('E',CX+5.5,-1.4),D('M',CX-2.5,-5),D('W',CX+2.5,-5),D('N',38,-5),D('C',5,-6),D('C',47.5,-6),D('FS',CX-8,-12),D('SS',CX+8,-12)]
- },
- 7:{
-  'Cover 3':()=>[D('C',6,-7),D('C',47,-7),D('FS',CX,-13),D('W',13,-5),D('M',22,-5),D('S',31,-5),D('B',40,-5)],
-  'Cover 2':()=>[D('C',6,-4),D('C',47,-4),D('S',15,-13),D('S',38,-13),D('W',17,-5),D('M',CX,-5),D('B',36,-5)]
- },
- 5:{
-  'Man + Rush':()=>[D('R',CX5,-7.6),D('C',3,-4),D('N',21,-4),D('C',27,-4),D('S',CX5,-12)],
-  'Zone + Rush':()=>[D('R',CX5,-7.6),D('C',5,-6),D('C',25,-6),D('S',9,-13),D('S',21,-13)],
-  'Cover 2 (no rush)':()=>[D('C',4,-5),D('M',CX5,-5),D('C',26,-5),D('S',8,-13),D('S',22,-13)]
- }
-};
-
-/* ---------- sample playbook ---------- */
-function makePlay(name,category,size,formation){
-  const cf=String(formation).startsWith('custom:')&&pb?(pb.customFormations||[]).find(f=>'custom:'+f.id===formation):null;
-  const players=cf?cf.players.map(p=>({...p,id:uid()})):FORMATIONS[size][formation]();
-  return {id:uid(),name,category,size,formation:cf?cf.name:formation,notes:'',defense:'None',players,lines:[],labels:[]};
-}
-function route(play,label,pts,o={}){
-  const p=play.players.find(x=>x.label===label&&x.kind!=='def');
-  play.lines.push({id:uid(),playerId:p?p.id:null,start:p?null:pts.shift(),pts,style:o.style||'solid',cap:o.cap||'arrow',smooth:!!o.smooth,color:o.color||'ink'});
-}
-function passPro(play){['LT','LG','C','RG','RT'].forEach(l=>{const p=play.players.find(x=>x.label===l);route(play,l,[[p.x,2.6]],{cap:'t'})});}
-function applyDefense(play,name){
-  const gone=new Set(play.players.filter(p=>p.kind==='def').map(p=>p.id));
-  play.players=play.players.filter(p=>!gone.has(p.id));
-  play.lines=play.lines.filter(l=>!gone.has(l.playerId));
-  play.defense=name;
-  const f=DEFENSES[play.size][name]; if(f) play.players.push(...f());
-}
-function samplePlaybook(){
-  const a=makePlay('Power Right','Run',11,'I-Form Right');
-  ['LT','LG','C','RG','RT'].forEach(l=>{const p=a.players.find(x=>x.label===l);route(a,l,[[p.x+1.4,-0.9]],{cap:'t'})});
-  route(a,'Y',[[CX+7.4,-0.9]],{cap:'t'});
-  route(a,'F',[[CX+3,3.4],[CX+5.2,-0.4]],{cap:'t',smooth:true});
-  route(a,'H',[[CX+1.6,4.8],[CX+5,0.6],[CX+5.6,-9]],{smooth:true,color:'red'});
-  route(a,'Q',[[CX+1.4,3.6]],{cap:'none',style:'dashed'});
-  route(a,'X',[[5,-5]],{cap:'t'}); route(a,'Z',[[46,-4.5]],{cap:'t'});
-  a.labels.push({id:uid(),x:CX+11.5,y:-6,text:'Hit the 6 hole'});
-  a.notes='Fullback kicks out the end man on the line. Tailback reads the kick-out and gets downhill.';
-  applyDefense(a,'4-3');
-
-  const b=makePlay('Slant Flat','Pass',11,'Spread 2x2');
-  route(b,'X',[[5,-2.5],[11,-8.5]]); route(b,'Z',[[47.5,-2.5],[41.5,-8.5]]);
-  route(b,'F',[[13,-0.2],[6,-1.8]],{smooth:true}); route(b,'Y',[[40,-0.2],[47,-1.8]],{smooth:true});
-  route(b,'H',[[CX+3.2,2.6]],{cap:'t'}); route(b,'Q',[[CX,8]],{cap:'none',style:'dashed'});
-  passPro(b);
-  b.labels.push({id:uid(),x:CX,y:-15,text:'Hot: slant vs blitz'});
-  b.notes='3-step drop. Read the flat defender: if he widens, throw the slant.';
-  applyDefense(b,'Nickel');
-
-  const c=makePlay('Four Verticals','Pass',11,'Spread 2x2');
-  route(c,'X',[[5,-23]]); route(c,'Z',[[47.5,-23]]);
-  route(c,'F',[[16.5,-6],[18,-23]],{smooth:true}); route(c,'Y',[[37,-6],[35.5,-23]],{smooth:true});
-  route(c,'H',[[CX+5.5,5.8],[CX+9.5,1]],{smooth:true,style:'dashed'});
-  route(c,'Q',[[CX,9.5]],{cap:'none',style:'dashed'}); passPro(c);
-
-  const d=makePlay('Bunch Snag','Pass',7,'Bunch Left');
-  route(d,'Y',[[7.8,-5],[10.5,-4.2]],{smooth:true}); route(d,'X',[[10,-7],[3.5,-12]]);
-  route(d,'F',[[16,-2.5]],{color:'red'}); route(d,'Z',[[47,-12],[44,-9]]);
-  route(d,'H',[[CX+6,4],[CX+9,1.5]],{smooth:true});
-  applyDefense(d,'Cover 3');
-
-  const e=makePlay('Flood Right','Pass',5,'Trips Right');
-  route(e,'X',[[27.5,-18]]); route(e,'Y',[[23.5,-7],[28.5,-7.5]]); route(e,'Z',[[21,-1],[28,-2.5]],{smooth:true});
-  route(e,'C',[[15,-3],[9,-5]],{color:'red'}); route(e,'Q',[[17,5.4],[20,4.6]],{cap:'none',style:'dashed',smooth:true});
-  e.labels.push({id:uid(),x:7,y:-9.5,text:'C is the outlet'});
-  e.notes='QB rolls right. Read high to low: X clears, Y out at 7, Z in the flat. Center drag is the outlet back side.';
-  applyDefense(e,'Man + Rush');
-  return {name:'Sample Playbook',sample:true,v:2,currentId:a.id,plays:[a,b,c,d,e]};
-}
-
-/* ---------- state + storage ---------- */
-const KEY='playcard.v1';
-let pb=null;
-try{pb=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){pb=null}
-if(!pb||!pb.plays||!pb.plays.length||(pb.sample&&pb.v!==2)) pb=samplePlaybook();
-const st={mode:'select',sel:null,drag:null,drawing:null,preview:null,down:null,snap:false,anim:null,undo:[],redo:[],
-  lineDefaults:{style:'solid',cap:'arrow',smooth:false,color:'ink'}};
-const shareId=(()=>{try{return (new URLSearchParams(location.search).get('share')||'').replace(/[^A-Za-z0-9]/g,'').slice(0,40)}catch(e){return ''}})();
-if(shareId){st.view=true;pb=samplePlaybook();document.body.classList.add('viewer','vloading');}
-let saveT=0;
-function saveLocal(){if(st.view)return;clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(pb))}catch(e){}},250)}
-function save(){saveLocal();cloudDirty();}
-const cur=()=>pb.plays.find(p=>p.id===pb.currentId)||pb.plays[0];
-function pushUndo(){st.undo.push(JSON.stringify(pb));if(st.undo.length>100)st.undo.shift();st.redo=[];}
-function markEdited(){if(pb.sample){pb.sample=false}}
-function restore(from,to){if(!from.length)return;to.push(JSON.stringify(pb));pb=JSON.parse(from.pop());st.sel=null;st.drawing=null;st.preview=null;renderAll();save();}
-
-/* ---------- geometry ---------- */
-const playerById=(play,id)=>play.players.find(p=>p.id===id);
-function startOf(line,play,pos){
-  if(line.playerId){const p=playerById(play,line.playerId);if(!p)return line.start||[0,0];const o=pos&&pos[p.id];if(o)return [o[0],o[1]];
-    if(!line.motion){const m=play.lines.find(x=>x.motion&&x.playerId===p.id&&x.pts.length);if(m){const q=m.pts[m.pts.length-1];return [q[0],q[1]];}}
-    return [p.x,p.y];}
-  return line.start;
-}
-function cr(p0,p1,p2,p3,t){const t2=t*t,t3=t2*t;return [0,1].map(i=>.5*(2*p1[i]+(-p0[i]+p2[i])*t+(2*p0[i]-5*p1[i]+4*p2[i]-p3[i])*t2+(-p0[i]+3*p1[i]-3*p2[i]+p3[i])*t3));}
-function samplePts(raw,smooth){
-  if(!smooth||raw.length<3)return raw;
-  const out=[raw[0]];
-  for(let i=0;i<raw.length-1;i++){const p0=raw[i-1]||raw[i],p1=raw[i],p2=raw[i+1],p3=raw[i+2]||raw[i+1];for(let t=1;t<=12;t++)out.push(cr(p0,p1,p2,p3,t/12));}
-  return out;
-}
-function zigzag(raw){
-  const out=[raw[0]];
-  for(let i=0;i<raw.length-1;i++){
-    const a=raw[i],b=raw[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);if(L<.01)continue;
-    const n=Math.max(2,Math.round(L/.8)),px=-dy/L,py=dx/L;
-    for(let j=1;j<n;j++){const f=j/n,o=(j%2?1:-1)*.38;out.push([a[0]+dx*f+px*o,a[1]+dy*f+py*o]);}
-    out.push(b);
-  }
-  return out;
-}
-const pathD=pts=>'M'+pts.map(p=>r2(p[0])+' '+r2(p[1])).join(' L');
-function lineGeom(line,play,pos){
-  const raw=[startOf(line,play,pos),...line.pts];
-  const drawn=line.style==='zigzag'?zigzag(raw):samplePts(raw,line.smooth);
-  return {raw,drawn,motion:samplePts(raw,line.smooth)};
-}
-function capSvg(line,drawn,raw,color){
-  if(line.cap==='none'||raw.length<2)return '';
-  const src=line.style==='zigzag'?raw:drawn;
-  const E=src[src.length-1];let A=src[src.length-2];
-  for(let i=src.length-2;i>=0&&Math.hypot(E[0]-src[i][0],E[1]-src[i][1])<.05;i--)A=src[i-1]||A;
-  const dx=E[0]-A[0],dy=E[1]-A[1],L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,nx=-uy,ny=ux;
-  if(line.cap==='arrow'){const t=[E[0]+ux*.45,E[1]+uy*.45],l=[E[0]-ux*.5+nx*.5,E[1]-uy*.5+ny*.5],r=[E[0]-ux*.5-nx*.5,E[1]-uy*.5-ny*.5];
-    return `<polygon points="${[t,l,r].map(p=>r2(p[0])+','+r2(p[1])).join(' ')}" fill="${color}"/>`;}
-  if(line.cap==='t')return `<line x1="${r2(E[0]+nx*.8)}" y1="${r2(E[1]+ny*.8)}" x2="${r2(E[0]-nx*.8)}" y2="${r2(E[1]-ny*.8)}" stroke="${color}" stroke-width=".26" stroke-linecap="round"/>`;
-  if(line.cap==='dot')return `<circle cx="${r2(E[0])}" cy="${r2(E[1])}" r=".38" fill="${color}"/>`;
-  return '';
-}
-
-/* ---------- rendering ---------- */
-function flagFieldSvg(){
-  const W=30;let s=`<rect x="-1.6" y="-26" width="${W+3.2}" height="38" fill="#dfe6df"/><rect x="0" y="-26" width="${W}" height="38" fill="#fbfcf8"/>`;
-  for(let y=-25;y<=10;y+=5)if(y)s+=`<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="#cfd8d1" stroke-width=".12"/>`;
-  for(let y=-26;y<=12;y++){if(y%5===0)continue;s+=`<line x1=".3" x2="1" y1="${y}" y2="${y}" stroke="#d6ddd8" stroke-width=".1"/><line x1="${W-1}" x2="${W-.3}" y1="${y}" y2="${y}" stroke="#d6ddd8" stroke-width=".1"/>`;}
-  for(const y of [-20,-15,-10,-5,5])s+=`<text x="2.4" y="${y}" dominant-baseline="central" font-size="1" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="600" fill="#b3beb6">${y<0?'+'+(-y):'-'+y}</text>`;
-  s+=`<line x1="0" x2="${W}" y1="-7" y2="-7" stroke="#e8590c" stroke-width=".12" stroke-dasharray=".6 .45" opacity=".55"/><text x="${W/2}" y="-6.5" text-anchor="middle" font-size=".8" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="600" fill="#e8590c" opacity=".75">7-YD RUSH LINE</text>`;
-  s+=`<line x1="0" x2="${W}" y1="0" y2="0" stroke="#74a6d8" stroke-width=".16"/>`;
-  return s;
-}
-function fieldSvg(){
-  let s=`<rect x="-1.6" y="-26" width="56.53" height="38" fill="#dfe6df"/><rect x="0" y="-26" width="${FW}" height="38" fill="#fbfcf8"/>`;
-  for(let y=-25;y<=10;y+=5)s+=`<line x1="0" x2="${FW}" y1="${y}" y2="${y}" stroke="#cfd8d1" stroke-width=".12"/>`;
-  for(let y=-26;y<=12;y++){if(y%5===0)continue;
-    for(const [a,b] of [[.4,1.1],[17.42,18.12],[35.21,35.91],[52.23,52.93]])s+=`<line x1="${a}" x2="${b}" y1="${y}" y2="${y}" stroke="#d6ddd8" stroke-width=".1"/>`;}
-  for(const y of [-25,-15,-5,5]){let yd=35-y;if(yd>50)yd=100-yd;
-    s+=`<text x="7.6" y="${y}" transform="rotate(90 7.6 ${y})" text-anchor="middle" dominant-baseline="central" font-size="2.3" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="600" fill="#c3ccc5">${yd}</text>`;
-    s+=`<text x="45.7" y="${y}" transform="rotate(-90 45.7 ${y})" text-anchor="middle" dominant-baseline="central" font-size="2.3" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="600" fill="#c3ccc5">${yd}</text>`;}
-  s+=`<line x1="0" x2="${FW}" y1="0" y2="0" stroke="#74a6d8" stroke-width=".16"/>`;
-  return s;
-}
-const FIELD=fieldSvg(), FLAG_FIELD=flagFieldSvg();
-function playSvgInner(play,o={}){
-  const pos=o.pos||null, faded=!!pos;
-  let s=play.size===5?FLAG_FIELD:FIELD;
-  for(const l of play.lines){
-    const g=lineGeom(l,play,pos),c=COLORS[l.color]||COLORS.ink,on=o.interactive&&st.sel&&st.sel.type==='line'&&st.sel.id===l.id;
-    s+=`<g data-k="line" data-id="${l.id}" opacity="${faded?.3:1}">`;
-    if(o.interactive)s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="transparent" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`;
-    if(on)s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="#f9c74f" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>`;
-    s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="${c}" stroke-width=".22" stroke-linecap="round" stroke-linejoin="round"${l.style==='dashed'?' stroke-dasharray=".7 .55"':''}/>`;
-    s+=capSvg(l,g.drawn,g.raw,c)+'</g>';
-  }
-  if(o.interactive&&st.preview&&st.drawing){
-    const l=play.lines.find(x=>x.id===st.drawing);
-    if(l){const last=l.pts.length?l.pts[l.pts.length-1]:startOf(l,play);
-      s+=`<line x1="${r2(last[0])}" y1="${r2(last[1])}" x2="${r2(st.preview[0])}" y2="${r2(st.preview[1])}" stroke="${COLORS[l.color]}" stroke-width=".18" stroke-dasharray=".4 .35" opacity=".7"/>`;}
-  }
-  for(const lb of play.labels){
-    const on=o.interactive&&st.sel&&st.sel.type==='label'&&st.sel.id===lb.id;
-    s+=`<g data-k="label" data-id="${lb.id}">${on?`<rect x="${r2(lb.x-lb.text.length*.29-.4)}" y="${r2(lb.y-.95)}" width="${r2(lb.text.length*.58+.8)}" height="1.9" rx=".3" fill="none" stroke="var(--sel)" stroke-width=".1" stroke-dasharray=".3 .2"/>`:''}<text x="${r2(lb.x)}" y="${r2(lb.y)}" text-anchor="middle" dominant-baseline="central" font-size="1.15" font-weight="600" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="#1f2f57">${esc(lb.text)}</text></g>`;
-  }
-  for(const p of play.players){
-    const q=pos&&pos[p.id],x=r2(q?q[0]:p.x),y=r2(q?q[1]:p.y),stroke=KIND_STROKE[p.kind]||KIND_STROKE.skill;
-    const on=o.interactive&&st.sel&&st.sel.type==='player'&&st.sel.id===p.id;
-    const fs=p.label.length>2?.62:p.label.length>1?.78:1;
-    s+=`<g data-k="player" data-id="${p.id}">`;
-    if(on)s+=`<circle cx="${x}" cy="${y}" r="1.45" fill="none" stroke="#24407a" stroke-width=".12" stroke-dasharray=".35 .25"/>`;
-    if(p.shape==='def'){
-      s+=`<circle cx="${x}" cy="${y}" r="1" fill="transparent"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${p.label.length>1?1.05:1.35}" font-weight="700" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="${stroke}">${esc(p.label)}</text>`;
-    }else{
-      s+=p.shape==='square'?`<rect x="${r2(x-.9)}" y="${r2(y-.9)}" width="1.8" height="1.8" fill="#fff" stroke="${stroke}" stroke-width=".2"/>`
-        :`<circle cx="${x}" cy="${y}" r=".95" fill="#fff" stroke="${stroke}" stroke-width=".2"/>`;
-      s+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="${stroke}">${esc(p.label)}</text>`;
-    }
-    s+='</g>';
-  }
-  if(o.interactive&&st.sel&&st.sel.type==='line'&&!pos){
-    const l=play.lines.find(x=>x.id===st.sel.id);
-    if(l)l.pts.forEach((p,i)=>{s+=`<circle data-k="vertex" data-id="${l.id}" data-idx="${i}" cx="${r2(p[0])}" cy="${r2(p[1])}" r=".5" fill="#fff" stroke="#24407a" stroke-width=".14"/>`;});
-    if(l&&!l.playerId)s+=`<circle data-k="vertex" data-id="${l.id}" data-idx="-1" cx="${r2(l.start[0])}" cy="${r2(l.start[1])}" r=".5" fill="#fff" stroke="#24407a" stroke-width=".14"/>`;
-  }
-  return s;
-}
-const thumbSvg=(play,cls='',vb)=>`<svg viewBox="${vb||vbOf(play)}" class="${cls}" aria-hidden="true">${playSvgInner(play)}</svg>`;
-function fitVB(play){
-  const ys=[];play.players.forEach(p=>ys.push(p.y));play.labels.forEach(l=>ys.push(l.y));
-  play.lines.forEach(l=>{l.pts.forEach(q=>ys.push(q[1]));if(l.start)ys.push(l.start[1]);});
-  let lo=Math.max(-26,Math.min(...ys)-2),hi=Math.min(12,Math.max(...ys)+2);
-  if(hi-lo<14){const m=(hi+lo)/2;lo=Math.max(-26,m-7);hi=Math.min(12,lo+14);}
-  return `-0.5 ${r2(lo)} ${r2(fwOf(play)+1)} ${r2(hi-lo)}`;
-}
-
-const $=id=>document.getElementById(id);
-const svg=$('field');
-const mqDrawer=matchMedia('(max-width:960px)'),mqPhone=matchMedia('(max-width:700px)');
-const ZW=30,ZH=26;
-const zoomOn=c=>!!(st.zoom&&mqPhone.matches&&fwOf(c)>40);
-function vbCur(c){
-  if(!zoomOn(c))return vbOf(c);
-  st.vx=Math.min(fwOf(c)+1.6-ZW,Math.max(-1.6,st.vx||0));st.vy=Math.min(12-ZH,Math.max(-26,st.vy==null?-18:st.vy));
-  return `${r2(st.vx)} ${r2(st.vy)} ${ZW} ${ZH}`;
-}
-function renderCanvas(){
-  const c=cur(),vb=vbCur(c);
-  if(svg.getAttribute('viewBox')!==vb){svg.setAttribute('viewBox',vb);const a=vb.split(' ');svg.style.aspectRatio=`${a[2]}/${a[3]}`;}
-  const zb=$('zoomBtn');zb.hidden=!(mqPhone.matches&&fwOf(c)>40);zb.textContent=zoomOn(c)?'Whole field':'Zoom in';
-  svg.innerHTML=playSvgInner(c,{interactive:true,pos:st.anim&&st.anim.pos});
-  svg.classList.toggle('draw',st.mode==='draw');svg.classList.toggle('text',st.mode==='text');
-}
-const foldersOf=()=>[...new Set(pb.plays.map(p=>p.folder).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-function renderList(){
-  const c=cur(),folders=foldersOf(),q=(st.plQ||'').toLowerCase();
-  if(st.plFolder&&!folders.includes(st.plFolder))st.plFolder='';
-  $('plTools').hidden=pb.plays.length<6&&!folders.length&&!q;
-  $('plFolder').hidden=!folders.length;
-  $('plFolder').innerHTML='<option value="">All folders</option>'+folders.map(f=>`<option${f===st.plFolder?' selected':''}>${esc(f)}</option>`).join('');
-  const rows=pb.plays.map((p,i)=>[p,i]).filter(([p])=>(!st.plFolder||p.folder===st.plFolder)&&(!q||p.name.toLowerCase().includes(q)||(p.folder||'').toLowerCase().includes(q)||p.category.toLowerCase().includes(q)));
-  $('playList').innerHTML=rows.map(([p,i])=>`<li class="pitem${p.id===c.id?' on':''}" data-play="${p.id}">${thumbSvg(p)}<div><div class="pname"><span class="pnum">${i+1}.</span>${esc(p.name)}</div><div class="pmeta">${esc(p.category)} · ${SIZE_NAME[p.size]}${p.folder?' · '+esc(p.folder):''}</div><div class="pacts"><button class="mini" data-act="up" data-id="${p.id}" aria-label="Move ${esc(p.name)} up"${i===0?' disabled':''}>▲ Up</button><button class="mini" data-act="down" data-id="${p.id}" aria-label="Move ${esc(p.name)} down"${i===pb.plays.length-1?' disabled':''}>▼ Down</button><button class="mini" data-act="dup" data-id="${p.id}">Duplicate</button><button class="mini danger" data-act="del" data-id="${p.id}">${st.confirmDel===p.id?'Confirm delete':'Delete'}</button></div></div></li>`).join('');
-  $('plEmpty').hidden=rows.length>0;
-  $('sampleChip').hidden=!pb.sample;
-}
-function renderToolbar(){
-  document.querySelectorAll('#modeSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===st.mode)));
-  $('undoBtn').disabled=!st.undo.length;$('redoBtn').disabled=!st.redo.length;
-  const c=cur(),opts=['None',...Object.keys(DEFENSES[c.size])];
-  $('defSel').innerHTML=opts.map(o=>`<option${o===c.defense?' selected':''}>${o}</option>`).join('');
-  $('animBtn').textContent=st.anim?'Stop':'Run play';
-  $('snapChk').checked=st.snap;
-  let h='';
-  document.body.classList.toggle('touring',!!st.tour&&st.mode==='select'&&!st.anim);
-  if(st.view)h=st.anim?'Running the play.':'View only. Pick a play from the list, then press <b>Run play</b> to watch it.';
-  else if(st.anim)h='Running the play. Motion goes first, then everyone runs their route.';
-  else if(st.mode==='select')h=zoomOn(c)?'Zoomed in. Drag an empty spot to slide the field. Tap a player for routes, or drag to move them.':c.lines.length?'Tap a player to pick a ready-made route, or drag to move them. Tap a route to restyle or reshape it.'
-    :'<b>Step 1:</b> drag players to set your lineup. <b>Step 2:</b> tap a player and pick a route, or tap <b>Draw</b> to draw your own.';
-  else if(st.mode==='draw')h=st.drawing?'Tap the field to add points. Tap the last point again, double-tap, or press Enter to finish. <button class="btn primary" id="finishBtn">Finish route</button>'
-    :'Tap a player, then tap the field to draw their route. You can also drag from a player. Tap empty field to draw a free line.';
-  else h='Tap the field to place a text label.';
-  $('hint').innerHTML=h;
-  const fb=$('finishBtn');if(fb)fb.onclick=finishDrawing;
-  renderFormbar();
-}
-/* ---------- ready-made routes ---------- */
-const QICON={go:'M12 21V3',slant:'M7 21v-5L18 6',out:'M15 21V9H5',in:'M8 21V9h11',post:'M8 21V11l9-8',corner:'M15 21V11L7 3',hitch:'M12 21V6l-4 5',comeback:'M10 21V4l6 7',flat:'M8 20q2-5 12-5',wheel:'M6 20q8 0 9-7V3',drag:'M5 20l2-4h13',block:'M12 21v-9M6 12h12'};
-const qIcon=k=>{const d=QICON[k],m=d.match(/^M(\d+) (\d+)/);return `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${m[1]}" cy="${m[2]}" r="2.6" fill="currentColor"/></svg>`;};
-const QUICK=[['go','Go'],['slant','Slant'],['out','Out'],['in','In'],['post','Post'],['corner','Corner'],['hitch','Hitch'],['comeback','Comeback'],['flat','Flat'],['wheel','Wheel'],['drag','Drag'],['block','Block']];
-function quickLine(c,p,name,flip,color){
-  const W=fwOf(c),k=c.size===5?.6:1,d=c.size===5?.8:1,X=p.x;
-  let inn=Math.abs(W/2-X)<1.5?-1:Math.sign(W/2-X);if(flip)inn=-inn;const out=-inn;
-  const R={
-    go:{pts:[[X,-18*d]]},
-    slant:{pts:[[X,-2],[X+inn*7*k,-8*d]]},
-    out:{pts:[[X,-5*d],[X+out*6*k,-5*d]]},
-    in:{pts:[[X,-10*d],[X+inn*9*k,-10*d]]},
-    post:{pts:[[X,-10*d],[X+inn*7*k,-18*d]]},
-    corner:{pts:[[X,-10*d],[X+out*6*k,-17*d]]},
-    hitch:{pts:[[X,-6*d],[X+inn*1.2,-4.8*d]]},
-    comeback:{pts:[[X,-13*d],[X+out*2.5*k,-10.5*d]]},
-    flat:{pts:[[X+out*3*k,Math.min(p.y-1,0)],[X+out*8*k,-2]],smooth:true},
-    wheel:{pts:[[X+out*5*k,Math.min(p.y-1,-.5)],[X+out*7*k,-5],[X+out*7*k,-16*d]],smooth:true},
-    drag:{pts:[[X,-2],[X+inn*14*k,-3.5]]},
-    block:{pts:[[X,p.y-1.8]],cap:'t'}
-  }[name];if(!R)return null;
-  return {id:uid(),playerId:p.id,route:(QUICK.find(q=>q[0]===name)||[])[1]||'',start:null,pts:R.pts.map(q=>[r2(Math.min(W-.8,Math.max(.8,q[0]))),r2(Math.min(11.4,Math.max(-25.4,q[1])))]),style:'solid',cap:R.cap||'arrow',smooth:!!R.smooth,color:color||'ink'};
-}
-const motionOf=(c,pid)=>c.lines.find(x=>x.motion&&x.playerId===pid&&x.pts.length);
-function applyQuickRoute(pid,name){
-  const c=cur(),p=playerById(c,pid);if(!p)return;
-  const flip=!!(st.lastQuick&&st.lastQuick.pid===pid&&st.lastQuick.name===name&&!st.lastQuick.flip);
-  const m=motionOf(c,pid),e=m&&m.pts[m.pts.length-1];
-  const l=quickLine(c,e?{...p,x:e[0],y:e[1]}:p,name,flip,st.lineDefaults.color);if(!l)return;
-  pushUndo();
-  c.lines=c.lines.filter(x=>x.playerId!==pid||x.motion);
-  c.lines.push(l);
-  st.lastQuick={pid,name,flip};
-  commit({insp:true});tourDone(2);
-}
-
-/* ---------- formation bar ---------- */
-function formationList(size){
-  const mine=(pb.customFormations||[]).filter(f=>f.size===size);
-  return {mine,std:Object.keys(FORMATIONS[size])};
-}
-function renderFormbar(){
-  const c=cur(),el=$('formbar');
-  if(st.fbSaving){
-    if(!$('fbName'))el.innerHTML=`<label class="tool" for="fbName">Name this formation</label><input class="inp" id="fbName" maxlength="30" placeholder="e.g. Trips Right Tight"><button class="btn primary sm" data-fb="doSave">Save</button><button class="btn sm" data-fb="cancel">Cancel</button><span class="pmeta">Saves where the players are lined up, not the routes.</span>`;
-    return;
-  }
-  const {mine,std}=formationList(c.size);
-  el.innerHTML=`<span class="fb-name"><span class="pmeta">Formation</span><b>${esc(c.formation)}</b><span class="pmeta">${SIZE_NAME[c.size]}</span></span>
-    <button class="btn sm" data-fb="save">Save as formation</button>
-    <label class="tool">Switch to <select id="fbSwitch"><option value="">Choose…</option>${mine.length?`<optgroup label="Your formations">${mine.map(f=>`<option value="custom:${f.id}">${esc(f.name)}</option>`).join('')}</optgroup>`:''}<optgroup label="Standard">${std.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('')}</optgroup></select></label>
-    <button class="btn sm" data-fb="add">+ Add player</button>
-    <span class="pmeta" id="fbMsg" role="status">${esc(st.fbMsg||'')}</span>`;
-}
-function fbFlash(m){st.fbMsg=m;clearTimeout(st.fbT);st.fbT=setTimeout(()=>{st.fbMsg='';const e=$('fbMsg');if(e)e.textContent='';},7000);}
-function saveFormation(){
-  const c=cur(),nm=($('fbName').value||'').trim();if(!nm){$('fbName').focus();return;}
-  pushUndo();pb.customFormations=pb.customFormations||[];
-  const players=c.players.filter(p=>p.kind!=='def').map(({label,x,y,kind,shape})=>({label,x,y,kind,shape}));
-  const ex=pb.customFormations.find(f=>f.name.toLowerCase()===nm.toLowerCase()&&f.size===c.size);
-  if(ex)ex.players=players;else pb.customFormations.push({id:uid(),name:nm,size:c.size,players});
-  c.formation=nm;st.fbSaving=false;$('formbar').innerHTML='';
-  fbFlash(ex?'Updated "'+nm+'".':'Saved "'+nm+'". Pick it under + New play, or Switch to.');
-  buildFormOpts();commit({insp:true});
-}
-function applyFormation(key){
-  const c=cur();let target,name;
-  if(key.startsWith('custom:')){const f=(pb.customFormations||[]).find(x=>'custom:'+x.id===key);if(!f)return;target=f.players.map(p=>({...p}));name=f.name;}
-  else{if(!FORMATIONS[c.size][key])return;target=FORMATIONS[c.size][key]();name=key;}
-  pushUndo();
-  const off=c.players.filter(p=>p.kind!=='def'),def=c.players.filter(p=>p.kind==='def'),used=new Set(),next=[];
-  for(const t of target){
-    const m=off.find(p=>p.label===t.label&&!used.has(p.id));
-    if(m){used.add(m.id);const dx=t.x-m.x,dy=t.y-m.y;
-      c.lines.forEach(l=>{if(l.playerId===m.id)l.pts=l.pts.map(q=>[r2(q[0]+dx),r2(q[1]+dy)]);});
-      m.x=t.x;m.y=t.y;m.kind=t.kind;m.shape=t.shape;next.push(m);}
-    else next.push({id:uid(),label:t.label,x:t.x,y:t.y,kind:t.kind,shape:t.shape});
-  }
-  const gone=new Set(off.filter(p=>!used.has(p.id)).map(p=>p.id));
-  c.lines=c.lines.filter(l=>!gone.has(l.playerId));
-  c.players=[...next,...def];c.formation=name;st.sel=null;
-  fbFlash('Switched to "'+name+'". Routes moved with their players. Undo puts it back.');
-  commit({insp:true});
-}
-function addPlayer(){
-  const c=cur(),off=c.players.filter(p=>p.kind!=='def');
-  if(off.length>=12){fbFlash('A play can have up to 12 offensive players.');renderFormbar();return;}
-  pushUndo();
-  const taken=new Set(off.map(p=>p.label)),label=['A','B','T','R','S','W','J','K'].find(l=>!taken.has(l))||'A';
-  let x=r2(fwOf(c)/2+4),y=6;while(off.some(p=>Math.hypot(p.x-x,p.y-y)<2)&&y<10)y+=2;
-  const p={id:uid(),label,x,y,kind:'skill',shape:'circle'};
-  c.players.unshift(p);st.mode='select';st.sel={type:'player',id:p.id};
-  fbFlash('Player '+label+' added. Drag it into place. Rename it in the panel on the right.');
-  commit({insp:true});
-}
-$('formbar').addEventListener('click',e=>{
-  const b=e.target.closest('button[data-fb]');if(!b)return;const a=b.dataset.fb;
-  if(a==='save'){if(st.drawing)finishDrawing();st.fbSaving=true;$('formbar').innerHTML='';renderFormbar();const i=$('fbName');const c=cur();
-    if((pb.customFormations||[]).some(f=>f.name===c.formation&&f.size===c.size))i.value=c.formation;i.focus();i.select();}
-  else if(a==='cancel'){st.fbSaving=false;$('formbar').innerHTML='';renderFormbar();}
-  else if(a==='doSave')saveFormation();
-  else if(a==='add'){if(st.drawing)finishDrawing();addPlayer();}
-});
-$('formbar').addEventListener('keydown',e=>{if(e.target.id!=='fbName')return;
-  if(e.key==='Enter'){e.preventDefault();saveFormation();}
-  else if(e.key==='Escape'){e.stopPropagation();st.fbSaving=false;$('formbar').innerHTML='';renderFormbar();}});
-$('formbar').addEventListener('change',e=>{if(e.target.id==='fbSwitch'&&e.target.value){if(st.drawing)finishDrawing();applyFormation(e.target.value);}});
-function seg(set,opts,val){return `<div class="seg" role="group">${opts.map(([v,t])=>`<button data-set="${set}" data-val="${v}" aria-pressed="${String(v===val)}">${t}</button>`).join('')}</div>`;}
-function lineControls(l){
-  return `<div class="isec"><h3>Line style</h3>${seg('style',[['solid','Solid'],['dashed','Dashed'],['zigzag','Zigzag']],l.style)}</div>
-  <div class="isec"><h3>End</h3>${seg('cap',[['arrow','Arrow'],['t','Block (T)'],['dot','Dot'],['none','None']],l.cap)}</div>
-  <div class="isec"><h3>Shape</h3>${seg('smooth',[['0','Straight'],['1','Smooth']],l.smooth?'1':'0')}</div>
-  <div class="isec"><h3>Color</h3><div class="swatches">${Object.entries(COLORS).map(([k,v])=>`<button class="sw" data-set="color" data-val="${k}" aria-pressed="${String(l.color===k)}" style="background:${v}" aria-label="${k}"></button>`).join('')}</div></div>`;
-}
-function renderSelPick(){
-  const c=cur(),el=$('selPick'),r=pb.roster||{};
-  el.innerHTML='<option value="">Choose…</option>'+c.players.map(p=>`<option value="${p.id}">${esc(p.label)}${p.kind==='def'?' (defense)':r[p.label]?' '+esc(r[p.label]):''}</option>`).join('');
-  el.value=st.sel&&st.sel.type==='player'?st.sel.id:'';
-}
-function renderInspector(){
-  $('inspector').dataset.sel=st.sel?st.sel.type:'';
-  const c=cur(),s=st.sel,el=$('inspector');let h='';
-  if(st.view){el.innerHTML=`<div class="isec"><h2>${esc(c.name)}</h2><span class="pmeta">${esc(c.category)} · ${esc(c.formation)} · ${SIZE_NAME[c.size]}</span>${asgHtml(c)}${c.notes?`<p class="vnotes">${esc(c.notes)}</p>`:''}</div>`;return;}
-  renderSelPick();
-  if(s&&s.type==='line'){const l=c.lines.find(x=>x.id===s.id);if(!l){st.sel=null;return renderInspector();}
-    const p=l.playerId&&playerById(c,l.playerId);
-    h=`<div class="isec"><h2>${p?esc(p.label)+(l.motion?' pre-snap motion':' route'):'Free line'}</h2><span class="pmeta">${l.motion?'Runs before the snap. Drag the white handle to change where the player ends up.':l.pts.length+' point'+(l.pts.length===1?'':'s')+'. Drag the white handles to reshape.'}</span></div>${lineControls(l)}
-    <div class="row"><button class="btn warn" data-do="delSel">Delete line</button></div>`;
-  }else if(s&&s.type==='player'){const p=playerById(c,s.id);if(!p){st.sel=null;return renderInspector();}
-    h=`<div class="isec"><h2>Player</h2><label class="f">Label<input class="inp" id="plLabel" maxlength="3" value="${esc(p.label)}"></label>
-    ${p.kind!=='def'?`<label class="f">Player name<input class="inp" id="plName" maxlength="20" placeholder="Optional, e.g. Jake" value="${esc((pb.roster||{})[p.label]||'')}"></label><span class="pmeta">The name follows this position on every play and prints on play sheets.</span>`:''}</div>
-    ${p.kind!=='def'?`<div class="isec"><h3>Ready-made routes</h3><div class="qr">${QUICK.map(([k,t])=>`<button class="btn sm" data-route="${k}" aria-pressed="${String(!!(st.lastQuick&&st.lastQuick.pid===p.id&&st.lastQuick.name===k))}">${qIcon(k)}<span>${t}</span></button>`).join('')}</div>
-    <span class="pmeta">Tap a route to give it to this player. Tap the same one again to flip its direction. It replaces the route they have.</span></div>`:''}
-    <div class="row"><button class="btn${p.kind!=='def'?'':' primary'}" data-do="drawFrom">Draw my own</button><button class="btn" data-do="clearRoutes">Clear routes</button></div>
-    ${p.kind!=='def'?`<div class="isec"><h3>Pre-snap motion</h3><div class="row"><button class="btn sm" data-do="motL">Motion left</button><button class="btn sm" data-do="motR">Motion right</button>${motionOf(c,p.id)?'<button class="btn sm" data-do="motDel">Remove motion</button>':''}</div>
-    <span class="pmeta">The player moves here before the snap, then runs their route from the new spot. Tap the wavy line to drag where it ends.</span></div>`:''}
-    <div class="isec"><h3>Fine-tune position</h3><div class="row nudge"><button class="btn sm" data-nudge="-1,0" aria-label="Move left half a yard">←</button><button class="btn sm" data-nudge="0,-1" aria-label="Move upfield half a yard">↑</button><button class="btn sm" data-nudge="0,1" aria-label="Move back half a yard">↓</button><button class="btn sm" data-nudge="1,0" aria-label="Move right half a yard">→</button></div>
-    <span class="pmeta">Half a yard per tap. On a keyboard, click the field and use the arrow keys.</span></div>
-    <div class="row"><button class="btn warn" data-do="delSel">Remove player</button></div>`;
-  }else if(s&&s.type==='label'){const lb=c.labels.find(x=>x.id===s.id);if(!lb){st.sel=null;return renderInspector();}
-    h=`<div class="isec"><h2>Text label</h2><label class="f">Text<input class="inp" id="lbText" maxlength="40" value="${esc(lb.text)}"></label></div>
-    <div class="row"><button class="btn warn" data-do="delSel">Delete label</button></div>`;
-  }else{
-    h=`<div class="isec"><h2>Play</h2>
-    <label class="f">Name<input class="inp" id="playName" value="${esc(c.name)}"></label>
-    <label class="f">Category<select class="inp" id="playCat">${CATS.map(k=>`<option${k===c.category?' selected':''}>${k}</option>`).join('')}</select></label>
-    <label class="f">Folder<input class="inp" id="playFolder" list="folderList" maxlength="30" placeholder="Optional, e.g. Red zone" value="${esc(c.folder||'')}"></label><datalist id="folderList">${foldersOf().map(f=>`<option value="${esc(f)}">`).join('')}</datalist>
-    <label class="f">Coaching notes<textarea class="inp" id="playNotes" placeholder="Reads, blocking rules, coaching points">${esc(c.notes||'')}</textarea></label>
-    <span class="pmeta">${esc(c.formation)} · ${SIZE_NAME[c.size]}</span>
-    <div class="row" style="align-items:center"><button class="btn sm" data-do="savePng">Save play as image</button><span class="pmeta" id="pngMsg" role="status"></span></div></div>
-    ${(pb.customFormations||[]).some(f=>f.size===c.size)?`<div class="isec"><h2>Your formations</h2>${pb.customFormations.filter(f=>f.size===c.size).map(f=>`<div class="row" style="justify-content:space-between;align-items:center"><span>${esc(f.name)}</span><button class="mini danger" data-do="delForm" data-id="${f.id}">Delete</button></div>`).join('')}</div>`:''}
-    <div class="isec"><h2>Next line</h2><span class="pmeta">New routes start with these settings.</span></div>${lineControls(st.lineDefaults)}
-    <div class="isec"><h2>Quick keys</h2><ul class="tips"><li><span class="kbd">Enter</span> finishes a route</li><li><span class="kbd">Arrow keys</span> move the selected player (click the field first)</li><li><span class="kbd">Delete</span> removes the selected item</li><li><span class="kbd">Ctrl/Cmd Z</span> undo</li></ul></div>`;
-  }
-  el.innerHTML=h;
-}
-function renderAll(){if(typeof buildFormOpts==='function')buildFormOpts();renderCanvas();renderList();renderToolbar();renderInspector();$('pbName').value=pb.name;}
-
-/* ---------- edits ---------- */
-function commit(opts={}){markEdited();save();renderCanvas();if(opts.list!==false)renderList();renderToolbar();if(opts.insp)renderInspector();}
-const clampX=x=>Math.min(fwOf(cur())-.5,Math.max(.5,x)), clampY=y=>Math.min(11.4,Math.max(-25.4,y));
-const snap=v=>st.snap?Math.round(v*2)/2:r2(v);
-function toSvg(e){const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const m=svg.getScreenCTM();if(!m)return[0,0];const r=pt.matrixTransform(m.inverse());return [r.x,r.y];}
-function setMode(m){if(st.drawing)finishDrawing();st.mode=m;renderCanvas();renderToolbar();}
-function startLineFrom(playerId,startPt){
-  pushUndo();const d=st.lineDefaults;
-  const l={id:uid(),playerId:playerId||null,start:playerId?null:[snap(clampX(startPt[0])),snap(clampY(startPt[1]))],pts:[],style:d.style,cap:d.cap,smooth:d.smooth,color:d.color};
-  cur().lines.push(l);st.drawing=l.id;st.sel={type:'line',id:l.id};return l;
-}
-function finishDrawing(){
-  const c=cur(),l=c.lines.find(x=>x.id===st.drawing);
-  if(l&&!l.pts.length){c.lines=c.lines.filter(x=>x!==l);st.sel=null;st.undo.pop();}
-  else if(l&&l.playerId)setTimeout(()=>tourDone(2),0);
-  st.drawing=null;st.preview=null;commit({insp:true});
-}
-function deleteSel(){
-  const c=cur(),s=st.sel;if(!s)return;pushUndo();
-  if(s.type==='line')c.lines=c.lines.filter(l=>l.id!==s.id);
-  if(s.type==='label')c.labels=c.labels.filter(l=>l.id!==s.id);
-  if(s.type==='player'){c.players=c.players.filter(p=>p.id!==s.id);c.lines=c.lines.filter(l=>l.playerId!==s.id);}
-  st.sel=null;commit({insp:true});
-}
-
-/* ---------- pointer handling ---------- */
-function hitAt(e,pt){
-  const t=e.target.closest('[data-k]'),c=cur();
-  if(t&&t.dataset.k!=='line')return {k:t.dataset.k,id:t.dataset.id,idx:t.dataset.idx};
-  {
-    const m=svg.getScreenCTM(),tol=e.pointerType==='mouse'?1.4:Math.max(1.4,22/((m&&m.a)||10));let best=null,bd=tol;
-    if(st.mode==='select'&&st.sel&&st.sel.type==='line'){
-      const l=c.lines.find(x=>x.id===st.sel.id);
-      if(l){l.pts.forEach((q,i)=>{const d=Math.hypot(q[0]-pt[0],q[1]-pt[1]);if(d<bd){bd=d;best={k:'vertex',id:l.id,idx:i};}});
-        if(!l.playerId&&l.start){const d=Math.hypot(l.start[0]-pt[0],l.start[1]-pt[1]);if(d<bd){bd=d;best={k:'vertex',id:l.id,idx:-1};}}}
-      if(best)return best;
-    }
-    bd=t?tol*.5:tol;
-    for(const p of c.players){const d=Math.hypot(p.x-pt[0],p.y-pt[1]);if(d<bd){bd=d;best={k:'player',id:p.id};}}
-    if(best)return best;
-  }
-  return t?{k:'line',id:t.dataset.id}:{};
-}
-svg.addEventListener('pointerdown',e=>{
-  if(st.anim)return;
-  if(st.view){if(zoomOn(cur())){svg.setPointerCapture(e.pointerId);st.pan={x:e.clientX,y:e.clientY,vx:st.vx,vy:st.vy,s:ZW/svg.getBoundingClientRect().width};}return;}
-  const pt=toSvg(e),t=hitAt(e,pt),k=t.k,id=t.id,c=cur();
-  svg.setPointerCapture(e.pointerId);st.down=pt;
-  if(st.mode==='select'){
-    if(k==='vertex'){st.drag={type:'vertex',id,idx:+t.idx,pushed:false};}
-    else if(k==='player'||k==='label'){
-      const obj=k==='player'?playerById(c,id):c.labels.find(x=>x.id===id);
-      st.sel={type:k,id};st.drag={type:k,id,dx:obj.x-pt[0],dy:obj.y-pt[1],pushed:false};
-    }else if(k==='line'){st.sel={type:'line',id};}
-    else{st.sel=null;if(zoomOn(c))st.pan={x:e.clientX,y:e.clientY,vx:st.vx,vy:st.vy,s:ZW/svg.getBoundingClientRect().width};}
-    renderCanvas();renderInspector();
-  }else if(st.mode==='draw'){
-    if(!st.drawing){
-      if(k==='player'){startLineFrom(id);st.justStarted=true;}
-      else{startLineFrom(null,pt);st.justStarted=true;}
-      renderCanvas();renderToolbar();renderInspector();
-    }else st.justStarted=false;
-  }else if(st.mode==='text'){
-    pushUndo();const lb={id:uid(),x:snap(clampX(pt[0])),y:snap(clampY(pt[1])),text:'Label'};
-    c.labels.push(lb);st.sel={type:'label',id:lb.id};st.mode='select';commit({insp:true});
-    const i=$('lbText');if(i){i.focus();i.select();}
-  }
-});
-svg.addEventListener('pointermove',e=>{
-  if(st.pan){const p=st.pan;st.vx=p.vx-(e.clientX-p.x)*p.s;st.vy=p.vy-(e.clientY-p.y)*p.s;svg.setAttribute('viewBox',vbCur(cur()));return;}
-  const pt=toSvg(e),c=cur();
-  if(st.drag){
-    const d=st.drag;
-    if(!d.pushed){if(st.down&&Math.hypot(pt[0]-st.down[0],pt[1]-st.down[1])<.15)return;pushUndo();d.pushed=true;}
-    if(d.type==='player'||d.type==='label'){
-      const obj=d.type==='player'?playerById(c,d.id):c.labels.find(x=>x.id===d.id);
-      obj.x=snap(clampX(pt[0]+d.dx));obj.y=snap(clampY(pt[1]+d.dy));
-    }else if(d.type==='vertex'){
-      const l=c.lines.find(x=>x.id===d.id),np=[snap(clampX(pt[0])),snap(clampY(pt[1]))];
-      if(d.idx<0)l.start=np;else l.pts[d.idx]=np;
-    }
-    renderCanvas();
-  }else if(st.drawing){st.preview=[snap(clampX(pt[0])),snap(clampY(pt[1]))];renderCanvas();}
-});
-svg.addEventListener('pointercancel',()=>{st.pan=null;});
-$('zoomBtn').onclick=()=>{
-  const c=cur();st.zoom=!zoomOn(c);
-  if(st.zoom){const p=st.sel&&st.sel.type==='player'&&playerById(c,st.sel.id);st.vx=(p?p.x:fwOf(c)/2)-ZW/2;st.vy=-18;}
-  renderCanvas();renderToolbar();
-};
-function setDrawer(on){document.body.classList.toggle('plays-open',on);$('playsBtn').setAttribute('aria-expanded',String(on));if(on)$('playsClose').focus();}
-function placePb(){(mqDrawer.matches?$('pbSlot'):$('pbHome')).append($('pbName'),$('sampleChip'),$('syncChip'));}
-$('playsBtn').onclick=()=>setDrawer(true);
-$('playsClose').onclick=$('scrim').onclick=()=>setDrawer(false);
-mqDrawer.addEventListener('change',()=>{placePb();setDrawer(false);});
-mqPhone.addEventListener('change',()=>{renderCanvas();renderToolbar();});
-placePb();
-svg.addEventListener('pointerup',e=>{
-  if(st.pan){st.pan=null;return;}
-  const pt=toSvg(e),c=cur();
-  if(st.drag){const moved=st.drag.pushed,ty=st.drag.type;st.drag=null;if(moved){commit();if(ty==='player')tourDone(1);}return;}
-  if(st.mode==='draw'&&st.drawing){
-    const l=c.lines.find(x=>x.id===st.drawing);if(!l)return;
-    const np=[snap(clampX(pt[0])),snap(clampY(pt[1]))];
-    const moved=st.down&&Math.hypot(pt[0]-st.down[0],pt[1]-st.down[1])>1;
-    if(st.justStarted){if(moved){l.pts.push(np);}st.justStarted=false;commit({insp:true});return;}
-    const last=l.pts.length?l.pts[l.pts.length-1]:startOf(l,c);
-    if(Math.hypot(np[0]-last[0],np[1]-last[1])<.7){finishDrawing();return;}
-    l.pts.push(np);commit({insp:true});
-  }
-});
-svg.addEventListener('dblclick',()=>{if(st.drawing)finishDrawing();});
-
-document.addEventListener('keydown',e=>{
-  const tag=(document.activeElement&&document.activeElement.tagName)||'';
-  const typing=/INPUT|TEXTAREA|SELECT/.test(tag);
-  if(st.view&&e.key!=='Escape')return;
-  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'&&!typing){e.preventDefault();e.shiftKey?restore(st.redo,st.undo):restore(st.undo,st.redo);return;}
-  if(typing)return;
-  if((e.key==='Enter'||e.key==='Escape')&&st.drawing){e.preventDefault();finishDrawing();return;}
-  if(e.key==='Escape'&&document.body.classList.contains('plays-open')){setDrawer(false);$('playsBtn').focus();return;}
-  if(e.key==='Escape'&&st.sel){st.sel=null;renderCanvas();renderInspector();return;}
-  if((e.key==='Delete'||e.key==='Backspace')&&st.sel){e.preventDefault();deleteSel();return;}
-  const AR={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
-  if(AR&&document.activeElement===svg&&st.sel&&st.sel.type!=='line'&&!st.drawing&&!st.anim){e.preventDefault();const k=e.shiftKey?.5:1;nudge(AR[0]*k,AR[1]*k);}
-});
-
-/* ---------- image export ---------- */
-function savePng(){
-  const c=cur(),vb=fitVB(c).split(' ').map(Number),W=1400,H=Math.round(W*vb[3]/vb[2]),top=96;
-  const src=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="${vb.join(' ')}">${playSvgInner(c)}</svg>`;
-  const img=new Image(),say=m=>{const el=$('pngMsg');if(el)el.textContent=m;};
-  img.onload=()=>{
-    const cv=document.createElement('canvas');cv.width=W;cv.height=H+top;const g=cv.getContext('2d');
-    g.fillStyle='#fff';g.fillRect(0,0,W,H+top);g.fillStyle='#15211b';g.font='700 46px "Barlow Condensed","Arial Narrow",Arial,sans-serif';g.textBaseline='middle';g.fillText(c.name,28,top/2-4,W-360);
-    g.font='500 24px Barlow,Arial,sans-serif';g.fillStyle='#5b6a62';g.textAlign='right';g.fillText(pb.name+' · PlayBand',W-28,top/2-2,320);
-    g.drawImage(img,0,top,W,H);
-    cv.toBlob(async blob=>{
-      if(!blob){say('Could not make the image.');return;}
-      const name=(c.name.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'')||'play')+'.png';
-      try{const file=new File([blob],name,{type:'image/png'});
-        if(mqDrawer.matches&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:c.name});say('');return;}}catch(e){if(e&&e.name==='AbortError')return;}
-      if(framed){say('Downloads are blocked in this preview. Use the live site.');return;}
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000);say('Image saved.');
-    },'image/png');
-  };
-  img.onerror=()=>say('Could not make the image.');
-  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(src);
-}
-
-/* ---------- inspector events ---------- */
-$('inspector').addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b)return;const c=cur();
-  if(b.dataset.set){
-    const target=st.sel&&st.sel.type==='line'?c.lines.find(l=>l.id===st.sel.id):st.lineDefaults;
-    let v=b.dataset.val;if(b.dataset.set==='smooth')v=v==='1';
-    if(target!==st.lineDefaults)pushUndo();
-    target[b.dataset.set]=v;
-    if(target!==st.lineDefaults){st.lineDefaults[b.dataset.set]=v;commit({insp:true});}else renderInspector();
-    return;
-  }
-  if(b.dataset.route){applyQuickRoute(st.sel.id,b.dataset.route);return;}
-  if(b.dataset.nudge){const d=b.dataset.nudge.split(',').map(Number);nudge(d[0]*.5,d[1]*.5);return;}
-  const act=b.dataset.do;
-  if(act==='motL'||act==='motR'||act==='motDel'){
-    const p=playerById(c,st.sel.id);if(!p)return;const old=motionOf(c,p.id),k=c.size===5?.6:1;
-    if(act==='motDel'&&!old)return;
-    pushUndo();
-    const from=old?old.pts[old.pts.length-1]:[p.x,p.y],end=act==='motDel'?[p.x,p.y]:[r2(clampX(p.x+(act==='motL'?-7:7)*k)),p.y],dx=end[0]-from[0],dy=end[1]-from[1];
-    c.lines=c.lines.filter(l=>!(l.motion&&l.playerId===p.id));
-    c.lines.forEach(l=>{if(l.playerId===p.id)l.pts=l.pts.map(q=>[r2(clampX(q[0]+dx)),r2(clampY(q[1]+dy))]);});
-    if(act!=='motDel')c.lines.unshift({id:uid(),playerId:p.id,motion:true,route:'',start:null,pts:[end],style:'zigzag',cap:'none',smooth:false,color:'ink'});
-    commit({insp:true});return;
-  }
-  if(act==='savePng'){savePng();return;}
-  if(act==='delSel')deleteSel();
-  if(act==='delForm'){pushUndo();pb.customFormations=(pb.customFormations||[]).filter(f=>f.id!==b.dataset.id);buildFormOpts();commit({insp:true});}
-  if(act==='clearRoutes'){pushUndo();c.lines=c.lines.filter(l=>l.playerId!==st.sel.id);commit({insp:true});}
-  if(act==='drawFrom'){const pid=st.sel.id;st.mode='draw';startLineFrom(pid);st.justStarted=false;commit({insp:true});}
-});
-function nudge(dx,dy){
-  const c=cur(),s=st.sel;if(!s||s.type==='line'||st.view)return;
-  const o=s.type==='player'?playerById(c,s.id):c.labels.find(x=>x.id===s.id);if(!o)return;
-  pushUndo();o.x=r2(clampX(o.x+dx));o.y=r2(clampY(o.y+dy));commit();if(s.type==='player')tourDone(1);
-}
-let typingUndo=null;
-$('inspector').addEventListener('focusin',e=>{if(e.target.matches('input,textarea'))typingUndo=JSON.stringify(pb);});
-$('inspector').addEventListener('input',e=>{
-  const c=cur(),t=e.target;
-  if(t.id==='fmName')return;
-  if(typingUndo){st.undo.push(typingUndo);st.redo=[];typingUndo=null;}
-  if(t.id==='plName'){const p=playerById(c,st.sel.id),v=t.value.trim().slice(0,20);pb.roster=pb.roster||{};if(v)pb.roster[p.label]=v;else delete pb.roster[p.label];markEdited();save();return;}
-  if(t.id==='plLabel'){const p=playerById(c,st.sel.id);p.label=t.value.toUpperCase().slice(0,3)||'?';}
-  else if(t.id==='lbText'){const lb=c.labels.find(x=>x.id===st.sel.id);lb.text=t.value||' ';}
-  else if(t.id==='playName')c.name=t.value||'Untitled play';
-  else if(t.id==='playNotes'){c.notes=t.value;markEdited();save();return;}
-  else if(t.id==='playFolder'){c.folder=t.value.trim().slice(0,30);markEdited();save();renderList();return;}
-  else return;
-  commit();
-});
-$('inspector').addEventListener('change',e=>{if(e.target.id==='playCat'){pushUndo();cur().category=e.target.value;commit();}});
-
-/* ---------- toolbar ---------- */
-$('modeSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.mode);});
-$('undoBtn').onclick=()=>restore(st.undo,st.redo);
-$('redoBtn').onclick=()=>restore(st.redo,st.undo);
-$('flipBtn').onclick=()=>{
-  const c=cur(),W=fwOf(c);pushUndo();
-  c.players.forEach(p=>p.x=r2(W-p.x));
-  c.lines.forEach(l=>{l.pts=l.pts.map(p=>[r2(W-p[0]),p[1]]);if(l.start)l.start=[r2(W-l.start[0]),l.start[1]];});
-  c.labels.forEach(l=>l.x=r2(W-l.x));
-  if(/Right/.test(c.formation))c.formation=c.formation.replace('Right','Left');else if(/Left/.test(c.formation))c.formation=c.formation.replace('Left','Right');
-  commit({insp:true});
-};
-$('defSel').onchange=e=>{pushUndo();applyDefense(cur(),e.target.value);st.sel=null;commit({insp:true});};
-$('snapChk').onchange=e=>{st.snap=e.target.checked;};
-$('pbName').addEventListener('input',e=>{pb.name=e.target.value||'Untitled playbook';markEdited();save();$('sampleChip').hidden=!pb.sample;});
-
-/* ---------- animation ---------- */
-const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-function runPlay(){
-  if(st.anim){cancelAnimationFrame(st.anim.raf);st.anim=null;renderCanvas();renderToolbar();return;}
-  if(st.drawing)finishDrawing();
-  const c=cur(),tracks=[],speed=reduceMotion?1000:7.5*(+$('animSpeed').value||1);
-  const mk=(id,pts,t0)=>{const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return {id,pts,cum,len:cum[cum.length-1],t0};};
-  let M=0;
-  for(const l of c.lines){if(!l.motion||!l.pts.length||!playerById(c,l.playerId))continue;const tr=mk(l.playerId,lineGeom(l,c).motion.slice(),0);tracks.push(tr);M=Math.max(M,tr.len/speed);}
-  if(M)M+=reduceMotion?0:.45;
-  for(const p of c.players){
-    const l=c.lines.find(x=>x.playerId===p.id&&x.pts.length&&!x.motion)||c.lines.find(x=>!x.playerId&&x.start&&x.pts.length&&Math.hypot(x.start[0]-p.x,x.start[1]-p.y)<1.6&&!c.players.some(q=>q!==p&&Math.hypot(x.start[0]-q.x,x.start[1]-q.y)<Math.hypot(x.start[0]-p.x,x.start[1]-p.y)));
-    if(!l)continue;
-    const pts=lineGeom(l,c).motion.slice();
-    if(!l.playerId)pts[0]=[p.x,p.y];
-    tracks.push(mk(p.id,pts,M));
-  }
-  if(!tracks.length)return;
-  tourDone(3);
-  const t0=performance.now(),maxT=Math.max(...tracks.map(t=>t.t0+t.len/speed));
-  st.anim={pos:{},raf:0};
-  const step=now=>{
-    const t=(now-t0)/1000;
-    for(const tr of tracks){
-      if(t<tr.t0)continue;
-      const d=Math.min(tr.len,(t-tr.t0)*speed);let i=1;while(i<tr.cum.length-1&&tr.cum[i]<d)i++;
-      const a=tr.pts[i-1],b=tr.pts[i]||a,seg=(tr.cum[i]-tr.cum[i-1])||1,f=Math.max(0,Math.min(1,(d-tr.cum[i-1])/seg));
-      st.anim.pos[tr.id]=[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];
-    }
-    renderCanvas();
-    if(t<maxT+1.2)st.anim.raf=requestAnimationFrame(step);else{st.anim=null;renderCanvas();renderToolbar();}
-  };
-  renderToolbar();st.anim.raf=requestAnimationFrame(step);
-}
-$('animBtn').onclick=runPlay;
-$('moreBtn').onclick=()=>{const on=!document.querySelector('.toolbar').classList.contains('more');document.querySelector('.toolbar').classList.toggle('more',on);$('moreBtn').setAttribute('aria-expanded',String(on));$('moreBtn').textContent=on?'Less':'More';};
-
-/* ---------- play list ---------- */
-$('playList').addEventListener('click',e=>{
-  const b=e.target.closest('button[data-act]');
-  if(b){
-    const p=pb.plays.find(x=>x.id===b.dataset.id);
-    if(b.dataset.act==='up'||b.dataset.act==='down'){const i=pb.plays.indexOf(p),j=i+(b.dataset.act==='up'?-1:1);if(j<0||j>=pb.plays.length)return;pushUndo();pb.plays.splice(i,1);pb.plays.splice(j,0,p);markEdited();save();renderList();const nb=$('playList').querySelector(`[data-act="${b.dataset.act}"][data-id="${p.id}"]`);if(nb)nb.focus();return;}
-    if(b.dataset.act==='dup'){pushUndo();const cp=JSON.parse(JSON.stringify(p));cp.id=uid();cp.name=p.name+' (copy)';
-      const map={};cp.players.forEach(pl=>{const n=uid();map[pl.id]=n;pl.id=n;});cp.lines.forEach(l=>{l.id=uid();if(l.playerId)l.playerId=map[l.playerId];});cp.labels.forEach(l=>l.id=uid());
-      pb.plays.splice(pb.plays.indexOf(p)+1,0,cp);pb.currentId=cp.id;st.sel=null;markEdited();save();renderAll();}
-    if(b.dataset.act==='del'){
-      if(pb.plays.length===1){b.textContent='Keep at least one';return;}
-      if(st.confirmDel!==p.id){st.confirmDel=p.id;renderList();setTimeout(()=>{if(st.confirmDel===p.id){st.confirmDel=null;renderList();}},3000);return;}
-      pushUndo();st.confirmDel=null;pb.plays=pb.plays.filter(x=>x!==p);if(pb.currentId===p.id)pb.currentId=pb.plays[0].id;st.sel=null;markEdited();save();renderAll();}
-    return;
-  }
-  const li=e.target.closest('[data-play]');if(!li)return;
-  if(st.anim)runPlay();if(st.drawing)finishDrawing();
-  pb.currentId=li.dataset.play;st.sel=null;st.fbSaving=false;$('formbar').innerHTML='';save();renderAll();setDrawer(false);
-});
-$('plSearch').addEventListener('input',e=>{st.plQ=e.target.value.trim();renderList();});
-$('plFolder').addEventListener('change',e=>{st.plFolder=e.target.value;renderList();});
-const npForm=$('newPlayForm');
-function buildFormOpts(){
-  const size=st.npSize||cur().size,{mine,std}=formationList(size);
-  $('npForm').innerHTML=(mine.length?`<optgroup label="Your formations">${mine.map(f=>`<option value="custom:${f.id}">${esc(f.name)}</option>`).join('')}</optgroup>`:'')+
-    `<optgroup label="Standard">${std.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('')}</optgroup>`;
-  document.querySelectorAll('#npSize button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.size===size)));
-}
-$('npSize').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;st.npSize=+b.dataset.size;buildFormOpts();});
-buildFormOpts();
-$('npCat').innerHTML=CATS.map(c=>`<option>${c}</option>`).join('');
-$('newPlayBtn').onclick=()=>{npForm.hidden=!npForm.hidden;if(!npForm.hidden){if(!st.npSize)st.npSize=cur().size;buildFormOpts();$('npName').focus();}};
-$('npCancel').onclick=()=>{npForm.hidden=true;};
-npForm.addEventListener('submit',e=>{
-  e.preventDefault();const f=$('npForm').value,n=st.npSize||cur().size;
-  pushUndo();const p=makePlay($('npName').value.trim()||'New play',$('npCat').value,+n,f);
-  pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='select';st.fbSaving=false;$('formbar').innerHTML='';markEdited();save();npForm.reset();npForm.hidden=true;renderAll();setDrawer(false);
-});
-
-/* ---------- reset ---------- */
-let resetArmed=false;
-$('resetBtn').onclick=e=>{
-  const b=e.currentTarget;
-  if(!resetArmed){resetArmed=true;b.textContent='Tap again to replace all plays';b.classList.add('warn');
-    setTimeout(()=>{resetArmed=false;b.textContent='Reset to sample plays';b.classList.remove('warn');},4000);return;}
-  pushUndo();pb=samplePlaybook();st.sel=null;st.npSize=null;resetArmed=false;b.textContent='Reset to sample plays';b.classList.remove('warn');save();renderAll();$('dataView').hidden=true;
-};
-
-/* ---------- print ---------- */
-let sheetType='plays';
-let PP=[];
-const logoImg=()=>pb.logo?`<img src="${esc(pb.logo)}" alt="">`:'';
-function asgHtml(p){
-  const r=pb.roster||{},items=p.players.filter(q=>q.kind!=='def').map(q=>{const l=p.lines.find(x=>x.playerId===q.id&&x.pts.length&&!x.motion),nm=r[q.label];
-    if(!nm&&!(l&&l.route))return '';return `<b>${esc(q.label)}</b>${nm?' '+esc(nm):''}${l&&l.route?': '+esc(l.route):''}`;}).filter(Boolean);
-  return items.length?`<p class="asg">${items.join(' &nbsp;·&nbsp; ')}</p>`:'';
-}
-function renderSets(){
-  const sets=pb.printSets||[];
-  $('setSel').innerHTML='<option value="">Saved sets…</option>'+sets.map(x=>`<option value="${x.id}"${st.setId===x.id?' selected':''}>${esc(x.name)} (${x.ids.length})</option>`).join('');
-  $('setSel').hidden=!sets.length;$('setDel').hidden=!sets.some(x=>x.id===st.setId);
-  $('logoDel').hidden=!pb.logo;$('logoBtn').textContent=pb.logo?'Change team logo':'Add team logo';
-}
-function renderPick(){
-  const n=pb.plays.length,k=pb.plays.filter(p=>!st.skip.has(p.id)).length;
-  $('pickBtn').textContent=k===n?'Choose plays (all '+n+')':'Choose plays ('+k+' of '+n+')';
-  $('pickList').innerHTML=pb.plays.map((p,i)=>`<label class="pk"><input type="checkbox" data-pick="${p.id}"${st.skip.has(p.id)?'':' checked'}> <span>${esc(p.name)}<small>${esc(p.category)} · ${SIZE_NAME[p.size]}</small></span></label>`).join('');
-}
-function renderSheets(){
-  if(!st.skip)st.skip=new Set();
-  PP=pb.plays.filter(p=>!st.skip.has(p.id));renderPick();renderSets();
-  if(!PP.length){document.querySelectorAll('#sheetSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sheet===sheetType)));document.querySelectorAll('.pv-opts').forEach(o=>o.hidden=o.dataset.for!==sheetType);$('sheets').innerHTML='<p class="pv-note" style="margin:24px auto;text-align:center">No plays are selected. Tick at least one play under Choose plays.</p>';return;}
-  document.querySelectorAll('#sheetSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sheet===sheetType)));
-  document.querySelectorAll('.pv-opts').forEach(o=>o.hidden=o.dataset.for!==sheetType);
-  if(sheetType==='wrist')return renderWrist();
-  if(sheetType==='call')return renderCall();
-  const per=+$('perPage').value,cols=per===1?1:2,rows=Math.ceil(per/cols);let h='';
-  for(let i=0;i<PP.length;i+=per){
-    h+=`<div class="sheet"><div class="sh-head">${logoImg()}${esc(pb.name)}<span>Page ${i/per+1} of ${Math.ceil(PP.length/per)}</span></div><div class="sh-grid" style="grid-template-columns:repeat(${cols},minmax(0,1fr));grid-template-rows:repeat(${rows},minmax(0,1fr))">`;
-    PP.slice(i,i+per).forEach((p,j)=>{h+=`<div class="cell"><h4>${i+j+1}. ${esc(p.name)}<span>${esc(p.category)} · ${esc(p.formation)}</span></h4>${thumbSvg(p)}${per<=4?asgHtml(p):''}${per<=2&&p.notes?`<p>${esc(p.notes)}</p>`:''}</div>`;});
-    h+='</div></div>';
-  }
-  $('sheets').innerHTML=h;
-}
-const framed=(()=>{try{return window.self!==window.top}catch(e){return true}})();
-$('printBtn').onclick=()=>{if(st.drawing)finishDrawing();renderSheets();
-  $('pvNote').textContent=framed?'Printing is blocked inside this preview. Open the playband.html file in a browser to print or save a PDF.':'Letter, landscape. Choose "Save as PDF" in the print dialog for a PDF.';
-  $('printView').hidden=false;};
-$('closePrint').onclick=()=>{$('printView').hidden=true;};
-$('perPage').onchange=renderSheets;
-$('sheetSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b){sheetType=b.dataset.sheet;renderSheets();}});
-['wbSize','wbW','wbH','wbMode','wbGrid','wbCopies','callDiag'].forEach(id=>$(id).addEventListener('input',renderSheets));
-const PAGE_W=10.3,PAGE_H=7.7;
-function wbDims(){
-  const v=$('wbSize').value;$('wbCustom').hidden=v!=='custom';
-  let [w,h]=v==='custom'?[+$('wbW').value,+$('wbH').value]:v.split('x').map(Number);
-  w=Math.min(PAGE_W,Math.max(1.5,w||4));h=Math.min(PAGE_H,Math.max(1,h||2.5));return [w,h];
-}
-function renderWrist(){
-  const [w,h]=wbDims(),[gc,gr]=$('wbGrid').value.split('x').map(Number),per=gc*gr,list=$('wbMode').value==='list';
-  const copies=Math.min(30,Math.max(1,+$('wbCopies').value||1));
-  const cards=[];
-  for(let i=0;i<PP.length;i+=per){
-    let inner='';
-    for(let k=0;k<per;k++){
-      const idx=i+k,p=PP[idx];
-      if(list){inner+=p?`<div class="wl" style="font-size:${r2(Math.max(5,Math.min(11,(h/gr)*72*.48)))}pt"><i>${idx+1}</i>${esc(p.name)}</div>`:'<div class="wl"></div>';}
-      else inner+=p?`<div class="win"><b>${idx+1}</b>${thumbSvg(p,'',fitVB(p))}</div>`:'<div class="win"></div>';
-    }
-    const style=`width:${w}in;height:${h}in;grid-template-columns:repeat(${gc},minmax(0,1fr));grid-template-rows:repeat(${gr},minmax(0,1fr));grid-auto-flow:${list?'column':'row'}`;
-    const card=`<div class="wb" style="${style}">${inner}</div>`;
-    for(let c=0;c<copies;c++)cards.push(card);
-  }
-  const perPage=Math.max(1,Math.floor(PAGE_W/w)*Math.floor(PAGE_H/h));
-  let out='';
-  for(let i=0;i<cards.length;i+=perPage)out+=`<div class="page wb-page">${cards.slice(i,i+perPage).join('')}<span class="page-cap">${esc(pb.name)} · wristbands ${w} × ${h} in · cut on dashed lines</span></div>`;
-  $('sheets').innerHTML=out;
-}
-const rosterHtml=()=>{const r=pb.roster||{},k=Object.keys(r);return k.length?`<p style="margin:0;font-size:9pt">${k.map(l=>`<b>${esc(l)}</b> ${esc(r[l])}`).join(' &nbsp;·&nbsp; ')}</p>`:'';};
-function renderCall(){
-  const groups={};PP.forEach((p,i)=>{(groups[p.category]=groups[p.category]||[]).push([i+1,p]);});
-  let cols='';
-  for(const cat of CATS.concat(Object.keys(groups).filter(k=>!CATS.includes(k)))){
-    if(!groups[cat])continue;
-    cols+=`<div class="cgroup"><h4>${esc(cat)}</h4>${groups[cat].map(([n,p])=>`<div class="crow"><b>${n}</b><div>${esc(p.name)}<small>${esc(p.formation)} · ${SIZE_NAME[p.size]}${p.defense&&p.defense!=='None'?' · vs '+esc(p.defense):''}</small></div></div>`).join('')}</div>`;
-  }
-  let out=`<div class="page call"><h3>${logoImg()}${esc(pb.name)} <span>Coach call sheet · numbers match the wristbands</span></h3>${rosterHtml()}<div class="call-cols">${cols}</div></div>`;
-  if($('callDiag').checked){
-    for(let i=0;i<PP.length;i+=16){
-      out+=`<div class="page call"><h3>${esc(pb.name)} <span>Diagrams ${i+1}–${Math.min(PP.length,i+16)}</span></h3><div class="cdiag">${PP.slice(i,i+16).map((p,j)=>`<div class="win"><b>${i+j+1}</b>${thumbSvg(p,'',fitVB(p))}</div>`).join('')}</div></div>`;
-    }
-  }
-  $('sheets').innerHTML=out;
-}
-$('doPrint').onclick=()=>window.print();
-$('pickBtn').onclick=()=>{const on=$('pickPanel').hidden;$('pickPanel').hidden=!on;$('pickBtn').setAttribute('aria-expanded',String(on));};
-$('pickList').addEventListener('change',e=>{const id=e.target.dataset.pick;if(!id)return;e.target.checked?st.skip.delete(id):st.skip.add(id);const y=$('pickList').scrollTop;renderSheets();$('pickList').scrollTop=y;const el=$('pickList').querySelector('[data-pick="'+id+'"]');if(el)el.focus();});
-$('setSave').onclick=()=>{const name=$('setName').value.trim();if(!name){flash('setMsg','Type a name for this set first.');$('setName').focus();return;}
-  if(!PP.length){flash('setMsg','Tick at least one play first.');return;}
-  pushUndo();pb.printSets=pb.printSets||[];const ex=pb.printSets.find(x=>x.name.toLowerCase()===name.toLowerCase()),ids=PP.map(p=>p.id);
-  if(ex){ex.ids=ids;st.setId=ex.id;}else{const x={id:uid(),name,ids};pb.printSets.push(x);st.setId=x.id;}
-  $('setName').value='';markEdited();save();renderSets();flash('setMsg','Saved "'+name+'" with '+ids.length+(ids.length===1?' play.':' plays.'));};
-$('setSel').addEventListener('change',e=>{const x=(pb.printSets||[]).find(q=>q.id===e.target.value);st.setId=x?x.id:null;if(x){const keep=new Set(x.ids);st.skip=new Set(pb.plays.filter(p=>!keep.has(p.id)).map(p=>p.id));}renderSheets();});
-$('setDel').onclick=()=>{pushUndo();pb.printSets=(pb.printSets||[]).filter(x=>x.id!==st.setId);st.setId=null;markEdited();save();renderSets();};
-$('logoBtn').onclick=()=>$('logoFile').click();
-$('logoDel').onclick=()=>{pushUndo();pb.logo='';markEdited();save();renderSheets();};
-$('logoFile').addEventListener('change',e=>{const file=e.target.files[0];e.target.value='';if(!file)return;
-  const img=new Image(),url=URL.createObjectURL(file);
-  img.onload=()=>{const k=Math.min(1,240/Math.max(img.width,img.height)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(img.width*k));cv.height=Math.max(1,Math.round(img.height*k));
-    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(url);let d='';try{d=cv.toDataURL('image/png');}catch(err){}
-    if(!d||d.length>190000){$('pvNote').textContent='That image could not be used. Try a smaller PNG or JPG.';return;}
-    pushUndo();pb.logo=d;markEdited();save();renderSheets();};
-  img.onerror=()=>{URL.revokeObjectURL(url);$('pvNote').textContent='That file is not an image we can read. Use a PNG or JPG.';};
-  img.src=url;});
-$('pickAll').onclick=()=>{st.skip.clear();renderSheets();};
-$('pickNone').onclick=()=>{pb.plays.forEach(p=>st.skip.add(p.id));renderSheets();};
-
-/* ---------- backup / restore ---------- */
-const num=(v,lo,hi,d)=>{v=Number(v);return Number.isFinite(v)?Math.min(hi,Math.max(lo,r2(v))):d;};
-const str=(v,n,d='')=>(typeof v==='string'?v:d).slice(0,n);
-const pick=(v,arr,d)=>arr.includes(v)?v:d;
-const normPt=q=>Array.isArray(q)?[num(q[0],-5,60,0),num(q[1],-30,15,0)]:null;
-function normPlayers(arr,map){
-  return (Array.isArray(arr)?arr:[]).slice(0,30).map(p=>{const id=uid();if(map&&p&&typeof p.id==='string')map[p.id]=id;
-    return {id,label:str(p&&p.label,3,'?')||'?',x:num(p&&p.x,0,54,10),y:num(p&&p.y,-26,12,1),kind:pick(p&&p.kind,['qb','skill','ol','def'],'skill'),shape:pick(p&&p.shape,['circle','square','def'],'circle')};});
-}
-function normPlaybook(o){
-  const src=o&&o.playbook?o.playbook:o;
-  if(!src||!Array.isArray(src.plays))throw new Error('bad');
-  const pmap={};
-  const plays=src.plays.slice(0,300).map(p=>{
-    if(!p||typeof p!=='object')return null;
-    const size=pick(Number(p.size),[11,7,5],11),map={},players=normPlayers(p.players,map);
-    const lines=(Array.isArray(p.lines)?p.lines:[]).slice(0,80).map(l=>{
-      if(!l)return null;const pid=typeof l.playerId==='string'?map[l.playerId]:null,start=pid?null:normPt(l.start);
-      if(!pid&&!start)return null;
-      return {id:uid(),playerId:pid||null,start,pts:(Array.isArray(l.pts)?l.pts:[]).slice(0,60).map(normPt).filter(Boolean),route:str(l.route,12),style:pick(l.style,['solid','dashed','zigzag'],'solid'),cap:pick(l.cap,['arrow','t','dot','none'],'arrow'),smooth:!!l.smooth,color:pick(l.color,Object.keys(COLORS),'ink'),...(pid&&l.motion?{motion:true}:{})};
-    }).filter(Boolean);
-    const labels=(Array.isArray(p.labels)?p.labels:[]).slice(0,40).map(l=>l?{id:uid(),x:num(l.x,0,54,10),y:num(l.y,-26,12,0),text:str(l.text,40,'Label')||' '}:null).filter(Boolean);
-    const nid=uid();if(typeof p.id==='string')pmap[p.id]=nid;
-    return {id:nid,name:str(p.name,60,'Untitled play')||'Untitled play',category:pick(p.category,CATS,'Run'),size,formation:str(p.formation,40,'Custom'),notes:str(p.notes,2000),folder:str(p.folder,30).trim(),
-      defense:pick(p.defense,Object.keys(DEFENSES[size]),'None'),players,lines,labels};
-  }).filter(Boolean);
-  if(!plays.length)throw new Error('empty');
-  const customFormations=(Array.isArray(src.customFormations)?src.customFormations:[]).slice(0,100).map(f=>f?{id:uid(),name:str(f.name,30,'Formation')||'Formation',size:pick(Number(f.size),[11,7,5],11),
-    players:normPlayers(f.players).map(({label,x,y,kind,shape})=>({label,x,y,kind,shape}))}:null).filter(f=>f&&f.players.length);
-  const roster={};if(src.roster&&typeof src.roster==='object')Object.keys(src.roster).slice(0,40).forEach(k=>{const v=str(src.roster[k],20).trim();if(v&&k.length<=3)roster[k]=v;});
-  const logo=typeof src.logo==='string'&&src.logo.length<200000&&/^data:image\/(png|jpeg);base64,[A-Za-z0-9+\/=]+$/.test(src.logo)?src.logo:'';
-  const live=new Set(plays.map(p=>p.id));
-  const printSets=(Array.isArray(src.printSets)?src.printSets:[]).slice(0,30).map(x=>x&&Array.isArray(x.ids)?{id:uid(),name:str(x.name,30,'Set')||'Set',ids:x.ids.map(i=>pmap[i]).filter(i=>live.has(i))}:null).filter(x=>x&&x.ids.length);
-  return {name:str(src.name,60,'My Playbook')||'My Playbook',sample:false,v:2,currentId:live.has(pmap[src.currentId])?pmap[src.currentId]:plays[0].id,plays,customFormations,roster,logo,printSets};
-}
-const backupText=()=>JSON.stringify({app:'playband',format:1,exported:new Date().toISOString(),playbook:pb});
-function flash(id,msg){const el=$(id);el.textContent=msg;clearTimeout(el._t);el._t=setTimeout(()=>{el.textContent='';},6000);}
-$('dataBtn').onclick=()=>{if(st.drawing)finishDrawing();rsArmed=false;$('rsGo').textContent='Restore';$('rsGo').classList.remove('warn');$('dataView').hidden=false;$('dataClose').focus();};
-$('dataClose').onclick=()=>{$('dataView').hidden=true;};
-$('dataView').addEventListener('click',e=>{if(e.target.id==='dataView')$('dataView').hidden=true;});
-$('bkDownload').onclick=()=>{
-  if(framed){$('rsText').value=backupText();flash('bkMsg','Downloads are blocked in this preview. The backup text is in the box below: copy it and save it in a note or file.');return;}
-  try{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([backupText()],{type:'application/json'}));
-    a.href=url;a.download='playband-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
-    flash('bkMsg','Backup file saved to your downloads.');}
-  catch(e){$('rsText').value=backupText();flash('bkMsg','Could not download here. The backup text is in the box below.');}
-};
-$('bkCopy').onclick=()=>{const t=backupText();
-  const fail=()=>{$('rsText').value=t;$('rsText').focus();$('rsText').select();flash('bkMsg','Copy was blocked. The text is selected below: copy it from there.');};
-  try{navigator.clipboard.writeText(t).then(()=>flash('bkMsg','Backup text copied. Paste it into a note or email to yourself.'),fail);}catch(e){fail();}
-};
-$('rsFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;
-  if(f.size>5e6){flash('rsMsg','That file is too large to be a PlayBand backup.');return;}
-  const rd=new FileReader();rd.onload=()=>{$('rsText').value=String(rd.result||'');flash('rsMsg','File loaded. Tap Restore to use it.');};rd.onerror=()=>flash('rsMsg','Could not read that file.');rd.readAsText(f);});
-let rsArmed=false;
-$('rsText').addEventListener('input',()=>{rsArmed=false;$('rsGo').textContent='Restore';$('rsGo').classList.remove('warn');});
-$('rsGo').onclick=()=>{
-  const raw=$('rsText').value.trim();if(!raw){flash('rsMsg','Choose a backup file or paste backup text first.');return;}
-  let next;try{next=normPlaybook(JSON.parse(raw));}catch(e){flash('rsMsg','That does not look like a PlayBand backup. Check that you pasted all of it.');return;}
-  if(!rsArmed){rsArmed=true;$('rsGo').textContent='Replace what I have now with '+next.plays.length+(next.plays.length===1?' play':' plays');$('rsGo').classList.add('warn');return;}
-  pushUndo();pb=next;st.sel=null;rsArmed=false;$('rsGo').textContent='Restore';$('rsGo').classList.remove('warn');$('rsText').value='';$('rsFile').value='';
-  save();renderAll();flash('rsMsg','Restored '+next.plays.length+(next.plays.length===1?' play':' plays')+'. Undo brings back what you had.');
-};
-$('fbCopy').onclick=e=>{const b=e.target,done=m=>{b.textContent=m;setTimeout(()=>{b.textContent='Copy';},2500);};
-  try{navigator.clipboard.writeText('info@treviweb.com').then(()=>done('Copied'),()=>done('Select the address to copy'));}catch(err){done('Select the address to copy');}};
-
-/* ---------- starter play library ---------- */
-const LIB=[
- {n:'Quick Slants',c:'Pass',s:5,f:'Spread',r:'X:slant Y:slant Z:slant C:hitch',t:'One-step throw. Hit the slant that breaks open first. Center turns around as the safe outlet.'},
- {n:'Mesh',c:'Pass',s:5,f:'Spread',r:'X:drag Z:drag Y:corner C:hitch',t:'X and Z cross close together so defenders run into each other. Throw to whoever comes out clean.'},
- {n:'Smash',c:'Pass',s:5,f:'Spread',r:'X:hitch Z:hitch Y:corner C:in',t:'Read the corner on Y side. If he sits on the hitch, throw the corner route over him.'},
- {n:'Four Verticals',c:'Pass',s:5,f:'Spread',r:'X:go Y:go Z:go C:go',t:'Everybody deep. Look the safety off, then throw away from him.'},
- {n:'Trips Flood',c:'Pass',s:5,f:'Trips Right',r:'X:go Y:out Z:flat C:drag',t:'Three levels on one side. Read deep to short: go, out, flat.'},
- {n:'Stick',c:'Pass',s:5,f:'Trips Right',r:'X:go Y:hitch Z:out C:in',t:'Quick game. If the flat defender widens with the out, throw the hitch.'},
- {n:'Bunch Rub',c:'Pass',s:5,f:'Bunch Right',r:'X:in Y:corner Z:flat C:hitch',t:'Receivers start tight so defenders get picked in traffic. Great against man coverage.'},
- {n:'Handoff Sweep',c:'Run',s:5,f:'RB Offset',r:'X:go Z:post C:drag',x:[['H',[[21,3.6],[26,-1],[27,-9]],{smooth:true,color:'red'}],['Q',[[16.8,4.6]],{cap:'none',style:'dashed'}]],t:'Receivers run their defenders away. H takes the handoff and gets to the sideline.'},
- {n:'Smash',c:'Pass',s:7,f:'Spread 2x2',r:'X:hitch Z:hitch F:corner Y:corner H:flat',t:'Hitch and corner on both sides. Pick a side before the snap and read the cornerback.'},
- {n:'Mesh',c:'Pass',s:7,f:'Spread 2x2',r:'F:drag Y:drag X:post Z:corner H:wheel',t:'Crossers rub underneath. Post and corner clear out the deep defenders.'},
- {n:'Four Verticals',c:'Pass',s:7,f:'Spread 2x2',r:'X:go F:go Y:go Z:go H:flat',t:'Stretch the deep coverage with four. H in the flat is the checkdown.'},
- {n:'Trips Flood',c:'Pass',s:7,f:'Trips Right',r:'Z:go F:out Y:flat X:post H:flat',t:'Overload the right side at three depths. Read deep to short.'},
- {n:'Stick',c:'Pass',s:7,f:'Trips Right',r:'Z:go F:hitch Y:out X:slant H:flat!',t:'Quick throw to the hitch or the out. Backside slant if the middle is open.'},
- {n:'Y Cross',c:'Pass',s:7,f:'Spread 2x2',r:'Y:in X:post Z:comeback F:hitch H:flat',t:'Y crosses the field behind the linebackers. Post takes the top off.'},
- {n:'Inside Zone',c:'Run',s:11,f:'Singleback Ace',rb:1,r:'X:block Z:block',x:[['Y',[[CX+7.2,-.9]],{cap:'t'}],['F',[[CX-4.8,-.9]],{cap:'t'}],['H',[[CX+.8,3.6],[CX+1.6,-.5],[CX+2,-9]],{smooth:true,color:'red'}],['Q',[[CX+.8,3.8]],{cap:'none',style:'dashed'}]],t:'Line steps right together. Back reads the first down lineman past the center: bang it, bend it or bounce it.'},
- {n:'Toss Sweep Right',c:'Run',s:11,f:'I-Form Right',rb:1,r:'X:block Z:block',x:[['Y',[[CX+7.6,-.6]],{cap:'t'}],['F',[[CX+5,3.6],[CX+9.5,-.5]],{cap:'t',smooth:true}],['H',[[CX+6,6.4],[CX+11.5,2],[CX+13,-8]],{smooth:true,color:'red'}],['Q',[[CX+1.5,4.2]],{cap:'none',style:'dashed'}]],t:'Quick pitch to the tailback. Fullback leads to the edge and blocks the first defender who shows.'},
- {n:'Smash',c:'Pass',s:11,f:'Spread 2x2',pp:1,r:'X:hitch Z:hitch F:corner Y:corner H:block',t:'Hitch and corner on both sides. Read the cornerback: if he sinks, throw the hitch.'},
- {n:'Mesh',c:'Pass',s:11,f:'Spread 2x2',pp:1,r:'F:drag Y:drag X:post Z:go H:flat',t:'Crossers rub underneath against man coverage. Against zone they sit down in the open window.'},
- {n:'Stick',c:'Pass',s:11,f:'Trips Right',pp:1,r:'X:slant Y:hitch F:out Z:go H:flat',t:'Three-step drop. Throw the hitch unless the flat defender sits on it, then throw the out.'}
-];
-function libPlay(e){
-  const p=makePlay(e.n,e.c,e.s,e.f);
-  (e.r||'').split(' ').filter(Boolean).forEach(tok=>{let [lab,k]=tok.split(':');const flip=k.endsWith('!');if(flip)k=k.slice(0,-1);
-    const pl=p.players.find(x=>x.label===lab);if(!pl)return;const l=quickLine(p,pl,k,flip,'ink');if(l)p.lines.push(l);});
-  (e.x||[]).forEach(([lab,pts,o])=>route(p,lab,pts.map(q=>q.slice()),o));
-  if(e.pp)passPro(p);
-  if(e.rb)['LT','LG','C','RG','RT'].forEach(l=>{const q=p.players.find(x=>x.label===l);if(q)route(p,l,[[q.x+1.2,-.9]],{cap:'t'});});
-  p.notes=e.t||'';return p;
-}
-function renderLib(){
-  const s=st.libSize||cur().size;
-  document.querySelectorAll('#libSize button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.size===s)));
-  $('libGrid').innerHTML=LIB.map((e,i)=>[e,i]).filter(([e])=>e.s===s).map(([e,i])=>{const p=libPlay(e);
-    return `<div class="lib-item">${thumbSvg(p,'',fitVB(p))}<b>${esc(p.name)}</b><span class="pmeta">${esc(p.category)} · ${esc(p.formation)}</span><span class="pmeta">${esc(p.notes)}</span><button class="btn sm" data-lib="${i}">Add to my plays</button></div>`;}).join('');
-}
-function openLib(){if(st.view)return;if(st.drawing)finishDrawing();st.libSize=st.libSize||cur().size;$('libMsg').textContent='';renderLib();setDrawer(false);$('libView').hidden=false;$('libClose').focus();}
-$('libBtn').onclick=openLib;
-$('helpLib').onclick=()=>{closeHelp();openLib();};
-$('libClose').onclick=()=>{$('libView').hidden=true;};
-$('libView').addEventListener('click',e=>{
-  if(e.target.id==='libView'){$('libView').hidden=true;return;}
-  const sz=e.target.closest('#libSize button');if(sz){st.libSize=+sz.dataset.size;renderLib();return;}
-  const b=e.target.closest('button[data-lib]');if(!b)return;
-  const p=libPlay(LIB[+b.dataset.lib]);pushUndo();pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='select';st.fbSaving=false;$('formbar').innerHTML='';markEdited();save();renderAll();
-  b.textContent='Added';b.disabled=true;$('libMsg').textContent='Added "'+p.name+'". It is open in the editor when you tap Done.';
-});
-
-/* ---------- guided first play ---------- */
-function renderTour(){
-  const el=$('tour'),n=st.tour||0;el.hidden=!n||!!st.view;
-  document.body.classList.toggle('touring',!!n&&st.mode==='select'&&!st.anim);
-  if(!n)return;
-  const T=['','<b>Drag any player</b> to a new spot. That is how you set a lineup.','<b>Tap a player</b>, then tap a ready-made route like Slant or Go.'+(mqPhone.matches?' The routes show up under the field.':''),'Now press <b>Run play</b> to watch it move.','You have the basics. <b>Print</b> makes wristbands and coach sheets, and <b>Sign in</b> saves your plays online.'];
-  el.innerHTML=`<span class="chip">${n<4?'Step '+n+' of 3':'Nice work'}</span><span class="tour-t">${T[n]}</span>${n<4?'<button class="mini" id="tourSkip">Skip</button>':'<button class="btn sm primary" id="tourSkip">Done</button><button class="mini" id="tourLib">Browse starter plays</button>'}`;
-}
-function tourDone(n){if(st.tour===n){st.tour=n+1;renderTour();}}
-function endTour(){st.tour=0;try{localStorage.setItem('playcard.helpSeen','1')}catch(e){}renderTour();}
-$('tour').addEventListener('click',e=>{if(e.target.id==='tourSkip')endTour();else if(e.target.id==='tourLib'){endTour();openLib();}});
-$('tourGo').onclick=()=>{closeHelp();st.tour=1;st.mode='select';renderTour();renderToolbar();renderCanvas();$('tour').scrollIntoView({block:'nearest'});};
-$('selPick').onchange=e=>{if(st.view)return;if(st.drawing)finishDrawing();const id=e.target.value;st.sel=id?{type:'player',id}:null;st.mode='select';renderCanvas();renderToolbar();renderInspector();if(id)svg.focus();};
-
-function openHelp(){$('helpView').hidden=false;$('helpClose').focus();}
-function closeHelp(){$('helpView').hidden=true;try{localStorage.setItem('playcard.helpSeen','1')}catch(e){}}
-$('helpBtn').onclick=openHelp;$('helpClose').onclick=closeHelp;
-$('helpView').addEventListener('click',e=>{if(e.target.id==='helpView')closeHelp();});
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('helpView').hidden)closeHelp();else if(!$('dataView').hidden)$('dataView').hidden=true;else if(!$('authView').hidden)$('authView').hidden=true;else if(!$('libView').hidden)$('libView').hidden=true;},true);
-/* ---------- accounts and cloud saving ---------- */
-const SB_URL='https://oghqkzgkegffndjujoeq.supabase.co',SB_KEY='sb_publishable_jnHW32LRFOTOxNnQQYLYMw_ESp9fVFc';
-const SB_LIB='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
-const OWNER='playband.owner',DIRTY='playband.dirty';
-const cloud={sb:null,user:null,dirty:false,busy:false,t:0,status:'off',remoteAt:null,mode:'in',libFail:false};
-const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
-const lsSet=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
-const SYNC_TXT={off:'On this device only',loading:'Loading your plays…',saving:'Saving…',saved:'Saved to your account',error:'Not saved yet, will retry'};
-function auMsg(m){$('auMsg').textContent=m||'';}
-function renderAccount(){
-  const u=cloud.user,txt=u?SYNC_TXT[cloud.status]||'':SYNC_TXT.off;
-  $('acctBtn').textContent=u?'Account':'Sign in';$('acctBtn').classList.toggle('primary',!u);
-  $('syncChip').textContent=txt;$('syncChip').dataset.s=u?cloud.status:'off';
-  $('footSave').textContent=u?'Signed in as '+u.email+'. Your plays save to your PlayBand account.':'Your plays are saved only in this browser. Sign in to save them to a free account.';
-  $('promo').hidden=!!u||framed||!!cloud.promoOff;
-  const rec=cloud.recover;
-  $('authOut').hidden=!!u||rec;$('authIn').hidden=!u||rec;$('authNew').hidden=!rec;
-  if(u){$('auWho').textContent=u.email;$('auSync').textContent=txt+'. Changes save automatically as you work.';}
-  document.querySelectorAll('#authSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.auth===cloud.mode)));
-  $('auGo').textContent=cloud.mode==='up'?'Create account':'Sign in';$('auForgot').hidden=cloud.mode==='up';
-  $('auPass').autocomplete=cloud.mode==='up'?'new-password':'current-password';
-}
-function setSync(s){cloud.status=s;renderAccount();}
-function cloudDirty(){
-  if(st.view||!cloud.user||cloud.loading)return;
-  cloud.dirty=true;lsSet(DIRTY,'1');if(cloud.status!=='saving')setSync('saving');
-  clearTimeout(cloud.t);cloud.t=setTimeout(pushCloud,1500);
-}
-async function pushCloud(){
-  clearTimeout(cloud.t);
-  if(!cloud.user||!cloud.sb)return false;
-  if(cloud.busy){cloud.t=setTimeout(pushCloud,800);return false;}
-  cloud.busy=true;cloud.dirty=false;let ok=false;
-  try{
-    const r=await cloud.sb.from('playbooks').upsert({user_id:cloud.user.id,data:pb,updated_at:new Date().toISOString()}).select('updated_at').single();
-    if(r.error)throw r.error;cloud.remoteAt=r.data.updated_at;ok=true;
-  }catch(e){cloud.dirty=true;}
-  cloud.busy=false;
-  if(!ok){setSync('error');cloud.t=setTimeout(pushCloud,15000);return false;}
-  if(cloud.dirty){cloud.t=setTimeout(pushCloud,1500);}else{lsSet(DIRTY,null);setSync('saved');}
-  return true;
-}
-function adopt(next,keepIdx){
-  const i=keepIdx?pb.plays.findIndex(p=>p.id===pb.currentId):-1;
-  pb=next;if(i>0&&pb.plays[i])pb.currentId=pb.plays[i].id;
-  st.sel=null;st.drawing=null;st.preview=null;st.undo=[];st.redo=[];saveLocal();renderAll();
-}
-async function loadCloud(user){
-  cloud.loading=true;setSync('loading');let row=null;
-  try{
-    const r=await cloud.sb.from('playbooks').select('data,updated_at').eq('user_id',user.id).maybeSingle();
-    if(r.error)throw r.error;row=r.data;
-  }catch(e){cloud.loading=false;setSync('error');clearTimeout(cloud.rt);cloud.rt=setTimeout(()=>{if(cloud.user&&cloud.user.id===user.id)loadCloud(user);},15000);return;}
-  if(!cloud.user||cloud.user.id!==user.id){cloud.loading=false;return;}
-  const owner=lsGet(OWNER),mine=owner===user.id,anon=!owner&&!pb.sample;let push=false,note='';
-  if(!row){
-    if(owner&&!mine)adopt(samplePlaybook());
-    push=true;
-  }else{
-    let remote=null;try{remote=normPlaybook(row.data);}catch(e){}
-    cloud.remoteAt=row.updated_at;
-    if(!remote){push=mine||anon;if(!push){cloud.loading=false;setSync('error');return;}}
-    else if(mine&&lsGet(DIRTY))push=true;
-    else if(anon){
-      let local=null;try{local=normPlaybook(pb);}catch(e){}
-      if(local){
-        const sig=p=>JSON.stringify([p.name,p.size,p.players.map(q=>[q.label,q.x,q.y]),p.lines.map(l=>l.pts)]),have=new Set(remote.plays.map(sig));
-        const add=local.plays.filter(p=>!have.has(sig(p))),fh=new Set(remote.customFormations.map(f=>JSON.stringify([f.name,f.size,f.players])));
-        remote.plays.push(...add);remote.customFormations.push(...local.customFormations.filter(f=>!fh.has(JSON.stringify([f.name,f.size,f.players]))));
-        if(add.length){note='Added '+add.length+(add.length===1?' play':' plays')+' from this device to your account.';push=true;}
-      }
-      adopt(remote);
-    }else adopt(remote);
-  }
-  lsSet(OWNER,user.id);cloud.loading=false;
-  if(push){cloud.dirty=true;setSync('saving');await pushCloud();}else{lsSet(DIRTY,null);setSync('saved');}
-  if(note)auMsg(note);
-}
-function onSession(ev,session){
-  const user=session&&session.user;
-  if(ev==='PASSWORD_RECOVERY'){cloud.recover=true;$('authView').hidden=false;}
-  if(user){
-    if(cloud.user&&cloud.user.id===user.id){cloud.user=user;renderAccount();return;}
-    cloud.user=user;auMsg('');loadCloud(user);
-  }else if(cloud.user){
-    cloud.user=null;clearTimeout(cloud.t);lsSet(OWNER,null);lsSet(DIRTY,null);cloud.status='off';adopt(samplePlaybook());renderAccount();
-  }else renderAccount();
-}
-async function refreshCloud(){
-  if(!cloud.user||cloud.dirty||cloud.busy||cloud.loading||st.drawing||st.drag)return;
-  try{
-    const u=cloud.user,r=await cloud.sb.from('playbooks').select('updated_at').eq('user_id',u.id).maybeSingle();
-    if(r.error||!r.data||r.data.updated_at===cloud.remoteAt||cloud.dirty||cloud.user!==u)return;
-    const d=await cloud.sb.from('playbooks').select('data,updated_at').eq('user_id',u.id).maybeSingle();
-    if(d.error||!d.data||cloud.dirty||cloud.user!==u)return;
-    cloud.loading=true;adopt(normPlaybook(d.data.data),true);cloud.loading=false;cloud.remoteAt=d.data.updated_at;
-  }catch(e){cloud.loading=false;}
-}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshCloud();else if(cloud.dirty)pushCloud();});
-$('acctBtn').onclick=()=>{
-  if(st.drawing)finishDrawing();
-  if(!cloud.sb)auMsg(framed?'Accounts work on sports.treviweb.com, not inside this preview.':cloud.libFail?'Accounts are unavailable right now. Check your connection and reload the page.':'Getting accounts ready. Try again in a moment.');
-  $('authView').hidden=false;renderAccount();(cloud.user?$('authClose'):$('auEmail')).focus();
-  if(cloud.user){paintShare(cloud.share?null:'');loadShareInfo();}
-};
-$('authClose').onclick=()=>{$('authView').hidden=true;};
-/* ---------- share link ---------- */
-const shareUrl=id=>location.origin+location.pathname+'?share='+id;
-function paintShare(m){
-  const s=cloud.share;$('shGo').textContent=s?'Update shared copy':'Create share link';$('shStop').hidden=!s;$('shRow').hidden=!s;if(s)$('shUrl').value=shareUrl(s.id);
-  $('shMsg').textContent=m!=null?m:s?'Players see your plays as of '+new Date(s.updated_at).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})+'. Tap Update shared copy after you change plays.':'';
-}
-async function loadShareInfo(){
-  if(!cloud.sb||!cloud.user)return;const u=cloud.user;
-  try{const r=await cloud.sb.from('shares').select('id,updated_at').eq('user_id',u.id).maybeSingle();if(cloud.user!==u)return;cloud.share=r.error?null:r.data||null;}catch(e){cloud.share=null;}
-  paintShare();
-}
-$('shGo').onclick=async()=>{
-  if(!cloud.sb||!cloud.user)return;const b=$('shGo');b.disabled=true;
-  const data=JSON.parse(JSON.stringify(pb));delete data.printSets;delete data.customFormations;if(!$('shNames').checked)delete data.roster;
-  try{const r=await cloud.sb.from('shares').upsert({user_id:cloud.user.id,data,updated_at:new Date().toISOString()},{onConflict:'user_id'}).select('id,updated_at').single();
-    if(r.error||!r.data)throw r.error||new Error('none');cloud.share=r.data;paintShare('Your link is ready. Copy it and send it to your players and parents.');}
-  catch(e){paintShare('Could not make the link right now. Try again in a moment.');}
-  b.disabled=false;
-};
-$('shStop').onclick=async()=>{
-  if(!cloud.sb||!cloud.user)return;
-  try{const r=await cloud.sb.from('shares').delete().eq('user_id',cloud.user.id);if(r.error)throw r.error;cloud.share=null;paintShare('Sharing is off. The old link no longer works.');}
-  catch(e){paintShare('Could not turn sharing off. Try again in a moment.');}
-};
-$('shCopy').onclick=()=>{const i=$('shUrl'),ok=()=>{$('shCopy').textContent='Copied';setTimeout(()=>{$('shCopy').textContent='Copy';},2500);},fb=()=>{i.focus();i.select();};
-  try{navigator.clipboard.writeText(i.value).then(ok,fb);}catch(e){fb();}};
-async function loadShared(){
-  $('viewBar').hidden=false;$('viewTxt').textContent='Loading the shared plays…';$('viewGo').href=location.pathname;$('pbName').readOnly=true;
-  try{
-    const r=await fetch(SB_URL+'/rest/v1/rpc/get_share',{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({sid:shareId})});
-    const d=r.ok?await r.json():null;if(!d||typeof d!=='object')throw new Error('none');
-    pb=normPlaybook(d);st.sel=null;st.undo=[];st.redo=[];document.body.classList.remove('vloading');renderAll();
-    $('viewTxt').innerHTML='<b>'+esc(pb.name)+'</b> was shared with you. View only: pick a play, then press Run play.';
-    document.title=pb.name+' · PlayBand';
-  }catch(e){$('viewTxt').textContent='This share link is not active any more. Ask your coach for a new one.';}
-}
-$('auPw').onclick=()=>{cloud.recover=true;auMsg('');renderAccount();$('auNewPass').focus();};
-$('auPwCancel').onclick=()=>{cloud.recover=false;$('auNewPass').value='';auMsg('');renderAccount();};
-try{cloud.promoOff=sessionStorage.getItem('playband.promoOff')==='1';}catch(e){}
-$('promoGo').onclick=()=>{cloud.mode='up';$('acctBtn').click();};
-$('promoX').onclick=()=>{cloud.promoOff=true;try{sessionStorage.setItem('playband.promoOff','1');}catch(e){}renderAccount();};
-$('authView').addEventListener('click',e=>{if(e.target.id==='authView')$('authView').hidden=true;});
-$('authSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cloud.mode=b.dataset.auth;auMsg('');renderAccount();});
-$('authForm').addEventListener('submit',async e=>{
-  e.preventDefault();if(!cloud.sb)return;
-  const email=$('auEmail').value.trim(),password=$('auPass').value,go=$('auGo');go.disabled=true;auMsg(cloud.mode==='up'?'Creating your account…':'Signing in…');
-  try{
-    const r=cloud.mode==='up'?await cloud.sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}}):await cloud.sb.auth.signInWithPassword({email,password});
-    if(r.error)auMsg(/invalid login/i.test(r.error.message)?'That email and password do not match an account. Check them, or use Create account if you are new.':r.error.message);
-    else if(!r.data.session)auMsg('Almost done. Open the confirmation link we just emailed you, then sign in here.');
-    else{$('auPass').value='';auMsg('');}
-  }catch(err){auMsg('Could not reach the server. Check your connection and try again.');}
-  go.disabled=false;
-});
-$('auForgot').onclick=async()=>{
-  if(!cloud.sb)return;const email=$('auEmail').value.trim();
-  if(!email){auMsg('Type your email above first, then tap Forgot password.');$('auEmail').focus();return;}
-  try{await cloud.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});}catch(e){}
-  auMsg('If that email has an account, a link to set a new password is on its way.');
-};
-$('authNew').addEventListener('submit',async e=>{
-  e.preventDefault();if(!cloud.sb)return;
-  try{const r=await cloud.sb.auth.updateUser({password:$('auNewPass').value});
-    if(r.error){auMsg(r.error.message);return;}
-    $('auNewPass').value='';cloud.recover=false;renderAccount();auMsg('Your new password is saved.');
-  }catch(err){auMsg('Could not reach the server. Check your connection and try again.');}
-});
-$('auOut').onclick=async()=>{
-  if(cloud.dirty||cloud.busy||cloud.status==='error'){auMsg('Saving your latest changes first…');const ok=await pushCloud();
-    if(!ok&&(cloud.dirty||cloud.busy)){auMsg('Your latest changes are not saved to your account yet. Check your connection and try again in a moment.');return;}}
-  auMsg('');try{await cloud.sb.auth.signOut();}catch(e){}
-  auMsg('Signed out. Your plays are safe in your account.');
-};
-$('auBackup').onclick=$('footData').onclick=()=>{$('authView').hidden=true;$('dataBtn').click();};
-if(!framed&&!shareId){
-  const sc=document.createElement('script');sc.src=SB_LIB;sc.async=true;
-  sc.onload=()=>{try{
-    cloud.sb=window.supabase.createClient(SB_URL,SB_KEY);
-    cloud.sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>onSession(ev,session),0);});
-  }catch(e){cloud.libFail=true;}};
-  sc.onerror=()=>{cloud.libFail=true;};
-  document.head.appendChild(sc);
-}
-let seen=null;try{seen=localStorage.getItem('playcard.helpSeen')}catch(e){}
-renderAll();renderAccount();
-if(shareId)loadShared();
-else if(!seen){st.tour=1;renderTour();}
-})();
-</script>
-
 </body>
 </html>
