@@ -11,6 +11,10 @@
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#d9480f">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23d9480f'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Arial Narrow,Arial,sans-serif' font-weight='700' font-size='20' fill='%23fff'%3EP%3C/text%3E%3C/svg%3E">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S3J37X932X"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());
+/* Send the page path only: share ids and sign-in tokens in the address never go to Analytics. */
+gtag('config','G-S3J37X932X',{page_location:location.origin+location.pathname});</script>
 <style>[hidden]{display:none!important}html{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}</style>
 </head>
 <body>
@@ -1194,7 +1198,7 @@ function runPlay(){
     tracks.push(mk(p.id,pts,M));
   }
   if(!tracks.length)return;
-  tourDone(3);
+  tourDone(3);if(!st.ranOnce){st.ranOnce=true;track('run_play');}
   const t0=performance.now(),maxT=Math.max(...tracks.map(t=>t.t0+t.len/speed));
   st.anim={pos:{},raf:0};
   const step=now=>{
@@ -1249,7 +1253,7 @@ $('npCancel').onclick=()=>{npForm.hidden=true;};
 npForm.addEventListener('submit',e=>{
   e.preventDefault();const f=$('npForm').value,n=st.npSize||cur().size;
   pushUndo();const p=makePlay($('npName').value.trim()||'New play',$('npCat').value,+n,f);
-  pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='select';st.fbSaving=false;$('formbar').innerHTML='';markEdited();save();npForm.reset();npForm.hidden=true;renderAll();setDrawer(false);
+  track('play_created',{size:String(n)});pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='select';st.fbSaving=false;$('formbar').innerHTML='';markEdited();save();npForm.reset();npForm.hidden=true;renderAll();setDrawer(false);
 });
 
 /* ---------- reset ---------- */
@@ -1347,7 +1351,8 @@ function renderCall(){
   }
   $('sheets').innerHTML=out;
 }
-$('doPrint').onclick=()=>window.print();
+const track=(n,p)=>{try{if(window.gtag)window.gtag('event',n,p||{});}catch(e){}};
+$('doPrint').onclick=()=>{track('print_sheets',{sheet:sheetType});window.print();};
 $('pickBtn').onclick=()=>{const on=$('pickPanel').hidden;$('pickPanel').hidden=!on;$('pickBtn').setAttribute('aria-expanded',String(on));};
 $('pickList').addEventListener('change',e=>{const id=e.target.dataset.pick;if(!id)return;e.target.checked?st.skip.delete(id):st.skip.add(id);const y=$('pickList').scrollTop;renderSheets();$('pickList').scrollTop=y;const el=$('pickList').querySelector('[data-pick="'+id+'"]');if(el)el.focus();});
 $('setSave').onclick=()=>{const name=$('setName').value.trim();if(!name){flash('setMsg','Type a name for this set first.');$('setName').focus();return;}
@@ -1482,7 +1487,7 @@ $('libView').addEventListener('click',e=>{
   const sz=e.target.closest('#libSize button');if(sz){st.libSize=+sz.dataset.size;renderLib();return;}
   const b=e.target.closest('button[data-lib]');if(!b)return;
   const p=libPlay(LIB[+b.dataset.lib]);pushUndo();pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='select';st.fbSaving=false;$('formbar').innerHTML='';markEdited();save();renderAll();
-  b.textContent='Added';b.disabled=true;$('libMsg').textContent='Added "'+p.name+'". It is open in the editor when you tap Done.';
+  track('starter_play_added');b.textContent='Added';b.disabled=true;$('libMsg').textContent='Added "'+p.name+'". It is open in the editor when you tap Done.';
 });
 
 /* ---------- guided first play ---------- */
@@ -1625,7 +1630,7 @@ $('shGo').onclick=async()=>{
   if(!cloud.sb||!cloud.user)return;const b=$('shGo');b.disabled=true;
   const data=JSON.parse(JSON.stringify(pb));delete data.printSets;delete data.customFormations;if(!$('shNames').checked)delete data.roster;
   try{const r=await cloud.sb.from('shares').upsert({user_id:cloud.user.id,data,updated_at:new Date().toISOString()},{onConflict:'user_id'}).select('id,updated_at').single();
-    if(r.error||!r.data)throw r.error||new Error('none');cloud.share=r.data;paintShare('Your link is ready. Copy it and send it to your players and parents.');}
+    if(r.error||!r.data)throw r.error||new Error('none');cloud.share=r.data;track('share_link_made');paintShare('Your link is ready. Copy it and send it to your players and parents.');}
   catch(e){paintShare('Could not make the link right now. Try again in a moment.');}
   b.disabled=false;
 };
@@ -1660,7 +1665,7 @@ $('authForm').addEventListener('submit',async e=>{
     const r=cloud.mode==='up'?await cloud.sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}}):await cloud.sb.auth.signInWithPassword({email,password});
     if(r.error)auMsg(/invalid login/i.test(r.error.message)?'That email and password do not match an account. Check them, or use Create account if you are new.':r.error.message);
     else if(!r.data.session)auMsg('Almost done. Open the confirmation link we just emailed you, then sign in here.');
-    else{$('auPass').value='';auMsg('');}
+    else{$('auPass').value='';auMsg('');track(cloud.mode==='up'?'sign_up':'login');}
   }catch(err){auMsg('Could not reach the server. Check your connection and try again.');}
   go.disabled=false;
 });

@@ -23,6 +23,10 @@
   if(/[?&]share=/.test(s)||auth||used)location.replace('/app'+s+h);
 }catch(e){}})();
 </script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S3J37X932X"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());
+/* Send the page path only: share ids and sign-in tokens in the address never go to Analytics. */
+gtag('config','G-S3J37X932X',{page_location:location.origin+location.pathname});</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
@@ -150,7 +154,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
         <h1>Draw the play.<br><em>Print the wristband.</em></h1>
         <p class="lede">PlayBand helps flag, 7v7 and tackle coaches build a playbook in minutes, on a phone or a laptop. Then it prints wristbands and a coach call sheet with matching numbers.</p>
         <div class="cta">
-          <a class="btn primary" href="/app">Start drawing free</a>
+          <a class="btn primary" href="/app" onclick="window.gtag&&gtag('event','start_click')">Start drawing free</a>
           <a class="btn ghost" href="#how">See how it works</a>
           <small>Free while in beta. No account needed to try it.</small>
         </div>
@@ -240,7 +244,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   <div class="wrap">
     <h2>Your first play takes about a minute</h2>
     <p>Open the editor, drag a player, pick a route and press Run play.</p>
-    <a class="btn primary" href="/app">Start drawing free</a>
+    <a class="btn primary" href="/app" onclick="window.gtag&&gtag('event','start_click')">Start drawing free</a>
   </div>
 </section>
 </main>
