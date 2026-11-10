@@ -70,7 +70,9 @@ h2{font-size:15px} h3{font-size:13px;color:var(--muted)}
 .formbar .fb-name b{font-family:var(--display);font-size:16px;letter-spacing:.02em}
 .btn.sm{padding:4px 10px;font-size:13px}
 .qr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-.qr .btn{padding:7px 4px;text-align:center}
+.qr .btn{padding:6px 4px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:12.5px;min-height:0}
+.qr .btn svg{color:var(--sel)}
+.qr .btn[aria-pressed="true"] svg{color:inherit}
 .qr .btn[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
 #fbName{width:190px;max-width:100%;padding:4px 8px}
 #npSize{align-self:flex-start}
@@ -79,6 +81,11 @@ h2{font-size:15px} h3{font-size:13px;color:var(--muted)}
 .mini{border:0;background:transparent;color:var(--muted);font-size:12px;padding:2px 4px;border-radius:4px}
 .mini:hover{color:var(--ink);background:var(--panel)}
 .mini.danger{color:var(--accent)}
+.pl-tools{display:flex;gap:6px;padding:0 8px 8px}
+.pl-tools .inp{padding:6px 8px;min-width:0}
+.pl-tools select.inp{flex:0 0 auto;width:auto;max-width:52%}
+.pnum{color:var(--muted);font-weight:500;margin-right:3px;font-variant-numeric:tabular-nums}
+.pacts{flex-wrap:wrap}
 #newPlayForm{padding:0 12px 12px;display:flex;flex-direction:column;gap:8px}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:500}
 .inp{border:1px solid var(--rule);background:var(--panel-2);border-radius:8px;padding:7px 9px;width:100%}
@@ -235,6 +242,18 @@ textarea.inp{resize:vertical;min-height:70px}
   #helpView,#dataView,#authView{padding-left:8px;padding-right:8px}
   .bar #dataBtn{display:none}
 }
+.tb-more{display:contents}
+.p-only{display:none}
+@media (max-width:700px){
+  .p-only{display:inline-flex;align-items:center}
+  .toolbar{flex-wrap:wrap;overflow:visible;-webkit-mask-image:none;mask-image:none;margin-inline:0;padding-inline:0}
+  .toolbar::after{display:none}
+  .toolbar .seg button{padding-inline:9px}
+  .toolbar .btn{padding-inline:10px}
+  .tb-more{display:none}
+  .toolbar.more .tb-more{display:contents}
+  #moreBtn{order:5} .tb-more>*{order:6}
+}
 @media (max-width:360px){
   .bar{gap:4px}
   .brand b{font-size:18px}
@@ -287,7 +306,12 @@ textarea.inp{resize:vertical;min-height:70px}
       <label class="f">Category<select class="inp" id="npCat"></select></label>
       <div class="row"><button class="btn primary" type="submit">Create play</button><button class="btn" type="button" id="npCancel">Cancel</button></div>
     </form>
+    <div class="pl-tools" id="plTools" hidden>
+      <input class="inp" id="plSearch" type="search" placeholder="Search plays" aria-label="Search plays">
+      <select class="inp" id="plFolder" aria-label="Show folder"></select>
+    </div>
     <ul id="playList"></ul>
+    <p class="pmeta" id="plEmpty" hidden style="padding:0 12px 12px">No plays match.</p>
   </aside>
 
   <main class="panel editor">
@@ -299,11 +323,15 @@ textarea.inp{resize:vertical;min-height:70px}
       </div>
       <span class="tsep"></span>
       <button class="btn" id="undoBtn" title="Undo (Ctrl/Cmd+Z)">Undo</button>
+      <button class="btn p-only" id="moreBtn" aria-expanded="false" aria-controls="tbMore">More</button>
+      <span class="tb-more" id="tbMore">
       <button class="btn" id="redoBtn" title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
       <button class="btn" id="flipBtn" title="Mirror the play left to right">Flip</button>
       <span class="tsep"></span>
       <label class="tool">Defense <select id="defSel"></select></label>
       <label class="tool"><input type="checkbox" id="snapChk"> Snap</label>
+      <label class="tool"><span class="p-only">Speed</span><select id="animSpeed" aria-label="Animation speed" title="Animation speed"><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="1.8">2x</option></select></label>
+      </span>
       <button class="btn primary" id="animBtn">Run play</button>
     </div>
     <div class="formbar" id="formbar"></div>
@@ -679,9 +707,16 @@ function renderCanvas(){
   svg.innerHTML=playSvgInner(c,{interactive:true,pos:st.anim&&st.anim.pos});
   svg.classList.toggle('draw',st.mode==='draw');svg.classList.toggle('text',st.mode==='text');
 }
+const foldersOf=()=>[...new Set(pb.plays.map(p=>p.folder).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 function renderList(){
-  const c=cur();
-  $('playList').innerHTML=pb.plays.map((p,i)=>`<li class="pitem${p.id===c.id?' on':''}" data-play="${p.id}">${thumbSvg(p)}<div><div class="pname">${esc(p.name)}</div><div class="pmeta">${esc(p.category)} · ${SIZE_NAME[p.size]}</div><div class="pacts"><button class="mini" data-act="dup" data-id="${p.id}">Duplicate</button><button class="mini danger" data-act="del" data-id="${p.id}">${st.confirmDel===p.id?'Confirm delete':'Delete'}</button></div></div></li>`).join('');
+  const c=cur(),folders=foldersOf(),q=(st.plQ||'').toLowerCase();
+  if(st.plFolder&&!folders.includes(st.plFolder))st.plFolder='';
+  $('plTools').hidden=pb.plays.length<6&&!folders.length&&!q;
+  $('plFolder').hidden=!folders.length;
+  $('plFolder').innerHTML='<option value="">All folders</option>'+folders.map(f=>`<option${f===st.plFolder?' selected':''}>${esc(f)}</option>`).join('');
+  const rows=pb.plays.map((p,i)=>[p,i]).filter(([p])=>(!st.plFolder||p.folder===st.plFolder)&&(!q||p.name.toLowerCase().includes(q)||(p.folder||'').toLowerCase().includes(q)||p.category.toLowerCase().includes(q)));
+  $('playList').innerHTML=rows.map(([p,i])=>`<li class="pitem${p.id===c.id?' on':''}" data-play="${p.id}">${thumbSvg(p)}<div><div class="pname"><span class="pnum">${i+1}.</span>${esc(p.name)}</div><div class="pmeta">${esc(p.category)} · ${SIZE_NAME[p.size]}${p.folder?' · '+esc(p.folder):''}</div><div class="pacts"><button class="mini" data-act="up" data-id="${p.id}" aria-label="Move ${esc(p.name)} up"${i===0?' disabled':''}>▲ Up</button><button class="mini" data-act="down" data-id="${p.id}" aria-label="Move ${esc(p.name)} down"${i===pb.plays.length-1?' disabled':''}>▼ Down</button><button class="mini" data-act="dup" data-id="${p.id}">Duplicate</button><button class="mini danger" data-act="del" data-id="${p.id}">${st.confirmDel===p.id?'Confirm delete':'Delete'}</button></div></div></li>`).join('');
+  $('plEmpty').hidden=rows.length>0;
   $('sampleChip').hidden=!pb.sample;
 }
 function renderToolbar(){
@@ -703,6 +738,8 @@ function renderToolbar(){
   renderFormbar();
 }
 /* ---------- ready-made routes ---------- */
+const QICON={go:'M12 21V3',slant:'M7 21v-5L18 6',out:'M15 21V9H5',in:'M8 21V9h11',post:'M8 21V11l9-8',corner:'M15 21V11L7 3',hitch:'M12 21V6l-4 5',comeback:'M10 21V4l6 7',flat:'M8 20q2-5 12-5',wheel:'M6 20q8 0 9-7V3',drag:'M5 20l2-4h13',block:'M12 21v-9M6 12h12'};
+const qIcon=k=>{const d=QICON[k],m=d.match(/^M(\d+) (\d+)/);return `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${m[1]}" cy="${m[2]}" r="2.6" fill="currentColor"/></svg>`;};
 const QUICK=[['go','Go'],['slant','Slant'],['out','Out'],['in','In'],['post','Post'],['corner','Corner'],['hitch','Hitch'],['comeback','Comeback'],['flat','Flat'],['wheel','Wheel'],['drag','Drag'],['block','Block']];
 function applyQuickRoute(pid,name){
   const c=cur(),p=playerById(c,pid);if(!p)return;
@@ -817,7 +854,7 @@ function renderInspector(){
     <div class="row"><button class="btn warn" data-do="delSel">Delete line</button></div>`;
   }else if(s&&s.type==='player'){const p=playerById(c,s.id);if(!p){st.sel=null;return renderInspector();}
     h=`<div class="isec"><h2>Player</h2><label class="f">Label<input class="inp" id="plLabel" maxlength="3" value="${esc(p.label)}"></label></div>
-    ${p.kind!=='def'?`<div class="isec"><h3>Ready-made routes</h3><div class="qr">${QUICK.map(([k,t])=>`<button class="btn sm" data-route="${k}" aria-pressed="${String(!!(st.lastQuick&&st.lastQuick.pid===p.id&&st.lastQuick.name===k))}">${t}</button>`).join('')}</div>
+    ${p.kind!=='def'?`<div class="isec"><h3>Ready-made routes</h3><div class="qr">${QUICK.map(([k,t])=>`<button class="btn sm" data-route="${k}" aria-pressed="${String(!!(st.lastQuick&&st.lastQuick.pid===p.id&&st.lastQuick.name===k))}">${qIcon(k)}<span>${t}</span></button>`).join('')}</div>
     <span class="pmeta">Tap a route to give it to this player. Tap the same one again to flip its direction. It replaces the route they have.</span></div>`:''}
     <div class="row"><button class="btn${p.kind!=='def'?'':' primary'}" data-do="drawFrom">Draw my own</button><button class="btn" data-do="clearRoutes">Clear routes</button></div>
     <div class="row"><button class="btn warn" data-do="delSel">Remove player</button></div>`;
@@ -828,6 +865,7 @@ function renderInspector(){
     h=`<div class="isec"><h2>Play</h2>
     <label class="f">Name<input class="inp" id="playName" value="${esc(c.name)}"></label>
     <label class="f">Category<select class="inp" id="playCat">${CATS.map(k=>`<option${k===c.category?' selected':''}>${k}</option>`).join('')}</select></label>
+    <label class="f">Folder<input class="inp" id="playFolder" list="folderList" maxlength="30" placeholder="Optional, e.g. Red zone" value="${esc(c.folder||'')}"></label><datalist id="folderList">${foldersOf().map(f=>`<option value="${esc(f)}">`).join('')}</datalist>
     <label class="f">Coaching notes<textarea class="inp" id="playNotes" placeholder="Reads, blocking rules, coaching points">${esc(c.notes||'')}</textarea></label>
     <span class="pmeta">${esc(c.formation)} · ${SIZE_NAME[c.size]}</span></div>
     ${(pb.customFormations||[]).some(f=>f.size===c.size)?`<div class="isec"><h2>Your formations</h2>${pb.customFormations.filter(f=>f.size===c.size).map(f=>`<div class="row" style="justify-content:space-between;align-items:center"><span>${esc(f.name)}</span><button class="mini danger" data-do="delForm" data-id="${f.id}">Delete</button></div>`).join('')}</div>`:''}
@@ -988,6 +1026,7 @@ $('inspector').addEventListener('input',e=>{
   else if(t.id==='lbText'){const lb=c.labels.find(x=>x.id===st.sel.id);lb.text=t.value||' ';}
   else if(t.id==='playName')c.name=t.value||'Untitled play';
   else if(t.id==='playNotes'){c.notes=t.value;markEdited();save();return;}
+  else if(t.id==='playFolder'){c.folder=t.value.trim().slice(0,30);markEdited();save();renderList();return;}
   else return;
   commit();
 });
@@ -1024,7 +1063,7 @@ function runPlay(){
     tracks.push({id:p.id,pts,cum,len:cum[cum.length-1]});
   }
   if(!tracks.length)return;
-  const speed=reduceMotion?1000:7.5,t0=performance.now();
+  const speed=reduceMotion?1000:7.5*(+$('animSpeed').value||1),t0=performance.now();
   const maxT=Math.max(...tracks.map(t=>t.len/speed));
   st.anim={pos:{},raf:0};
   const step=now=>{
@@ -1040,12 +1079,14 @@ function runPlay(){
   renderToolbar();st.anim.raf=requestAnimationFrame(step);
 }
 $('animBtn').onclick=runPlay;
+$('moreBtn').onclick=()=>{const on=!document.querySelector('.toolbar').classList.contains('more');document.querySelector('.toolbar').classList.toggle('more',on);$('moreBtn').setAttribute('aria-expanded',String(on));$('moreBtn').textContent=on?'Less':'More';};
 
 /* ---------- play list ---------- */
 $('playList').addEventListener('click',e=>{
   const b=e.target.closest('button[data-act]');
   if(b){
     const p=pb.plays.find(x=>x.id===b.dataset.id);
+    if(b.dataset.act==='up'||b.dataset.act==='down'){const i=pb.plays.indexOf(p),j=i+(b.dataset.act==='up'?-1:1);if(j<0||j>=pb.plays.length)return;pushUndo();pb.plays.splice(i,1);pb.plays.splice(j,0,p);markEdited();save();renderList();const nb=$('playList').querySelector(`[data-act="${b.dataset.act}"][data-id="${p.id}"]`);if(nb)nb.focus();return;}
     if(b.dataset.act==='dup'){pushUndo();const cp=JSON.parse(JSON.stringify(p));cp.id=uid();cp.name=p.name+' (copy)';
       const map={};cp.players.forEach(pl=>{const n=uid();map[pl.id]=n;pl.id=n;});cp.lines.forEach(l=>{l.id=uid();if(l.playerId)l.playerId=map[l.playerId];});cp.labels.forEach(l=>l.id=uid());
       pb.plays.splice(pb.plays.indexOf(p)+1,0,cp);pb.currentId=cp.id;st.sel=null;markEdited();save();renderAll();}
@@ -1059,6 +1100,8 @@ $('playList').addEventListener('click',e=>{
   if(st.anim)runPlay();if(st.drawing)finishDrawing();
   pb.currentId=li.dataset.play;st.sel=null;st.fbSaving=false;$('formbar').innerHTML='';save();renderAll();setDrawer(false);
 });
+$('plSearch').addEventListener('input',e=>{st.plQ=e.target.value.trim();renderList();});
+$('plFolder').addEventListener('change',e=>{st.plFolder=e.target.value;renderList();});
 const npForm=$('newPlayForm');
 function buildFormOpts(){
   const size=st.npSize||cur().size,{mine,std}=formationList(size);
@@ -1186,7 +1229,7 @@ function normPlaybook(o){
       return {id:uid(),playerId:pid||null,start,pts:(Array.isArray(l.pts)?l.pts:[]).slice(0,60).map(normPt).filter(Boolean),style:pick(l.style,['solid','dashed','zigzag'],'solid'),cap:pick(l.cap,['arrow','t','dot','none'],'arrow'),smooth:!!l.smooth,color:pick(l.color,Object.keys(COLORS),'ink')};
     }).filter(Boolean);
     const labels=(Array.isArray(p.labels)?p.labels:[]).slice(0,40).map(l=>l?{id:uid(),x:num(l.x,0,54,10),y:num(l.y,-26,12,0),text:str(l.text,40,'Label')||' '}:null).filter(Boolean);
-    return {id:uid(),name:str(p.name,60,'Untitled play')||'Untitled play',category:pick(p.category,CATS,'Run'),size,formation:str(p.formation,40,'Custom'),notes:str(p.notes,2000),
+    return {id:uid(),name:str(p.name,60,'Untitled play')||'Untitled play',category:pick(p.category,CATS,'Run'),size,formation:str(p.formation,40,'Custom'),notes:str(p.notes,2000),folder:str(p.folder,30).trim(),
       defense:pick(p.defense,Object.keys(DEFENSES[size]),'None'),players,lines,labels};
   }).filter(Boolean);
   if(!plays.length)throw new Error('empty');
