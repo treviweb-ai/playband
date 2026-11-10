@@ -204,7 +204,7 @@ $('addCard').addEventListener('submit',async e=>{
     const r=await tmp.auth.signUp({email,password});
     if(r.error)$('addMsg').textContent=/already/i.test(r.error.message)?'An account with that email already exists.':r.error.message;
     else if(r.data&&r.data.user&&r.data.user.identities&&r.data.user.identities.length===0)$('addMsg').textContent='An account with that email already exists.';
-    else{$('addMsg').innerHTML='Account created for <b>'+esc(email)+'</b>. Temporary password: <b>'+esc(password)+'</b>. Copy it now, it is not shown again.';
+    else{$('addMsg').innerHTML='Account created for <b>'+esc(email)+'</b>. Temporary password: <b>'+esc(password)+'</b>. Copy it now, it is not shown again.'+(r.data&&!r.data.session?' They also get an email with a confirmation link and must tap it before they can sign in.':'');
       $('addEmail').value='';$('addPass').value=tempPass();load();}
     try{await tmp.auth.signOut({scope:'local'});}catch(err){}
   }catch(err){$('addMsg').textContent='Could not reach the server. Check your connection and try again.';}
