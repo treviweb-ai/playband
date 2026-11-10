@@ -50,3 +50,26 @@ grant execute on function public.admin_list_users() to authenticated;
 
 -- To make an account an admin (run in the Supabase SQL editor, after that account has signed up):
 --   insert into public.admins (user_id) select id from auth.users where email = 'you@example.com';
+
+-- ---------------------------------------------------------------
+-- View-only share links (one per coach). The viewer page calls
+-- get_share(id) with the public key; the id is the secret.
+-- ---------------------------------------------------------------
+create table if not exists public.shares (
+  id text primary key default encode(extensions.gen_random_bytes(9), 'hex'),
+  user_id uuid not null unique default auth.uid() references auth.users (id) on delete cascade,
+  data jsonb not null check (pg_column_size(data) < 1500000),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table public.shares enable row level security;
+drop policy if exists "shares own rows" on public.shares;
+create policy "shares own rows" on public.shares for all to authenticated
+  using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+create or replace function public.get_share(sid text)
+returns jsonb language sql stable security definer set search_path = public as $$
+  select data from public.shares where id = sid
+$$;
+revoke all on function public.get_share(text) from public;
+grant execute on function public.get_share(text) to anon, authenticated;
