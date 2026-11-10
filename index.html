@@ -143,9 +143,12 @@ textarea.inp{resize:vertical;min-height:70px}
 .cdiag .win{border-color:#bbb}
 .cell p{margin:4px 0 0;font-size:11px;color:#333}
 
-#helpView,#dataView{position:fixed;inset:0;z-index:30;background:rgba(10,18,14,.55);display:flex;align-items:flex-start;justify-content:center;overflow:auto;
+#helpView,#dataView,#authView{position:fixed;inset:0;z-index:30;background:rgba(10,18,14,.55);display:flex;align-items:flex-start;justify-content:center;overflow:auto;
   padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
-#helpView[hidden],#dataView[hidden]{display:none}
+#helpView[hidden],#dataView[hidden],#authView[hidden]{display:none}
+#authView [hidden]{display:none}
+#syncChip{text-transform:none;letter-spacing:.02em;font-size:12px}
+#syncChip[data-s=error]{border-color:var(--accent);color:var(--accent)}
 .help-intro{margin:0;line-height:1.5;max-width:65ch}
 .sel{user-select:all;-webkit-user-select:all;font-weight:600;color:var(--ink)}
 .chip.beta{border-color:var(--accent);color:var(--accent)}
@@ -217,7 +220,8 @@ textarea.inp{resize:vertical;min-height:70px}
   .qr .btn{padding:8px 4px}
   .sw{width:34px;height:34px}
   .help-card{padding:16px}
-  #helpView,#dataView{padding-left:8px;padding-right:8px}
+  #helpView,#dataView,#authView{padding-left:8px;padding-right:8px}
+  .bar #dataBtn{display:none}
 }
 @media (max-width:360px){
   .bar{gap:4px}
@@ -242,11 +246,12 @@ textarea.inp{resize:vertical;min-height:70px}
   <button class="btn primary m-only" id="playsBtn" aria-expanded="false" aria-controls="playsPanel">Plays</button>
   <div class="brand"><b>Play<span>Band</span></b><span class="chip beta">Free beta</span></div>
   <span id="pbHome"><input id="pbName" aria-label="Playbook name" value="Sample Playbook">
-  <span class="chip" id="sampleChip">Sample plays</span></span>
+  <span class="chip" id="sampleChip">Sample plays</span><span class="chip" id="syncChip" role="status">On this device only</span></span>
   <div class="spacer"></div>
   <button class="btn" id="helpBtn"><span class="w">How to use</span><span class="n">Help</span></button>
   <button class="btn" id="dataBtn"><span class="w">Back up / Restore</span><span class="n">Backup</span></button>
   <button class="btn" id="printBtn"><span class="w">Print sheets</span><span class="n">Print</span></button>
+  <button class="btn primary" id="acctBtn">Sign in</button>
 </header>
 
 <div id="scrim"></div>
@@ -300,7 +305,7 @@ textarea.inp{resize:vertical;min-height:70px}
       <li><b>Line up.</b> Drag players where you want them. Tap <b>Save as formation</b> above the field to reuse that lineup on other plays.</li>
       <li><b>Add routes.</b> Tap a player and pick a ready-made route like Slant, Out or Post. Or tap <b>Draw</b>, tap a player, and tap points on the field to draw your own.</li>
       <li><b>Print.</b> <b>Print sheets</b> gives you play sheets, wristbands and a coach call sheet with matching numbers.</li>
-      <li><b>Back up.</b> Plays are saved only in this browser. Use <b>Back up / Restore</b> to keep a copy or move to another device.</li>
+      <li><b>Save.</b> Tap <b>Sign in</b> and create a free account. Your plays then save online and follow you to any phone or computer. Without an account they stay in this browser only.</li>
     </ol>
     <p class="help-note">Your plays save automatically in this browser on this device. Undo and redo are in the toolbar (Ctrl/Cmd Z). This is a beta, so tell us what feels clumsy or missing: <span class="sel">info@treviweb.com</span></p>
   </div>
@@ -308,7 +313,7 @@ textarea.inp{resize:vertical;min-height:70px}
 
 <footer class="foot">
   <span><b>PlayBand</b> free beta</span>
-  <span>Your plays are saved only in this browser. We do not collect them, so keep a backup.</span>
+  <span><span id="footSave">Your plays are saved only in this browser. Sign in to save them to a free account.</span> <button class="mini" id="footData">Back up / Restore</button></span>
   <span>Feedback or want launch updates? <a href="mailto:info@treviweb.com?subject=PlayBand%20feedback" id="fbLink">info@treviweb.com</a> <button class="mini" id="fbCopy">Copy</button></span>
   <span>Made by <a href="https://treviweb.com" target="_blank" rel="noopener">Trevi Web Co.</a></span>
 </footer>
@@ -330,6 +335,32 @@ textarea.inp{resize:vertical;min-height:70px}
       <p class="help-note">Replace everything with the sample plays. Back up first if you want to keep your work.</p>
       <div class="row"><button class="btn" id="resetBtn">Reset to sample plays</button></div>
     </div>
+  </div>
+</div>
+
+<div id="authView" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="help-card">
+    <div class="help-head"><h2 id="authTitle">Your account</h2><button class="btn" id="authClose">Close</button></div>
+    <div id="authOut" class="isec">
+      <p class="help-note">A free account saves your plays online, so they are on every phone and computer you sign in on. Plays already in this browser move into your account.</p>
+      <div class="seg" id="authSeg" role="group" aria-label="Sign in or create account"><button type="button" data-auth="in" aria-pressed="true">Sign in</button><button type="button" data-auth="up" aria-pressed="false">Create account</button></div>
+      <form id="authForm" class="isec">
+        <label class="f">Email<input class="inp" id="auEmail" type="email" autocomplete="email" required></label>
+        <label class="f">Password<input class="inp" id="auPass" type="password" minlength="8" autocomplete="current-password" required></label>
+        <div class="row"><button class="btn primary" type="submit" id="auGo">Sign in</button><button type="button" class="mini" id="auForgot">Forgot password?</button></div>
+      </form>
+    </div>
+    <div id="authIn" class="isec" hidden>
+      <p class="help-intro">Signed in as <b id="auWho"></b></p>
+      <p class="help-note" id="auSync"></p>
+      <div class="row"><button class="btn" id="auBackup">Back up / Restore</button><button class="btn" id="auOut">Sign out</button></div>
+    </div>
+    <form id="authNew" class="isec" hidden>
+      <p class="help-note">Choose a new password for your account.</p>
+      <label class="f">New password<input class="inp" id="auNewPass" type="password" minlength="8" autocomplete="new-password" required></label>
+      <div class="row"><button class="btn primary" type="submit">Save new password</button></div>
+    </form>
+    <p class="help-note" id="auMsg" role="status"></p>
   </div>
 </div>
 
@@ -486,7 +517,8 @@ if(!pb||!pb.plays||!pb.plays.length||(pb.sample&&pb.v!==2)) pb=samplePlaybook();
 const st={mode:'select',sel:null,drag:null,drawing:null,preview:null,down:null,snap:false,anim:null,undo:[],redo:[],
   lineDefaults:{style:'solid',cap:'arrow',smooth:false,color:'ink'}};
 let saveT=0;
-function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(pb))}catch(e){}},250)}
+function saveLocal(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(pb))}catch(e){}},250)}
+function save(){saveLocal();cloudDirty();}
 const cur=()=>pb.plays.find(p=>p.id===pb.currentId)||pb.plays[0];
 function pushUndo(){st.undo.push(JSON.stringify(pb));if(st.undo.length>100)st.undo.shift();st.redo=[];}
 function markEdited(){if(pb.sample){pb.sample=false}}
@@ -872,7 +904,7 @@ $('zoomBtn').onclick=()=>{
   renderCanvas();renderToolbar();
 };
 function setDrawer(on){document.body.classList.toggle('plays-open',on);$('playsBtn').setAttribute('aria-expanded',String(on));if(on)$('playsClose').focus();}
-function placePb(){(mqDrawer.matches?$('pbSlot'):$('pbHome')).append($('pbName'),$('sampleChip'));}
+function placePb(){(mqDrawer.matches?$('pbSlot'):$('pbHome')).append($('pbName'),$('sampleChip'),$('syncChip'));}
 $('playsBtn').onclick=()=>setDrawer(true);
 $('playsClose').onclick=$('scrim').onclick=()=>setDrawer(false);
 mqDrawer.addEventListener('change',()=>{placePb();setDrawer(false);});
@@ -1159,9 +1191,155 @@ function openHelp(){$('helpView').hidden=false;$('helpClose').focus();}
 function closeHelp(){$('helpView').hidden=true;try{localStorage.setItem('playcard.helpSeen','1')}catch(e){}}
 $('helpBtn').onclick=openHelp;$('helpClose').onclick=closeHelp;
 $('helpView').addEventListener('click',e=>{if(e.target.id==='helpView')closeHelp();});
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('helpView').hidden)closeHelp();else if(!$('dataView').hidden)$('dataView').hidden=true;},true);
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('helpView').hidden)closeHelp();else if(!$('dataView').hidden)$('dataView').hidden=true;else if(!$('authView').hidden)$('authView').hidden=true;},true);
+/* ---------- accounts and cloud saving ---------- */
+const SB_URL='https://oghqkzgkegffndjujoeq.supabase.co',SB_KEY='sb_publishable_jnHW32LRFOTOxNnQQYLYMw_ESp9fVFc';
+const SB_LIB='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+const OWNER='playband.owner',DIRTY='playband.dirty';
+const cloud={sb:null,user:null,dirty:false,busy:false,t:0,status:'off',remoteAt:null,mode:'in',libFail:false};
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
+const SYNC_TXT={off:'On this device only',loading:'Loading your plays…',saving:'Saving…',saved:'Saved to your account',error:'Not saved yet, will retry'};
+function auMsg(m){$('auMsg').textContent=m||'';}
+function renderAccount(){
+  const u=cloud.user,txt=u?SYNC_TXT[cloud.status]||'':SYNC_TXT.off;
+  $('acctBtn').textContent=u?'Account':'Sign in';$('acctBtn').classList.toggle('primary',!u);
+  $('syncChip').textContent=txt;$('syncChip').dataset.s=u?cloud.status:'off';
+  $('footSave').textContent=u?'Signed in as '+u.email+'. Your plays save to your PlayBand account.':'Your plays are saved only in this browser. Sign in to save them to a free account.';
+  const rec=cloud.recover;
+  $('authOut').hidden=!!u||rec;$('authIn').hidden=!u||rec;$('authNew').hidden=!rec;
+  if(u){$('auWho').textContent=u.email;$('auSync').textContent=txt+'. Changes save automatically as you work.';}
+  document.querySelectorAll('#authSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.auth===cloud.mode)));
+  $('auGo').textContent=cloud.mode==='up'?'Create account':'Sign in';$('auForgot').hidden=cloud.mode==='up';
+  $('auPass').autocomplete=cloud.mode==='up'?'new-password':'current-password';
+}
+function setSync(s){cloud.status=s;renderAccount();}
+function cloudDirty(){
+  if(!cloud.user||cloud.loading)return;
+  cloud.dirty=true;lsSet(DIRTY,'1');if(cloud.status!=='saving')setSync('saving');
+  clearTimeout(cloud.t);cloud.t=setTimeout(pushCloud,1500);
+}
+async function pushCloud(){
+  clearTimeout(cloud.t);
+  if(!cloud.user||!cloud.sb)return false;
+  if(cloud.busy){cloud.t=setTimeout(pushCloud,800);return false;}
+  cloud.busy=true;cloud.dirty=false;let ok=false;
+  try{
+    const r=await cloud.sb.from('playbooks').upsert({user_id:cloud.user.id,data:pb,updated_at:new Date().toISOString()}).select('updated_at').single();
+    if(r.error)throw r.error;cloud.remoteAt=r.data.updated_at;ok=true;
+  }catch(e){cloud.dirty=true;}
+  cloud.busy=false;
+  if(!ok){setSync('error');cloud.t=setTimeout(pushCloud,15000);return false;}
+  if(cloud.dirty){cloud.t=setTimeout(pushCloud,1500);}else{lsSet(DIRTY,null);setSync('saved');}
+  return true;
+}
+function adopt(next,keepIdx){
+  const i=keepIdx?pb.plays.findIndex(p=>p.id===pb.currentId):-1;
+  pb=next;if(i>0&&pb.plays[i])pb.currentId=pb.plays[i].id;
+  st.sel=null;st.drawing=null;st.preview=null;st.undo=[];st.redo=[];saveLocal();renderAll();
+}
+async function loadCloud(user){
+  cloud.loading=true;setSync('loading');let row=null;
+  try{
+    const r=await cloud.sb.from('playbooks').select('data,updated_at').eq('user_id',user.id).maybeSingle();
+    if(r.error)throw r.error;row=r.data;
+  }catch(e){cloud.loading=false;setSync('error');clearTimeout(cloud.rt);cloud.rt=setTimeout(()=>{if(cloud.user&&cloud.user.id===user.id)loadCloud(user);},15000);return;}
+  if(!cloud.user||cloud.user.id!==user.id){cloud.loading=false;return;}
+  const owner=lsGet(OWNER),mine=owner===user.id,anon=!owner&&!pb.sample;let push=false,note='';
+  if(!row){
+    if(owner&&!mine)adopt(samplePlaybook());
+    push=true;
+  }else{
+    let remote=null;try{remote=normPlaybook(row.data);}catch(e){}
+    cloud.remoteAt=row.updated_at;
+    if(!remote){push=mine||anon;if(!push){cloud.loading=false;setSync('error');return;}}
+    else if(mine&&lsGet(DIRTY))push=true;
+    else if(anon){
+      let local=null;try{local=normPlaybook(pb);}catch(e){}
+      if(local){
+        const sig=p=>JSON.stringify([p.name,p.size,p.players.map(q=>[q.label,q.x,q.y]),p.lines.map(l=>l.pts)]),have=new Set(remote.plays.map(sig));
+        const add=local.plays.filter(p=>!have.has(sig(p))),fh=new Set(remote.customFormations.map(f=>JSON.stringify([f.name,f.size,f.players])));
+        remote.plays.push(...add);remote.customFormations.push(...local.customFormations.filter(f=>!fh.has(JSON.stringify([f.name,f.size,f.players]))));
+        if(add.length){note='Added '+add.length+(add.length===1?' play':' plays')+' from this device to your account.';push=true;}
+      }
+      adopt(remote);
+    }else adopt(remote);
+  }
+  lsSet(OWNER,user.id);cloud.loading=false;
+  if(push){cloud.dirty=true;setSync('saving');await pushCloud();}else{lsSet(DIRTY,null);setSync('saved');}
+  if(note)auMsg(note);
+}
+function onSession(ev,session){
+  const user=session&&session.user;
+  if(ev==='PASSWORD_RECOVERY'){cloud.recover=true;$('authView').hidden=false;}
+  if(user){
+    if(cloud.user&&cloud.user.id===user.id){cloud.user=user;renderAccount();return;}
+    cloud.user=user;auMsg('');loadCloud(user);
+  }else if(cloud.user){
+    cloud.user=null;clearTimeout(cloud.t);lsSet(OWNER,null);lsSet(DIRTY,null);cloud.status='off';adopt(samplePlaybook());renderAccount();
+  }else renderAccount();
+}
+async function refreshCloud(){
+  if(!cloud.user||cloud.dirty||cloud.busy||cloud.loading||st.drawing||st.drag)return;
+  try{
+    const u=cloud.user,r=await cloud.sb.from('playbooks').select('updated_at').eq('user_id',u.id).maybeSingle();
+    if(r.error||!r.data||r.data.updated_at===cloud.remoteAt||cloud.dirty||cloud.user!==u)return;
+    const d=await cloud.sb.from('playbooks').select('data,updated_at').eq('user_id',u.id).maybeSingle();
+    if(d.error||!d.data||cloud.dirty||cloud.user!==u)return;
+    cloud.loading=true;adopt(normPlaybook(d.data.data),true);cloud.loading=false;cloud.remoteAt=d.data.updated_at;
+  }catch(e){cloud.loading=false;}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshCloud();else if(cloud.dirty)pushCloud();});
+$('acctBtn').onclick=()=>{
+  if(st.drawing)finishDrawing();
+  if(!cloud.sb)auMsg(framed?'Accounts work on sports.treviweb.com, not inside this preview.':cloud.libFail?'Accounts are unavailable right now. Check your connection and reload the page.':'Getting accounts ready. Try again in a moment.');
+  $('authView').hidden=false;renderAccount();(cloud.user?$('authClose'):$('auEmail')).focus();
+};
+$('authClose').onclick=()=>{$('authView').hidden=true;};
+$('authView').addEventListener('click',e=>{if(e.target.id==='authView')$('authView').hidden=true;});
+$('authSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cloud.mode=b.dataset.auth;auMsg('');renderAccount();});
+$('authForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(!cloud.sb)return;
+  const email=$('auEmail').value.trim(),password=$('auPass').value,go=$('auGo');go.disabled=true;auMsg(cloud.mode==='up'?'Creating your account…':'Signing in…');
+  try{
+    const r=cloud.mode==='up'?await cloud.sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}}):await cloud.sb.auth.signInWithPassword({email,password});
+    if(r.error)auMsg(/invalid login/i.test(r.error.message)?'That email and password do not match an account. Check them, or use Create account if you are new.':r.error.message);
+    else if(!r.data.session)auMsg('Almost done. Open the confirmation link we just emailed you, then sign in here.');
+    else{$('auPass').value='';auMsg('');}
+  }catch(err){auMsg('Could not reach the server. Check your connection and try again.');}
+  go.disabled=false;
+});
+$('auForgot').onclick=async()=>{
+  if(!cloud.sb)return;const email=$('auEmail').value.trim();
+  if(!email){auMsg('Type your email above first, then tap Forgot password.');$('auEmail').focus();return;}
+  try{await cloud.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});}catch(e){}
+  auMsg('If that email has an account, a link to set a new password is on its way.');
+};
+$('authNew').addEventListener('submit',async e=>{
+  e.preventDefault();if(!cloud.sb)return;
+  try{const r=await cloud.sb.auth.updateUser({password:$('auNewPass').value});
+    if(r.error){auMsg(r.error.message);return;}
+    $('auNewPass').value='';cloud.recover=false;renderAccount();auMsg('Your new password is saved.');
+  }catch(err){auMsg('Could not reach the server. Check your connection and try again.');}
+});
+$('auOut').onclick=async()=>{
+  if(cloud.dirty||cloud.busy||cloud.status==='error'){auMsg('Saving your latest changes first…');const ok=await pushCloud();
+    if(!ok&&(cloud.dirty||cloud.busy)){auMsg('Your latest changes are not saved to your account yet. Check your connection and try again in a moment.');return;}}
+  auMsg('');try{await cloud.sb.auth.signOut();}catch(e){}
+  auMsg('Signed out. Your plays are safe in your account.');
+};
+$('auBackup').onclick=$('footData').onclick=()=>{$('authView').hidden=true;$('dataBtn').click();};
+if(!framed){
+  const sc=document.createElement('script');sc.src=SB_LIB;sc.async=true;
+  sc.onload=()=>{try{
+    cloud.sb=window.supabase.createClient(SB_URL,SB_KEY);
+    cloud.sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>onSession(ev,session),0);});
+  }catch(e){cloud.libFail=true;}};
+  sc.onerror=()=>{cloud.libFail=true;};
+  document.head.appendChild(sc);
+}
 let seen=null;try{seen=localStorage.getItem('playcard.helpSeen')}catch(e){}
-renderAll();
+renderAll();renderAccount();
 if(!seen)openHelp();
 })();
 </script>
