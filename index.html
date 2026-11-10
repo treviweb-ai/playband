@@ -85,6 +85,16 @@ p{margin:0}
 .chips li{font-family:var(--display);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:14px;border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:4px 12px;color:#e9eee9}
 .shot{border-radius:14px;overflow:hidden;box-shadow:0 24px 50px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);align-self:start;margin-bottom:56px;background:#e9eee9}
 
+.nav-acts{display:flex;align-items:center;gap:16px}
+.navlink{color:#e9eee9;font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:16px;text-decoration:none;padding:10px 4px}
+.navlink:hover{text-decoration:underline}
+.acct{background:var(--field);color:#fff}
+.acct .split p.sub{color:#cfd8d1}
+.perks{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.acct .perks li{padding:18px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.05)}
+.acct .perks li::before{display:none}
+.perks h3{font-size:21px;text-transform:uppercase;letter-spacing:.03em;color:#fff}
+.perks p{color:#cfd8d1;font-size:16px;margin-top:6px}
 section{padding-block:76px}
 .sec-head{max-width:40em;margin-bottom:36px}
 .sec-head p{color:var(--muted);margin-top:12px;font-size:19px}
@@ -136,7 +146,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   body{font-size:16px}
   .grid{grid-template-columns:1fr}
   .btn{width:100%}
-  .nav .btn{width:auto}
+  .nav .btn{width:auto;font-size:14px;padding:8px 12px}
+  .navlink{display:none}
+  .nav .btn{white-space:nowrap}
+  .perks{grid-template-columns:1fr}
+  .logo{font-size:26px}
   .lede{font-size:18px}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
@@ -147,7 +161,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   <div class="wrap">
     <header class="nav">
       <a class="logo" href="/?home" aria-label="PlayBand home">Play<span>Band</span></a>
-      <a class="btn ghost" href="/app">Open the app</a>
+      <div class="nav-acts"><a class="navlink" href="/app">Open the app</a><a class="btn primary" href="/app?signup" onclick="window.gtag&&gtag('event','signup_click')">Create free account</a></div>
     </header>
     <div class="hero">
       <div class="hero-copy">
@@ -155,9 +169,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
         <h1>Draw the play.<br><em>Print the wristband.</em></h1>
         <p class="lede">PlayBand helps flag, 7v7 and tackle coaches build a playbook in minutes, on a phone or a laptop. Then it prints wristbands and a coach call sheet with matching numbers.</p>
         <div class="cta">
-          <a class="btn primary" href="/app" onclick="window.gtag&&gtag('event','start_click')">Start drawing free</a>
-          <a class="btn ghost" href="#how">See how it works</a>
-          <small>Free while in beta. No account needed to try it.</small>
+          <a class="btn primary" href="/app?signup" onclick="window.gtag&&gtag('event','signup_click')">Create free account</a>
+          <a class="btn ghost" href="/app" onclick="window.gtag&&gtag('event','start_click')">Try it first</a>
+          <small>Free while in beta. No credit card. Just an email and a password.</small>
         </div>
         <ul class="chips" aria-label="Game types"><li>5v5 flag</li><li>7v7</li><li>11-man</li></ul>
       </div>
@@ -204,7 +218,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <ul>
         <li>Big touch targets for dragging players and picking routes</li>
         <li>Press Run play to watch the routes develop, with pre-snap motion</li>
-        <li>A free account keeps your plays in sync across devices</li>
+        <li>A <a href="/app?signup">free account</a> keeps your plays in sync across devices</li>
       </ul>
     </div>
     <div class="phone"><img src="/img/phone.png" width="1170" height="1992" loading="lazy" alt="PlayBand on a phone showing a Trips Flood play for 5v5 flag"></div>
@@ -227,6 +241,26 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   </div>
 </section>
 
+<section class="acct" id="account">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow" style="color:#ff7b39">Free account</p>
+      <h2>Do not lose your playbook to a cleared browser</h2>
+      <p class="sub">Without an account, your plays live only in the browser you drew them in. A free account takes about 30 seconds and keeps them safe.</p>
+      <div class="cta">
+        <a class="btn primary" href="/app?signup" onclick="window.gtag&&gtag('event','signup_click')">Create free account</a>
+        <small>Email and a password. No credit card. Plays you already drew on this device stay with you.</small>
+      </div>
+    </div>
+    <ul class="perks">
+      <li><h3>Saved online</h3><p>Your playbook is backed up every time you change a play.</p></li>
+      <li><h3>Every device</h3><p>Draw on the laptop at home, open the same plays on your phone at the field.</p></li>
+      <li><h3>Share links</h3><p>Send players and parents a view-only link to the whole playbook.</p></li>
+      <li><h3>Free in beta</h3><p>Every feature is included while PlayBand is in beta.</p></li>
+    </ul>
+  </div>
+</section>
+
 <section>
   <div class="wrap">
     <div class="sec-head"><p class="eyebrow">Questions</p><h2>Good to know</h2></div>
@@ -244,8 +278,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
 <section class="final">
   <div class="wrap">
     <h2>Your first play takes about a minute</h2>
-    <p>Open the editor, drag a player, pick a route and press Run play.</p>
-    <a class="btn primary" href="/app" onclick="window.gtag&&gtag('event','start_click')">Start drawing free</a>
+    <p>Create a free account so every play you draw is saved, or jump straight into the editor and sign up later.</p>
+    <div class="cta" style="justify-content:center;margin-top:0"><a class="btn primary" href="/app?signup" onclick="window.gtag&&gtag('event','signup_click')">Create free account</a>
+    <a class="btn ghost" href="/app" onclick="window.gtag&&gtag('event','start_click')">Try it without an account</a></div>
   </div>
 </section>
 </main>

@@ -1689,11 +1689,14 @@ $('auOut').onclick=async()=>{
   auMsg('Signed out. Your plays are safe in your account.');
 };
 $('auBackup').onclick=$('footData').onclick=()=>{$('authView').hidden=true;$('dataBtn').click();};
+let wantSignup=false;try{wantSignup=new URLSearchParams(location.search).has('signup')}catch(e){}
 if(!framed&&!shareId){
   const sc=document.createElement('script');sc.src=SB_LIB;sc.async=true;
   sc.onload=()=>{try{
     cloud.sb=window.supabase.createClient(SB_URL,SB_KEY);
-    cloud.sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>onSession(ev,session),0);});
+    cloud.sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>{onSession(ev,session);
+      if(wantSignup){wantSignup=false;try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}
+        if(!session&&ev!=='PASSWORD_RECOVERY'){cloud.mode='up';$('acctBtn').click();}}},0);});
   }catch(e){cloud.libFail=true;}};
   sc.onerror=()=>{cloud.libFail=true;};
   document.head.appendChild(sc);
