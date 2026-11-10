@@ -69,6 +69,9 @@ h2{font-size:15px} h3{font-size:13px;color:var(--muted)}
 .formbar .fb-name{display:inline-flex;align-items:baseline;gap:6px;margin-right:4px}
 .formbar .fb-name b{font-family:var(--display);font-size:16px;letter-spacing:.02em}
 .btn.sm{padding:4px 10px;font-size:13px}
+.qr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.qr .btn{padding:7px 4px;text-align:center}
+.qr .btn[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
 #fbName{width:190px;max-width:100%;padding:4px 8px}
 #npSize{align-self:flex-start}
 #npSize button{padding:6px 9px;font-size:12.5px;color:var(--ink)}
@@ -237,7 +240,7 @@ textarea.inp{resize:vertical;min-height:70px}
     <ol class="help-steps">
       <li><b>Start a play.</b> Tap <b>+ New play</b>, pick your game type (5v5 flag, 7v7 or 11-man) and a starting formation.</li>
       <li><b>Line up.</b> Drag players where you want them. Tap <b>Save as formation</b> above the field to reuse that lineup on other plays.</li>
-      <li><b>Draw routes.</b> Tap <b>Draw</b>, tap a player, then tap points on the field. Tap the last point again to finish. Tap any route to change its style.</li>
+      <li><b>Add routes.</b> Tap a player and pick a ready-made route like Slant, Out or Post. Or tap <b>Draw</b>, tap a player, and tap points on the field to draw your own.</li>
       <li><b>Print.</b> <b>Print sheets</b> gives you play sheets, wristbands and a coach call sheet with matching numbers.</li>
       <li><b>Back up.</b> Plays are saved only in this browser. Use <b>Back up / Restore</b> to keep a copy or move to another device.</li>
     </ol>
@@ -568,8 +571,8 @@ function renderToolbar(){
   $('snapChk').checked=st.snap;
   let h='';
   if(st.anim)h='Running the play. Players follow their first route.';
-  else if(st.mode==='select')h=c.lines.length?'Drag players or labels to move them. Tap a route to edit its style or drag its points.'
-    :'<b>Step 1:</b> drag players to set your lineup. <b>Step 2:</b> tap <b>Draw</b> to add routes.';
+  else if(st.mode==='select')h=c.lines.length?'Tap a player to pick a ready-made route, or drag to move them. Tap a route to restyle or reshape it.'
+    :'<b>Step 1:</b> drag players to set your lineup. <b>Step 2:</b> tap a player and pick a route, or tap <b>Draw</b> to draw your own.';
   else if(st.mode==='draw')h=st.drawing?'Tap the field to add points. Tap the last point again, double-tap, or press Enter to finish. <button class="btn primary" id="finishBtn">Finish route</button>'
     :'Tap a player, then tap the field to draw their route. You can also drag from a player. Tap empty field to draw a free line.';
   else h='Tap the field to place a text label.';
@@ -577,6 +580,34 @@ function renderToolbar(){
   const fb=$('finishBtn');if(fb)fb.onclick=finishDrawing;
   renderFormbar();
 }
+/* ---------- ready-made routes ---------- */
+const QUICK=[['go','Go'],['slant','Slant'],['out','Out'],['in','In'],['post','Post'],['corner','Corner'],['hitch','Hitch'],['comeback','Comeback'],['flat','Flat'],['wheel','Wheel'],['drag','Drag'],['block','Block']];
+function applyQuickRoute(pid,name){
+  const c=cur(),p=playerById(c,pid);if(!p)return;
+  const flip=!!(st.lastQuick&&st.lastQuick.pid===pid&&st.lastQuick.name===name&&!st.lastQuick.flip);
+  const W=fwOf(c),k=c.size===5?.6:1,d=c.size===5?.8:1,X=p.x;
+  let inn=Math.abs(W/2-X)<1.5?-1:Math.sign(W/2-X);if(flip)inn=-inn;const out=-inn;
+  const R={
+    go:{pts:[[X,-18*d]]},
+    slant:{pts:[[X,-2],[X+inn*7*k,-8*d]]},
+    out:{pts:[[X,-5*d],[X+out*6*k,-5*d]]},
+    in:{pts:[[X,-10*d],[X+inn*9*k,-10*d]]},
+    post:{pts:[[X,-10*d],[X+inn*7*k,-18*d]]},
+    corner:{pts:[[X,-10*d],[X+out*6*k,-17*d]]},
+    hitch:{pts:[[X,-6*d],[X+inn*1.2,-4.8*d]]},
+    comeback:{pts:[[X,-13*d],[X+out*2.5*k,-10.5*d]]},
+    flat:{pts:[[X+out*3*k,Math.min(p.y-1,0)],[X+out*8*k,-2]],smooth:true},
+    wheel:{pts:[[X+out*5*k,Math.min(p.y-1,-.5)],[X+out*7*k,-5],[X+out*7*k,-16*d]],smooth:true},
+    drag:{pts:[[X,-2],[X+inn*14*k,-3.5]]},
+    block:{pts:[[X,p.y-1.8]],cap:'t'}
+  }[name];if(!R)return;
+  pushUndo();
+  c.lines=c.lines.filter(l=>l.playerId!==pid);
+  c.lines.push({id:uid(),playerId:pid,start:null,pts:R.pts.map(q=>[r2(Math.min(W-.8,Math.max(.8,q[0]))),r2(clampY(q[1]))]),style:'solid',cap:R.cap||'arrow',smooth:!!R.smooth,color:st.lineDefaults.color});
+  st.lastQuick={pid,name,flip};
+  commit({insp:true});
+}
+
 /* ---------- formation bar ---------- */
 function formationList(size){
   const mine=(pb.customFormations||[]).filter(f=>f.size===size);
@@ -663,7 +694,9 @@ function renderInspector(){
     <div class="row"><button class="btn warn" data-do="delSel">Delete line</button></div>`;
   }else if(s&&s.type==='player'){const p=playerById(c,s.id);if(!p){st.sel=null;return renderInspector();}
     h=`<div class="isec"><h2>Player</h2><label class="f">Label<input class="inp" id="plLabel" maxlength="3" value="${esc(p.label)}"></label></div>
-    <div class="row"><button class="btn primary" data-do="drawFrom">Draw route</button><button class="btn" data-do="clearRoutes">Clear routes</button></div>
+    ${p.kind!=='def'?`<div class="isec"><h3>Ready-made routes</h3><div class="qr">${QUICK.map(([k,t])=>`<button class="btn sm" data-route="${k}" aria-pressed="${String(!!(st.lastQuick&&st.lastQuick.pid===p.id&&st.lastQuick.name===k))}">${t}</button>`).join('')}</div>
+    <span class="pmeta">Tap a route to give it to this player. Tap the same one again to flip its direction. It replaces the route they have.</span></div>`:''}
+    <div class="row"><button class="btn${p.kind!=='def'?'':' primary'}" data-do="drawFrom">Draw my own</button><button class="btn" data-do="clearRoutes">Clear routes</button></div>
     <div class="row"><button class="btn warn" data-do="delSel">Remove player</button></div>`;
   }else if(s&&s.type==='label'){const lb=c.labels.find(x=>x.id===s.id);if(!lb){st.sel=null;return renderInspector();}
     h=`<div class="isec"><h2>Text label</h2><label class="f">Text<input class="inp" id="lbText" maxlength="40" value="${esc(lb.text)}"></label></div>
@@ -782,6 +815,7 @@ $('inspector').addEventListener('click',e=>{
     if(target!==st.lineDefaults){st.lineDefaults[b.dataset.set]=v;commit({insp:true});}else renderInspector();
     return;
   }
+  if(b.dataset.route){applyQuickRoute(st.sel.id,b.dataset.route);return;}
   const act=b.dataset.do;
   if(act==='delSel')deleteSel();
   if(act==='delForm'){pushUndo();pb.customFormations=(pb.customFormations||[]).filter(f=>f.id!==b.dataset.id);buildFormOpts();commit({insp:true});}
