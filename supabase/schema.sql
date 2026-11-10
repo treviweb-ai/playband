@@ -73,3 +73,38 @@ returns jsonb language sql stable security definer set search_path = public as $
 $$;
 revoke all on function public.get_share(text) from public;
 grant execute on function public.get_share(text) to anon, authenticated;
+
+-- ---------------------------------------------------------------
+-- In-app feedback. Anyone can send a note; only admins can read them
+-- (through admin_list_feedback on the admin page).
+-- ---------------------------------------------------------------
+create table if not exists public.feedback (
+  id bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  user_id uuid default auth.uid() references auth.users (id) on delete set null,
+  email text check (char_length(email) <= 200),
+  message text not null check (char_length(message) between 3 and 4000),
+  page text check (char_length(page) <= 200),
+  agent text check (char_length(agent) <= 300)
+);
+alter table public.feedback enable row level security;
+revoke all on public.feedback from anon, authenticated;
+grant insert (email, message, page, agent) on public.feedback to anon, authenticated;
+drop policy if exists "feedback insert" on public.feedback;
+create policy "feedback insert" on public.feedback for insert to anon, authenticated with check (true);
+
+create or replace function public.admin_list_feedback()
+returns table (id bigint, created_at timestamptz, email text, account_email text, message text, page text, agent text)
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  if not public.is_admin() then
+    raise exception 'not authorized' using errcode = '42501';
+  end if;
+  return query
+    select f.id, f.created_at, f.email, u.email::text, f.message, f.page, f.agent
+    from public.feedback f left join auth.users u on u.id = f.user_id
+    order by f.created_at desc limit 500;
+end;
+$$;
+revoke all on function public.admin_list_feedback() from public, anon;
+grant execute on function public.admin_list_feedback() to authenticated;

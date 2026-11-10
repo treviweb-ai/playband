@@ -170,9 +170,12 @@ textarea.inp{resize:vertical;min-height:70px}
 .cdiag .win{border-color:#bbb}
 .cell p{margin:4px 0 0;font-size:11px;color:#333}
 
-#helpView,#dataView,#authView,#libView{position:fixed;inset:0;z-index:30;background:rgba(10,18,14,.55);display:flex;align-items:flex-start;justify-content:center;overflow:auto;
+#helpView,#dataView,#authView,#libView,#fbView{position:fixed;inset:0;z-index:30;background:rgba(10,18,14,.55);display:flex;align-items:flex-start;justify-content:center;overflow:auto;
   padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
-#helpView[hidden],#dataView[hidden],#authView[hidden],#libView[hidden]{display:none}
+#helpView[hidden],#dataView[hidden],#authView[hidden],#libView[hidden],#fbView[hidden]{display:none}
+#fbView [hidden]{display:none}
+#fbText{min-height:130px;resize:vertical}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 #authView [hidden]{display:none}
 #syncChip{text-transform:none;letter-spacing:.02em;font-size:12px}
 #syncChip[data-s=error]{border-color:var(--accent);color:var(--accent)}
@@ -275,7 +278,7 @@ body.viewer #field{cursor:default}
   .qr .btn{padding:8px 4px}
   .sw{width:34px;height:34px}
   .help-card{padding:16px}
-  #helpView,#dataView,#authView,#libView{padding-left:8px;padding-right:8px}
+  #helpView,#dataView,#authView,#libView,#fbView{padding-left:8px;padding-right:8px}
   .bar #dataBtn{display:none}
 }
 .tb-more{display:contents}
@@ -410,9 +413,20 @@ body.viewer #field{cursor:default}
 <footer class="foot">
   <span><b>PlayBand</b> free beta</span>
   <span><span id="footSave">Your plays are saved only in this browser. Sign in to save them to a free account.</span> <button class="mini" id="footData">Back up / Restore</button></span>
-  <span>Feedback or want launch updates? <a href="mailto:info@treviweb.com?subject=PlayBand%20feedback" id="fbLink">info@treviweb.com</a> <button class="mini" id="fbCopy">Copy</button></span>
+  <span>Something clumsy or missing? <button class="mini" id="fbOpen">Send feedback</button> or email <a href="mailto:info@treviweb.com?subject=PlayBand%20feedback" id="fbLink">info@treviweb.com</a> <button class="mini" id="fbCopy">Copy</button></span>
   <span><a href="https://sports.treviweb.com/?home" id="aboutLink">About PlayBand</a> · Made by <a href="https://treviweb.com" target="_blank" rel="noopener">Trevi Web Co.</a></span>
 </footer>
+
+<div id="fbView" hidden role="dialog" aria-modal="true" aria-labelledby="fbTitle">
+  <form class="help-card" id="fbForm" novalidate>
+    <div class="help-head"><h2 id="fbTitle">Send feedback</h2><button class="btn" type="button" id="fbClose">Close</button></div>
+    <p class="help-note">What felt clumsy, what is missing, or what would make this useful for your team? It goes straight to the people building PlayBand.</p>
+    <label class="f">Your feedback<textarea class="inp" id="fbText" maxlength="4000" required placeholder="Example: I could not find how to print only my red zone plays."></textarea></label>
+    <label class="f">Email, if you want a reply (optional)<input class="inp" id="fbEmail" type="email" maxlength="200" autocomplete="email" placeholder="coach@example.com"></label>
+    <div class="hp" aria-hidden="true"><label>Leave this empty<input id="fbHp" type="text" tabindex="-1" autocomplete="off"></label></div>
+    <div class="row"><button class="btn primary" type="submit" id="fbGo">Send feedback</button><span class="pmeta" id="fbMsg" role="status"></span><a id="fbMail" hidden href="mailto:info@treviweb.com?subject=PlayBand%20feedback">Email it instead</a></div>
+  </form>
+</div>
 
 <div id="dataView" hidden role="dialog" aria-modal="true" aria-labelledby="dataTitle">
   <div class="help-card">
@@ -1508,7 +1522,7 @@ function openHelp(){$('helpView').hidden=false;$('helpClose').focus();}
 function closeHelp(){$('helpView').hidden=true;try{localStorage.setItem('playcard.helpSeen','1')}catch(e){}}
 $('helpBtn').onclick=openHelp;$('helpClose').onclick=closeHelp;
 $('helpView').addEventListener('click',e=>{if(e.target.id==='helpView')closeHelp();});
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('helpView').hidden)closeHelp();else if(!$('dataView').hidden)$('dataView').hidden=true;else if(!$('authView').hidden)$('authView').hidden=true;else if(!$('libView').hidden)$('libView').hidden=true;},true);
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('helpView').hidden)closeHelp();else if(!$('dataView').hidden)$('dataView').hidden=true;else if(!$('authView').hidden)$('authView').hidden=true;else if(!$('libView').hidden)$('libView').hidden=true;else if(!$('fbView').hidden)$('fbView').hidden=true;},true);
 /* ---------- accounts and cloud saving ---------- */
 const SB_URL='https://oghqkzgkegffndjujoeq.supabase.co',SB_KEY='sb_publishable_jnHW32LRFOTOxNnQQYLYMw_ESp9fVFc';
 const SB_LIB='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
@@ -1657,6 +1671,30 @@ try{cloud.promoOff=sessionStorage.getItem('playband.promoOff')==='1';}catch(e){}
 $('promoGo').onclick=()=>{cloud.mode='up';$('acctBtn').click();};
 $('promoX').onclick=()=>{cloud.promoOff=true;try{sessionStorage.setItem('playband.promoOff','1');}catch(e){}renderAccount();};
 $('authView').addEventListener('click',e=>{if(e.target.id==='authView')$('authView').hidden=true;});
+/* ---------- feedback ---------- */
+let fbLast=0;const fbMsg=t=>{$('fbMsg').textContent=t||'';};
+$('fbOpen').onclick=()=>{if(st.drawing)finishDrawing();fbMsg('');$('fbMail').hidden=true;
+  if(cloud.user&&cloud.user.email&&!$('fbEmail').value)$('fbEmail').value=cloud.user.email;
+  $('fbView').hidden=false;$('fbText').focus();};
+$('fbClose').onclick=()=>{$('fbView').hidden=true;};
+$('fbView').addEventListener('click',e=>{if(e.target.id==='fbView')$('fbView').hidden=true;});
+$('fbForm').addEventListener('submit',async e=>{
+  e.preventDefault();const message=$('fbText').value.trim(),email=$('fbEmail').value.trim();
+  if(message.length<3){fbMsg('Type a few words first.');$('fbText').focus();return;}
+  if(email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){fbMsg('That email does not look right. Fix it or leave it empty.');$('fbEmail').focus();return;}
+  if($('fbHp').value){$('fbView').hidden=true;return;}
+  if(Date.now()-fbLast<15000){fbMsg('Give it a few seconds, then send again.');return;}
+  const go=$('fbGo');go.disabled=true;fbMsg('Sending…');$('fbMail').hidden=true;let ok=false;
+  try{
+    let tok=SB_KEY;try{const r=await cloud.sb.auth.getSession();tok=r.data.session.access_token||SB_KEY;}catch(err){}
+    const r=await fetch(SB_URL+'/rest/v1/feedback',{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+tok,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({message:message.slice(0,4000),email:email.slice(0,200)||null,page:(st.view?'viewer':'editor')+' '+innerWidth+'x'+innerHeight,agent:navigator.userAgent.slice(0,300)})});
+    ok=r.ok;
+  }catch(err){}
+  go.disabled=false;
+  if(ok){fbLast=Date.now();$('fbText').value='';fbMsg('Thanks. Your note was sent.');track('feedback_sent');}
+  else{fbMsg('Could not send right now.');const a=$('fbMail');a.href='mailto:info@treviweb.com?subject=PlayBand%20feedback&body='+encodeURIComponent(message.slice(0,1500));a.hidden=false;}
+});
 $('authSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cloud.mode=b.dataset.auth;auMsg('');renderAccount();});
 $('authForm').addEventListener('submit',async e=>{
   e.preventDefault();if(!cloud.sb)return;

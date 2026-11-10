@@ -65,6 +65,9 @@ td.email{overflow-wrap:anywhere;font-weight:600}
 #addPass{font-family:ui-monospace,Menlo,monospace}
 #addMsg b{color:var(--ink);user-select:all;-webkit-user-select:all;font-family:ui-monospace,Menlo,monospace}
 .empty{padding:28px;text-align:center;color:var(--muted)}
+.fb{margin-bottom:10px}
+.fb p{margin:0 0 8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.fb small{color:var(--muted);font-size:12px;display:block;overflow-wrap:anywhere}
 @media (max-width:700px){
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .stat b{font-size:28px}
@@ -95,7 +98,9 @@ td.email{overflow-wrap:anywhere;font-weight:600}
   <main id="main" hidden>
     <div class="tabs" role="tablist" aria-label="Admin sections">
       <button role="tab" aria-selected="true" id="tabUsers">Users</button>
+      <button role="tab" aria-selected="false" id="tabFb">Feedback</button>
     </div>
+    <div id="pUsers">
     <div class="stats" id="stats"></div>
     <div class="tools">
       <input class="inp" id="q" type="search" placeholder="Search by email or playbook name" aria-label="Search users">
@@ -127,6 +132,11 @@ td.email{overflow-wrap:anywhere;font-weight:600}
         <tbody id="rows"></tbody>
       </table>
       <div class="empty" id="empty" hidden>No users match.</div>
+    </div>
+    </div>
+    <div id="pFb" hidden>
+      <div class="tools"><button class="btn" id="fbRefresh">Refresh</button><span class="msg" id="fbMsg" role="status"></span></div>
+      <div id="fbList"></div>
     </div>
   </main>
 </div>
@@ -191,6 +201,17 @@ $('inForm').addEventListener('submit',async e=>{
 });
 $('outBtn').onclick=async()=>{try{await sb.auth.signOut();}catch(e){}};
 $('refresh').onclick=load;
+let fbLoaded=false;
+async function loadFb(){
+  $('fbMsg').textContent='Loading…';let r;try{r=await sb.rpc('admin_list_feedback');}catch(e){r={error:{message:'network'}};}
+  if(r.error){$('fbMsg').textContent=/admin_list_feedback|PGRST202|404/.test((r.error.code||'')+' '+(r.error.message||''))?'Feedback is not set up yet. Run the feedback SQL in Supabase first.':'Could not load feedback. Tap Refresh.';return;}
+  fbLoaded=true;const list=r.data||[];
+  $('fbMsg').textContent=list.length+(list.length===1?' note':' notes');
+  $('fbList').innerHTML=list.length?list.map(f=>{const who=f.email||f.account_email;const d=new Date(f.created_at);
+    return `<div class="card fb"><p>${esc(f.message)}</p><small>${esc(d.toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}))} · ${who?`<a href="mailto:${esc(who)}?subject=PlayBand%20feedback">${esc(who)}</a>`:'No email given'}${f.account_email&&f.email&&f.email!==f.account_email?' (account '+esc(f.account_email)+')':''}${f.account_email?'':' · not signed in'} · ${esc(f.page||'')}</small><small>${esc(f.agent||'')}</small></div>`;}).join(''):'<div class="empty">No feedback yet.</div>';
+}
+function tab(fb){$('pUsers').hidden=fb;$('pFb').hidden=!fb;$('tabUsers').setAttribute('aria-selected',String(!fb));$('tabFb').setAttribute('aria-selected',String(fb));if(fb&&!fbLoaded)loadFb();}
+$('tabUsers').onclick=()=>tab(false);$('tabFb').onclick=()=>tab(true);$('fbRefresh').onclick=loadFb;
 function tempPass(){const a='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=new Uint32Array(12);crypto.getRandomValues(r);return Array.from(r,n=>a[n%a.length]).join('');}
 function setAdd(on){$('addCard').hidden=!on;$('addBtn').setAttribute('aria-expanded',String(on));if(on){$('addMsg').textContent='';$('addPass').value=tempPass();$('addEmail').focus();}}
 $('addBtn').onclick=()=>setAdd($('addCard').hidden);
