@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>PlayBand Admin</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315211b'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Arial Narrow,Arial,sans-serif' font-weight='700' font-size='20' fill='%23fff'%3EP%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#e9eee9; --panel:#ffffff; --panel-2:#f3f6f3; --ink:#15211b; --muted:#5b6a62; --rule:#d3dcd5;
+  --accent:#d9480f; --accent-ink:#ffffff;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding:0 max(16px,env(safe-area-inset-right,0px)) 32px max(16px,env(safe-area-inset-left,0px))}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2{font-family:var(--display);font-weight:700;letter-spacing:.03em;margin:0}
+h1{font-size:24px} h1 span{color:var(--accent)} h2{font-size:20px;text-transform:uppercase}
+.wrap{max-width:1100px;margin:0 auto}
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:12px}
+.chip{font-family:var(--display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--ink);border-radius:99px;padding:2px 9px}
+.spacer{flex:1}
+.who{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.btn{border:1px solid var(--rule);background:var(--panel);border-radius:8px;padding:8px 13px;font-weight:600;white-space:nowrap;min-height:40px;text-decoration:none;display:inline-flex;align-items:center;color:var(--ink)}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--rule);margin-bottom:16px}
+.tabs button{border:0;background:transparent;padding:10px 14px;font-weight:600;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{border-bottom-color:var(--accent)}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px}
+.gate{max-width:440px;margin:40px auto;display:flex;flex-direction:column;gap:12px}
+.gate p{margin:0;color:var(--muted)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:500}
+.inp{border:1px solid var(--rule);background:var(--panel-2);border-radius:8px;padding:9px 10px;width:100%;font-size:16px;color:var(--ink)}
+.msg{font-size:14px;color:var(--muted);min-height:1.4em;margin:0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+.stat b{display:block;font-family:var(--display);font-size:34px;line-height:1}
+.stat span{font-size:13px;color:var(--muted)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.tools .inp{flex:1 1 220px;width:auto;background:var(--panel)}
+.tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;white-space:nowrap;background:var(--panel-2)}
+th button{border:0;background:transparent;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;padding:0;font-weight:600}
+th button[aria-sort]::after{content:" ▾"} th button[aria-sort="ascending"]::after{content:" ▴"}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td small{display:block;color:var(--muted);font-size:12px}
+td.email{overflow-wrap:anywhere;font-weight:600}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+@media (max-width:700px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat b{font-size:28px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <h1>Play<span>Band</span></h1><span class="chip">Admin</span>
+    <div class="spacer"></div>
+    <span class="who" id="who"></span>
+    <a class="btn" href="/">Open the app</a>
+    <button class="btn" id="outBtn" hidden>Sign out</button>
+  </header>
+
+  <section class="card gate" id="gate">
+    <h2 id="gateTitle">Admin sign in</h2>
+    <p id="gateText">Sign in with your PlayBand admin account.</p>
+    <form id="inForm" style="display:flex;flex-direction:column;gap:12px">
+      <label class="f">Email<input class="inp" id="email" type="email" autocomplete="email" required></label>
+      <label class="f">Password<input class="inp" id="pass" type="password" autocomplete="current-password" required></label>
+      <div><button class="btn primary" type="submit" id="inBtn">Sign in</button></div>
+    </form>
+    <p class="msg" id="gateMsg" role="status"></p>
+  </section>
+
+  <main id="main" hidden>
+    <div class="tabs" role="tablist" aria-label="Admin sections">
+      <button role="tab" aria-selected="true" id="tabUsers">Users</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="tools">
+      <input class="inp" id="q" type="search" placeholder="Search by email or playbook name" aria-label="Search users">
+      <button class="btn" id="refresh">Refresh</button>
+      <button class="btn" id="csv">Download CSV</button>
+      <span class="msg" id="mainMsg" role="status"></span>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th><button data-sort="email">Email</button></th>
+          <th><button data-sort="created_at" aria-sort="descending">Signed up</button></th>
+          <th><button data-sort="last_sign_in_at">Last sign in</button></th>
+          <th class="num"><button data-sort="plays">Plays</button></th>
+          <th class="num"><button data-sort="formations">Formations</button></th>
+          <th><button data-sort="last_saved">Last saved</button></th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>No users match.</div>
+    </div>
+  </main>
+</div>
+
+<script>
+(()=>{
+const SB_URL='https://oghqkzgkegffndjujoeq.supabase.co',SB_KEY='sb_publishable_jnHW32LRFOTOxNnQQYLYMw_ESp9fVFc';
+const SB_LIB='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let sb=null,user=null,users=[],sort={key:'created_at',dir:-1},loadedFor=null;
+const DAY=864e5;
+const fmtDate=v=>{if(!v)return '<span style="color:var(--muted)">Never</span>';const d=new Date(v);
+  return esc(d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}))+'<small>'+esc(d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}))+'</small>';};
+function showGate(title,text,form,msg){$('gate').hidden=false;$('main').hidden=true;$('gateTitle').textContent=title;$('gateText').textContent=text;$('inForm').hidden=!form;$('gateMsg').textContent=msg||'';}
+function renderStats(){
+  const now=Date.now(),n=users.length,
+    new7=users.filter(u=>now-new Date(u.created_at)<7*DAY).length,
+    act7=users.filter(u=>u.last_sign_in_at&&now-new Date(u.last_sign_in_at)<7*DAY).length,
+    plays=users.reduce((a,u)=>a+(u.plays||0),0);
+  $('stats').innerHTML=[[n,'Total users'],[new7,'New in the last 7 days'],[act7,'Signed in, last 7 days'],[plays,'Plays saved']]
+    .map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+}
+function view(){
+  const q=$('q').value.trim().toLowerCase();
+  let list=users.filter(u=>!q||(u.email||'').toLowerCase().includes(q)||(u.playbook_name||'').toLowerCase().includes(q));
+  const k=sort.key;
+  list.sort((a,b)=>{const x=a[k],y=b[k];if(x==null&&y==null)return 0;if(x==null)return 1;if(y==null)return -1;return (x<y?-1:x>y?1:0)*sort.dir;});
+  return list;
+}
+function renderRows(){
+  const list=view();
+  $('rows').innerHTML=list.map(u=>`<tr><td class="email">${esc(u.email)}${u.playbook_name?`<small>${esc(u.playbook_name)}</small>`:''}</td><td>${fmtDate(u.created_at)}</td><td>${fmtDate(u.last_sign_in_at)}</td><td class="num">${u.plays||0}</td><td class="num">${u.formations||0}</td><td>${fmtDate(u.last_saved)}</td></tr>`).join('');
+  $('empty').hidden=list.length>0;
+  document.querySelectorAll('th button').forEach(b=>{if(b.dataset.sort===sort.key)b.setAttribute('aria-sort',sort.dir>0?'ascending':'descending');else b.removeAttribute('aria-sort');});
+}
+async function load(){
+  $('mainMsg').textContent='Loading…';$('refresh').disabled=true;
+  let r;try{r=await sb.rpc('admin_list_users');}catch(e){r={error:{message:'network'}};}
+  $('refresh').disabled=false;
+  if(r.error){
+    if(r.error.code==='42501'||/not authorized/i.test(r.error.message||'')){showGate('No admin access','You are signed in as '+user.email+', and this account is not an admin. Sign out and use an admin account.',false);return;}
+    if(!$('main').hidden){$('mainMsg').textContent='Could not load users. Check your connection and tap Refresh.';return;}
+    showGate('Admin','Could not load the admin data. Check your connection and reload the page.',false);return;
+  }
+  users=r.data||[];$('gate').hidden=true;$('main').hidden=false;renderStats();renderRows();
+  $('mainMsg').textContent='Updated '+new Date().toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+}
+function onSession(session){
+  user=session&&session.user||null;
+  $('who').textContent=user?user.email:'';$('outBtn').hidden=!user;
+  if(!user){loadedFor=null;users=[];$('rows').innerHTML='';showGate('Admin sign in','Sign in with your PlayBand admin account.',true);return;}
+  if(loadedFor===user.id)return;loadedFor=user.id;
+  showGate('Admin','Checking your access…',false);load();
+}
+$('inForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(!sb)return;$('inBtn').disabled=true;$('gateMsg').textContent='Signing in…';
+  try{const r=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('pass').value});
+    $('gateMsg').textContent=r.error?'That email and password do not match an account.':'';if(!r.error)$('pass').value='';
+  }catch(err){$('gateMsg').textContent='Could not reach the server. Check your connection and try again.';}
+  $('inBtn').disabled=false;
+});
+$('outBtn').onclick=async()=>{try{await sb.auth.signOut();}catch(e){}};
+$('refresh').onclick=load;
+$('q').addEventListener('input',renderRows);
+document.querySelector('thead').addEventListener('click',e=>{const b=e.target.closest('button[data-sort]');if(!b)return;
+  const k=b.dataset.sort;sort=sort.key===k?{key:k,dir:-sort.dir}:{key:k,dir:k==='email'?1:-1};renderRows();});
+$('csv').onclick=()=>{
+  const cell=v=>{let s=v==null?'':String(v);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';};
+  const rows=[['Email','Playbook','Signed up','Last sign in','Plays','Formations','Last saved']].concat(view().map(u=>[u.email,u.playbook_name,u.created_at,u.last_sign_in_at,u.plays||0,u.formations||0,u.last_saved]));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(cell).join(',')).join('\r\n')],{type:'text/csv'}));
+  a.download='playband-users-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+showGate('Admin','Getting things ready…',false);
+const sc=document.createElement('script');sc.src=SB_LIB;
+sc.onload=()=>{try{sb=window.supabase.createClient(SB_URL,SB_KEY);sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>onSession(session),0);});}
+  catch(e){showGate('Admin','Could not start. Reload the page.',false);}};
+sc.onerror=()=>showGate('Admin','Could not load. Check your connection and reload the page.',false);
+document.head.appendChild(sc);
+})();
+</script>
+</body>
+</html>
