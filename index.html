@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PlayBand | Free football play designer and wristband maker</title>
+<meta name="description" content="Draw football plays for 11-man, 7v7 and 5v5 flag, then print wristbands and coach call sheets. Free while in beta. By Trevi Web Co.">
+<meta property="og:title" content="PlayBand: free football play designer">
+<meta property="og:description" content="Draw plays for tackle, 7v7 and 5v5 flag football. Print wristbands and coach sheets. Free beta.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#d9480f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23d9480f'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Arial Narrow,Arial,sans-serif' font-weight='700' font-size='20' fill='%23fff'%3EP%3C/text%3E%3C/svg%3E">
+<style>[hidden]{display:none!important}html{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: coach's sideline tablet. Play list left, laminated play card center, tools right; stacks on phones. */
+:root{
+  --bg:#e9eee9; --panel:#ffffff; --panel-2:#f3f6f3; --ink:#15211b; --muted:#5b6a62; --rule:#d3dcd5;
+  --accent:#d9480f; --accent-ink:#ffffff; --accent-soft:#fde4d6; --sel:#24407a;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1411; --panel:#151f1a; --panel-2:#1b2721; --ink:#e5ece7; --muted:#93a39a; --rule:#2b3a32;
+  --accent:#ff7b39; --accent-ink:#1a0d05; --accent-soft:#3a2216; --sel:#9db6ef; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1411; --panel:#151f1a; --panel-2:#1b2721; --ink:#e5ece7; --muted:#93a39a; --rule:#2b3a32;
+  --accent:#ff7b39; --accent-ink:#1a0d05; --accent-soft:#3a2216; --sel:#9db6ef; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0;box-sizing:border-box;display:flex;flex-direction:column}
+*,*::before,*::after{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin:0}
+h2{font-size:15px} h3{font-size:13px;color:var(--muted)}
+
+.bar{display:flex;align-items:center;gap:12px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:8px}
+.brand b{font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.02em}
+.brand b span{color:var(--accent)}
+.chip{font-family:var(--display);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:99px;padding:2px 8px;color:var(--muted)}
+#pbName{border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 8px;font-family:var(--display);font-size:18px;font-weight:600;min-width:0;width:220px;max-width:100%}
+#pbName:hover,#pbName:focus{border-color:var(--rule);background:var(--panel)}
+.spacer{flex:1}
+.btn{border:1px solid var(--rule);background:var(--panel);border-radius:8px;padding:7px 12px;font-weight:600;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+
+.app{flex:1;min-height:0;display:grid;grid-template-columns:230px minmax(0,1fr) 270px;gap:12px;padding-bottom:10px}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:12px;min-height:0;display:flex;flex-direction:column}
+.plays-head{display:flex;justify-content:space-between;align-items:center;padding:12px 12px 8px}
+#playList{list-style:none;margin:0;padding:0 8px 8px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.pitem{border:1px solid var(--rule);border-radius:10px;padding:6px;display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px;align-items:center;background:var(--panel-2);cursor:pointer}
+.pitem.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.pitem svg{width:72px;height:auto;border-radius:4px;display:block}
+.pname{font-weight:600;line-height:1.2;overflow-wrap:anywhere}
+.pmeta{font-size:12px;color:var(--muted)}
+.pacts{display:flex;gap:4px;margin-top:4px}
+.mini{border:0;background:transparent;color:var(--muted);font-size:12px;padding:2px 4px;border-radius:4px}
+.mini:hover{color:var(--ink);background:var(--panel)}
+.mini.danger{color:var(--accent)}
+#newPlayForm{padding:0 12px 12px;display:flex;flex-direction:column;gap:8px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:500}
+.inp{border:1px solid var(--rule);background:var(--panel-2);border-radius:8px;padding:7px 9px;width:100%}
+textarea.inp{resize:vertical;min-height:70px}
+
+.editor{padding:10px;gap:8px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--panel-2)}
+.seg button{border:0;background:transparent;padding:6px 11px;font-weight:600;font-size:13px}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.tsep{width:1px;align-self:stretch;background:var(--rule)}
+.tool{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.tool select{border:1px solid var(--rule);background:var(--panel-2);border-radius:8px;padding:5px 6px;color:var(--ink)}
+.hint{display:flex;align-items:center;gap:10px;min-height:30px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.hint .btn{padding:3px 10px;font-size:12px}
+.fieldwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+#field{width:100%;height:100%;max-height:100%;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:8px;display:block}
+#field.draw{cursor:crosshair}
+#field.text{cursor:text}
+
+.inspector{padding:14px;gap:14px;overflow:auto}
+.isec{display:flex;flex-direction:column;gap:8px}
+.isec .seg{align-self:flex-start;flex-wrap:wrap}
+.swatches{display:flex;gap:8px}
+.sw{width:26px;height:26px;border-radius:50%;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--rule)}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.tips{margin:0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.5}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:11px;border:1px solid var(--rule);border-radius:4px;padding:0 4px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+
+#printView{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;
+  padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.pv-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.pv-note{font-size:13px;color:var(--muted);max-width:65ch}
+.sheet{background:#fff;color:#111;width:100%;max-width:1000px;aspect-ratio:11/8.5;margin:0 auto 16px;padding:2.5%;display:grid;gap:2%;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.cell{display:flex;flex-direction:column;min-height:0;border:1px solid #cfd6d1;border-radius:4px;padding:6px}
+.cell h4{margin:0 0 4px;font-family:var(--display);font-size:15px;display:flex;justify-content:space-between;gap:8px}
+.cell h4 span{color:#666;font-weight:500}
+.cell svg{flex:1;min-height:0;width:100%}
+.num{width:64px;border:1px solid var(--rule);background:var(--panel-2);border-radius:8px;padding:5px 6px;color:var(--ink)}
+#sheets{overflow-x:auto;padding-bottom:8px}
+.page{background:#fff;color:#111;width:10.3in;height:7.7in;margin:0 auto 16px;box-shadow:0 1px 4px rgba(0,0,0,.15);overflow:hidden;position:relative}
+.page-cap{position:absolute;right:.1in;bottom:.05in;font-size:7pt;color:#888}
+.wb-page{display:flex;flex-wrap:wrap;align-content:flex-start;gap:0}
+.wb{border:1px dashed #9aa5a0;display:grid;padding:.04in;gap:.03in;box-sizing:border-box}
+.win{border:.5pt solid #222;position:relative;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
+.win b{position:absolute;left:0;top:0;background:#111;color:#fff;font:700 7pt/1 var(--display);padding:1.5pt 3pt;z-index:1}
+.win svg{width:100%;height:100%;display:block}
+.wl{display:flex;align-items:center;gap:4pt;padding:0 3pt;line-height:1.25;font-family:var(--display);font-weight:600;white-space:nowrap;overflow:hidden;border-bottom:.5pt solid #ccc}
+.wl i{font-style:normal;font-weight:700;min-width:1.6em}
+.call{padding:.3in;display:flex;flex-direction:column;gap:.12in}
+.call h3{color:#111;font-size:16pt;letter-spacing:.02em;display:flex;justify-content:space-between;align-items:baseline}
+.call h3 span{font-size:9pt;color:#666;font-family:var(--body);text-transform:none;letter-spacing:0}
+.call-cols{columns:3;column-gap:.25in;column-rule:.5pt solid #ddd;flex:1;min-height:0}
+.cgroup{break-inside:avoid;margin-bottom:.14in}
+.cgroup h4{margin:0 0 3pt;font:700 10pt var(--display);text-transform:uppercase;letter-spacing:.06em;background:#111;color:#fff;padding:2pt 5pt}
+.crow{display:grid;grid-template-columns:2.2em 1fr;gap:4pt;font-size:9pt;padding:2pt 0;border-bottom:.5pt solid #e3e3e3}
+.crow b{font-family:var(--display)}
+.crow small{display:block;color:#666;font-size:7.5pt}
+.cdiag{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:1fr;gap:.08in;flex:1;min-height:0}
+.cdiag .win{border-color:#bbb}
+.cell p{margin:4px 0 0;font-size:11px;color:#333}
+
+#helpView,#dataView{position:fixed;inset:0;z-index:30;background:rgba(10,18,14,.55);display:flex;align-items:flex-start;justify-content:center;overflow:auto;
+  padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+#helpView[hidden],#dataView[hidden]{display:none}
+.help-intro{margin:0;line-height:1.5;max-width:65ch}
+.sel{user-select:all;-webkit-user-select:all;font-weight:600;color:var(--ink)}
+.chip.beta{border-color:var(--accent);color:var(--accent)}
+.foot{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;font-size:12px;color:var(--muted);padding-block:0 12px}
+.foot b{font-family:var(--display);font-size:14px;color:var(--ink);letter-spacing:.02em}
+.foot a{color:var(--ink)}
+#rsFile{font-size:13px;max-width:100%}
+#rsText{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:11px}
+.help-card{background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:14px;max-width:620px;width:100%;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+.help-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.help-head h2{font-size:20px}
+.help-steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;line-height:1.5;max-width:65ch}
+.help-steps b{color:var(--ink)}
+.help-steps li::marker{font-family:var(--display);font-weight:700;color:var(--accent)}
+.help-note{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
+@media (max-width:960px){
+  html,body{height:auto}
+  .app{grid-template-columns:minmax(0,1fr)}
+  .editor{order:1} .inspector{order:2} .plays{order:3}
+  .fieldwrap{flex:none}
+  #field{height:auto;aspect-ratio:56.6/38;max-height:75vh}
+  #playList{max-height:none}
+}
+@media print{
+  @page{size:letter landscape;margin:.35in}
+  body{padding:0;background:#fff;display:block}
+  body>*:not(#printView){display:none!important}
+  #printView{position:static;padding:0;background:#fff}
+  .pv-bar{display:none}
+  .sheet{box-shadow:none;margin:0;max-width:none;width:100%;break-after:page;padding:0;border-radius:0}
+  #sheets{overflow:visible}
+  .page{box-shadow:none;margin:0;break-after:page}
+  .page:last-child,.sheet:last-child{break-after:auto}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="bar">
+  <div class="brand"><b>Play<span>Band</span></b><span class="chip beta">Free beta</span></div>
+  <input id="pbName" aria-label="Playbook name" value="Sample Playbook">
+  <span class="chip" id="sampleChip">Sample plays</span>
+  <div class="spacer"></div>
+  <button class="btn" id="helpBtn">How to use</button>
+  <button class="btn" id="dataBtn">Back up / Restore</button>
+  <button class="btn" id="printBtn">Print sheets</button>
+  <button class="btn" id="resetBtn">Reset sample</button>
+</header>
+
+<div class="app">
+  <aside class="panel plays">
+    <div class="plays-head"><h2>Plays</h2><button class="btn primary" id="newPlayBtn">+ New play</button></div>
+    <form id="newPlayForm" hidden>
+      <label class="f">Play name<input class="inp" id="npName" placeholder="e.g. Inside Zone Left" required></label>
+      <label class="f">Formation<select class="inp" id="npForm"></select></label>
+      <label class="f">Category<select class="inp" id="npCat"></select></label>
+      <div class="row"><button class="btn primary" type="submit">Create play</button><button class="btn" type="button" id="npCancel">Cancel</button></div>
+    </form>
+    <ul id="playList"></ul>
+  </aside>
+
+  <main class="panel editor">
+    <div class="toolbar">
+      <div class="seg" id="modeSeg" role="group" aria-label="Tool">
+        <button data-mode="select" aria-pressed="true">Move</button>
+        <button data-mode="draw" aria-pressed="false">Draw</button>
+        <button data-mode="text" aria-pressed="false">Text</button>
+      </div>
+      <span class="tsep"></span>
+      <button class="btn" id="undoBtn" title="Undo (Ctrl/Cmd+Z)">Undo</button>
+      <button class="btn" id="redoBtn" title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
+      <button class="btn" id="flipBtn" title="Mirror the play left to right">Flip</button>
+      <span class="tsep"></span>
+      <label class="tool">Defense <select id="defSel"></select></label>
+      <label class="tool"><input type="checkbox" id="snapChk"> Snap</label>
+      <button class="btn primary" id="animBtn">Run play</button>
+    </div>
+    <div class="hint" id="hint"></div>
+    <div class="fieldwrap"><svg id="field" viewBox="-1.6 -26 56.53 38" aria-label="Play diagram"></svg></div>
+  </main>
+
+  <aside class="panel inspector" id="inspector"></aside>
+</div>
+
+<div id="helpView" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="help-card">
+    <div class="help-head"><h2 id="helpTitle">Welcome to PlayBand</h2><button class="btn" id="helpClose">Got it</button></div>
+    <p class="help-intro">Draw football plays, then print wristbands and coach sheets. PlayBand is free while it is in beta. Here is how it works:</p>
+    <ol class="help-steps">
+      <li><b>Pick a play</b> from the list on the left, or tap <b>+ New play</b>. Choose 11-man, 7v7 or 5v5 flag, a formation and a category.</li>
+      <li><b>Move players.</b> With <b>Move</b> on, drag any player to line them up how you want.</li>
+      <li><b>Draw routes.</b> Tap <b>Draw</b>, tap a player, then tap points on the field. Tap the last point again (or press Enter) to finish.</li>
+      <li><b>Style a route.</b> In Move, tap a route. In the right panel pick solid, dashed or zigzag, an arrow, block (T) or dot end, straight or smooth, and a color. Drag the white handles to reshape it.</li>
+      <li><b>Add notes.</b> Tap <b>Text</b> and tap the field to drop a label. Coaching notes go in the right panel.</li>
+      <li><b>Show a defense</b> with the Defense menu, <b>Flip</b> to mirror the play, and <b>Run play</b> to watch the routes animate.</li>
+      <li><b>Save a formation.</b> Line players up, type a name under Formations in the right panel and tap Save formation. It appears at the top of the New play menu.</li>
+      <li><b>Print.</b> Tap <b>Print sheets</b> for play sheets, wristbands (pick a size, grid and copies) or a coach call sheet. Numbers on the wristbands match the coach sheet.</li>
+      <li><b>Back up your plays.</b> Plays are saved only in this browser. Tap <b>Back up / Restore</b> to save a backup file, or to move your plays to another device.</li>
+    </ol>
+    <p class="help-note">Your plays save automatically in this browser on this device. Undo and redo are in the toolbar (Ctrl/Cmd Z). This is a beta, so tell us what feels clumsy or missing: <span class="sel">info@treviweb.com</span></p>
+  </div>
+</div>
+
+<footer class="foot">
+  <span><b>PlayBand</b> free beta</span>
+  <span>Your plays are saved only in this browser. We do not collect them, so keep a backup.</span>
+  <span>Feedback or want launch updates? <a href="mailto:info@treviweb.com?subject=PlayBand%20feedback" id="fbLink">info@treviweb.com</a> <button class="mini" id="fbCopy">Copy</button></span>
+  <span>Made by <a href="https://treviweb.com" target="_blank" rel="noopener">Trevi Web Co.</a></span>
+</footer>
+
+<div id="dataView" hidden role="dialog" aria-modal="true" aria-labelledby="dataTitle">
+  <div class="help-card">
+    <div class="help-head"><h2 id="dataTitle">Back up / Restore</h2><button class="btn" id="dataClose">Close</button></div>
+    <div class="isec"><h3>Back up</h3>
+      <p class="help-note">Save a copy of every play and saved formation in this playbook. Keep the file somewhere safe, or use it to move your plays to another device.</p>
+      <div class="row"><button class="btn primary" id="bkDownload">Download backup file</button><button class="btn" id="bkCopy">Copy backup text</button><span class="pmeta" id="bkMsg" role="status"></span></div>
+    </div>
+    <div class="isec"><h3>Restore</h3>
+      <p class="help-note">Choose a backup file, or paste backup text below. Restoring replaces the plays you have now.</p>
+      <input type="file" id="rsFile" accept=".json,application/json,text/plain" aria-label="Backup file">
+      <label class="f">Backup text<textarea class="inp" id="rsText" placeholder="Paste backup text here" spellcheck="false"></textarea></label>
+      <div class="row"><button class="btn" id="rsGo">Restore</button><span class="pmeta" id="rsMsg" role="status"></span></div>
+    </div>
+  </div>
+</div>
+
+<div id="printView" hidden>
+  <div class="pv-bar">
+    <h2>Print sheets</h2>
+    <div class="seg" id="sheetSeg" role="group" aria-label="Sheet type">
+      <button data-sheet="plays" aria-pressed="true">Play sheets</button>
+      <button data-sheet="wrist" aria-pressed="false">Wristbands</button>
+      <button data-sheet="call" aria-pressed="false">Coach sheet</button>
+    </div>
+    <span class="pv-opts" data-for="plays"><label class="tool">Plays per page
+      <select id="perPage"><option>1</option><option>2</option><option selected>4</option><option>6</option></select></label></span>
+    <span class="pv-opts" data-for="wrist" hidden>
+      <label class="tool">Size <select id="wbSize">
+        <option value="3x2">Youth 3 × 2 in</option><option value="3.5x2.25">Youth large 3.5 × 2.25 in</option>
+        <option value="4x2.5" selected>Adult 4 × 2.5 in</option><option value="4.5x3">Adult large 4.5 × 3 in</option>
+        <option value="5x3">QB / coach 5 × 3 in</option><option value="custom">Custom…</option></select></label>
+      <span id="wbCustom" hidden><label class="tool">W <input id="wbW" type="number" min="1.5" max="8" step="0.25" value="4" class="num"></label>
+        <label class="tool">H <input id="wbH" type="number" min="1" max="6" step="0.25" value="2.5" class="num"> in</label></span>
+      <label class="tool">Show <select id="wbMode"><option value="diagram">Diagrams</option><option value="list">Play list</option></select></label>
+      <label class="tool">Grid <select id="wbGrid"><option value="2x2">2 × 2</option><option value="3x2" selected>3 × 2</option><option value="3x3">3 × 3</option><option value="4x2">4 × 2</option><option value="4x3">4 × 3</option><option value="1x8">1 × 8 (list)</option><option value="2x6">2 × 6 (list)</option><option value="2x8">2 × 8 (list)</option></select></label>
+      <label class="tool">Copies <input id="wbCopies" type="number" min="1" max="30" value="2" class="num"></label>
+    </span>
+    <span class="pv-opts" data-for="call" hidden>
+      <label class="tool"><input type="checkbox" id="callDiag" checked> Add diagram page</label>
+    </span>
+    <button class="btn primary" id="doPrint">Print / Save as PDF</button>
+    <button class="btn" id="closePrint">Back to editor</button>
+    <span class="pv-note" id="pvNote"></span>
+  </div>
+  <div id="sheets"></div>
+</div>
+
+<script>
+(()=>{
+const FW=53.33, CX=26.67;
+const COLORS={ink:'#1f2f57',red:'#c92a2a',blue:'#1971c2',green:'#2b8a3e'};
+const KIND_STROKE={qb:'#d9480f',skill:'#24407a',ol:'#5f6b73',def:'#8f2d2d'};
+const CATS=['Run','Pass','Screen','Play-action','Special'];
+const uid=()=>Math.random().toString(36).slice(2,10);
+const r2=n=>Math.round(n*100)/100;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CX5=15, FWS={11:53.33,7:53.33,5:30}, SIZE_NAME={11:'11-man',7:'7v7',5:'5v5 flag'};
+const fwOf=p=>FWS[p.size]||53.33, vbOf=p=>`-1.6 -26 ${r2(fwOf(p)+3.2)} 38`;
+
+/* ---------- formations ---------- */
+const P=(label,x,y,kind='skill',shape='circle')=>({id:uid(),label,x,y,kind,shape});
+const D=(label,x,y)=>P(label,x,y,'def','def');
+const OL=()=>[P('LT',CX-4,1,'ol'),P('LG',CX-2,1,'ol'),P('C',CX,1,'ol','square'),P('RG',CX+2,1,'ol'),P('RT',CX+4,1,'ol')];
+const FORMATIONS={
+ 11:{
+  'I-Form Right':()=>[...OL(),P('Y',CX+6,1),P('X',5,1),P('Z',46,2.2),P('Q',CX,2.4,'qb'),P('F',CX,4.6),P('H',CX,6.8)],
+  'Singleback Ace':()=>[...OL(),P('Y',CX+6,1),P('F',CX-6,1),P('X',5,2.2),P('Z',47.5,2.2),P('Q',CX,2.4,'qb'),P('H',CX,6.6)],
+  'Spread 2x2':()=>[...OL(),P('X',5,1),P('F',15,2.2),P('Y',38,2.2),P('Z',47.5,1),P('Q',CX,5,'qb'),P('H',CX+2.4,5)],
+  'Trips Right':()=>[...OL(),P('X',5,1),P('Y',34.5,2.2),P('F',40.5,2.2),P('Z',47.5,1),P('Q',CX,5,'qb'),P('H',CX-2.4,5)],
+  'Empty 3x2':()=>[...OL(),P('X',5,1),P('F',13,2.2),P('H',34.5,2.2),P('Y',40.5,2.2),P('Z',47.5,1),P('Q',CX,5,'qb')]
+ },
+ 7:{
+  'Spread 2x2':()=>[P('C',CX,1,'ol','square'),P('X',6,1),P('F',15,2.2),P('Y',38,2.2),P('Z',47,1),P('Q',CX,5,'qb'),P('H',CX+2.4,5)],
+  'Trips Right':()=>[P('C',CX,1,'ol','square'),P('X',6,1),P('Y',34.5,2.2),P('F',40.5,2.2),P('Z',47,1),P('Q',CX,5,'qb'),P('H',CX-2.4,5)],
+  'Bunch Left':()=>[P('C',CX,1,'ol','square'),P('X',10,1),P('F',12.2,2.6),P('Y',7.8,2.6),P('Z',47,1),P('Q',CX,5,'qb'),P('H',CX+2.4,5)]
+ },
+ 5:{
+  'Spread':()=>[P('C',CX5,1,'skill','square'),P('X',3,1),P('Y',21,2.2),P('Z',27,1),P('Q',CX5,4,'qb')],
+  'Trips Right':()=>[P('C',CX5,1,'skill','square'),P('Z',19.5,2.2),P('Y',23.5,2.2),P('X',27.5,1),P('Q',CX5,4,'qb')],
+  'Bunch Right':()=>[P('C',CX5,1,'skill','square'),P('X',22,1),P('Y',24,2.6),P('Z',20,2.6),P('Q',CX5,4,'qb')],
+  'Stack Left':()=>[P('C',CX5,1,'skill','square'),P('X',5,1),P('Y',5,3.2),P('Z',26,1),P('Q',CX5,4,'qb')],
+  'RB Offset':()=>[P('C',CX5,1,'skill','square'),P('X',3,1),P('Z',27,1),P('Q',CX5,4,'qb'),P('H',CX5+2.6,4)]
+ }
+};
+const DEFENSES={
+ 11:{
+  '4-3':()=>[D('E',CX-5.5,-1.4),D('T',CX-1.2,-1.4),D('T',CX+1.8,-1.4),D('E',CX+5.5,-1.4),D('W',CX-5,-5),D('M',CX,-5),D('S',CX+5,-5),D('C',5,-6),D('C',47.5,-6),D('FS',CX-8,-12),D('SS',CX+8,-11)],
+  '3-4':()=>[D('E',CX-3.5,-1.4),D('N',CX,-1.4),D('E',CX+3.5,-1.4),D('B',CX-7.5,-2.5),D('M',CX-2.5,-5),D('M',CX+2.5,-5),D('B',CX+7.5,-2.5),D('C',5,-6),D('C',47.5,-6),D('FS',CX-8,-12),D('SS',CX+8,-11)],
+  'Nickel':()=>[D('E',CX-5.5,-1.4),D('T',CX-1.2,-1.4),D('T',CX+1.8,-1.4),D('E',CX+5.5,-1.4),D('M',CX-2.5,-5),D('W',CX+2.5,-5),D('N',38,-5),D('C',5,-6),D('C',47.5,-6),D('FS',CX-8,-12),D('SS',CX+8,-12)]
+ },
+ 7:{
+  'Cover 3':()=>[D('C',6,-7),D('C',47,-7),D('FS',CX,-13),D('W',13,-5),D('M',22,-5),D('S',31,-5),D('B',40,-5)],
+  'Cover 2':()=>[D('C',6,-4),D('C',47,-4),D('S',15,-13),D('S',38,-13),D('W',17,-5),D('M',CX,-5),D('B',36,-5)]
+ },
+ 5:{
+  'Man + Rush':()=>[D('R',CX5,-7.6),D('C',3,-4),D('N',21,-4),D('C',27,-4),D('S',CX5,-12)],
+  'Zone + Rush':()=>[D('R',CX5,-7.6),D('C',5,-6),D('C',25,-6),D('S',9,-13),D('S',21,-13)],
+  'Cover 2 (no rush)':()=>[D('C',4,-5),D('M',CX5,-5),D('C',26,-5),D('S',8,-13),D('S',22,-13)]
+ }
+};
+
+/* ---------- sample playbook ---------- */
+function makePlay(name,category,size,formation){
+  const cf=String(formation).startsWith('custom:')&&pb?(pb.customFormations||[]).find(f=>'custom:'+f.id===formation):null;
+  const players=cf?cf.players.map(p=>({...p,id:uid()})):FORMATIONS[size][formation]();
+  return {id:uid(),name,category,size,formation:cf?cf.name:formation,notes:'',defense:'None',players,lines:[],labels:[]};
+}
+function route(play,label,pts,o={}){
+  const p=play.players.find(x=>x.label===label&&x.kind!=='def');
+  play.lines.push({id:uid(),playerId:p?p.id:null,start:p?null:pts.shift(),pts,style:o.style||'solid',cap:o.cap||'arrow',smooth:!!o.smooth,color:o.color||'ink'});
+}
+function passPro(play){['LT','LG','C','RG','RT'].forEach(l=>{const p=play.players.find(x=>x.label===l);route(play,l,[[p.x,2.6]],{cap:'t'})});}
+function applyDefense(play,name){
+  const gone=new Set(play.players.filter(p=>p.kind==='def').map(p=>p.id));
+  play.players=play.players.filter(p=>!gone.has(p.id));
+  play.lines=play.lines.filter(l=>!gone.has(l.playerId));
+  play.defense=name;
+  const f=DEFENSES[play.size][name]; if(f) play.players.push(...f());
+}
+function samplePlaybook(){
+  const a=makePlay('Power Right','Run',11,'I-Form Right');
+  ['LT','LG','C','RG','RT'].forEach(l=>{const p=a.players.find(x=>x.label===l);route(a,l,[[p.x+1.4,-0.9]],{cap:'t'})});
+  route(a,'Y',[[CX+7.4,-0.9]],{cap:'t'});
+  route(a,'F',[[CX+3,3.4],[CX+5.2,-0.4]],{cap:'t',smooth:true});
+  route(a,'H',[[CX+1.6,4.8],[CX+5,0.6],[CX+5.6,-9]],{smooth:true,color:'red'});
+  route(a,'Q',[[CX+1.4,3.6]],{cap:'none',style:'dashed'});
+  route(a,'X',[[5,-5]],{cap:'t'}); route(a,'Z',[[46,-4.5]],{cap:'t'});
+  a.labels.push({id:uid(),x:CX+11.5,y:-6,text:'Hit the 6 hole'});
+  a.notes='Fullback kicks out the end man on the line. Tailback reads the kick-out and gets downhill.';
+  applyDefense(a,'4-3');
+
+  const b=makePlay('Slant Flat','Pass',11,'Spread 2x2');
+  route(b,'X',[[5,-2.5],[11,-8.5]]); route(b,'Z',[[47.5,-2.5],[41.5,-8.5]]);
+  route(b,'F',[[13,-0.2],[6,-1.8]],{smooth:true}); route(b,'Y',[[40,-0.2],[47,-1.8]],{smooth:true});
+  route(b,'H',[[CX+3.2,2.6]],{cap:'t'}); route(b,'Q',[[CX,8]],{cap:'none',style:'dashed'});
+  passPro(b);
+  b.labels.push({id:uid(),x:CX,y:-15,text:'Hot: slant vs blitz'});
+  b.notes='3-step drop. Read the flat defender: if he widens, throw the slant.';
+  applyDefense(b,'Nickel');
+
+  const c=makePlay('Four Verticals','Pass',11,'Spread 2x2');
+  route(c,'X',[[5,-23]]); route(c,'Z',[[47.5,-23]]);
+  route(c,'F',[[16.5,-6],[18,-23]],{smooth:true}); route(c,'Y',[[37,-6],[35.5,-23]],{smooth:true});
+  route(c,'H',[[CX+5.5,5.8],[CX+9.5,1]],{smooth:true,style:'dashed'});
+  route(c,'Q',[[CX,9.5]],{cap:'none',style:'dashed'}); passPro(c);
+
+  const d=makePlay('Bunch Snag','Pass',7,'Bunch Left');
+  route(d,'Y',[[7.8,-5],[10.5,-4.2]],{smooth:true}); route(d,'X',[[10,-7],[3.5,-12]]);
+  route(d,'F',[[16,-2.5]],{color:'red'}); route(d,'Z',[[47,-12],[44,-9]]);
+  route(d,'H',[[CX+6,4],[CX+9,1.5]],{smooth:true});
+  applyDefense(d,'Cover 3');
+
+  const e=makePlay('Flood Right','Pass',5,'Trips Right');
+  route(e,'X',[[27.5,-18]]); route(e,'Y',[[23.5,-7],[28.5,-7.5]]); route(e,'Z',[[21,-1],[28,-2.5]],{smooth:true});
+  route(e,'C',[[15,-3],[9,-5]],{color:'red'}); route(e,'Q',[[17,5.4],[20,4.6]],{cap:'none',style:'dashed',smooth:true});
+  e.labels.push({id:uid(),x:7,y:-9.5,text:'C is the outlet'});
+  e.notes='QB rolls right. Read high to low: X clears, Y out at 7, Z in the flat. Center drag is the outlet back side.';
+  applyDefense(e,'Man + Rush');
+  return {name:'Sample Playbook',sample:true,v:2,currentId:a.id,plays:[a,b,c,d,e]};
+}
+
+/* ---------- state + storage ---------- */
+const KEY='playcard.v1';
+let pb=null;
+try{pb=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){pb=null}
+if(!pb||!pb.plays||!pb.plays.length||(pb.sample&&pb.v!==2)) pb=samplePlaybook();
+const st={mode:'select',sel:null,drag:null,drawing:null,preview:null,down:null,snap:false,anim:null,undo:[],redo:[],
+  lineDefaults:{style:'solid',cap:'arrow',smooth:false,color:'ink'}};
+let saveT=0;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(pb))}catch(e){}},250)}
+const cur=()=>pb.plays.find(p=>p.id===pb.currentId)||pb.plays[0];
+function pushUndo(){st.undo.push(JSON.stringify(pb));if(st.undo.length>100)st.undo.shift();st.redo=[];}
+function markEdited(){if(pb.sample){pb.sample=false}}
+function restore(from,to){if(!from.length)return;to.push(JSON.stringify(pb));pb=JSON.parse(from.pop());st.sel=null;st.drawing=null;st.preview=null;renderAll();save();}
+
+/* ---------- geometry ---------- */
+const playerById=(play,id)=>play.players.find(p=>p.id===id);
+function startOf(line,play,pos){
+  if(line.playerId){const p=playerById(play,line.playerId);if(!p)return line.start||[0,0];const o=pos&&pos[p.id];return o?[o[0],o[1]]:[p.x,p.y];}
+  return line.start;
+}
+function cr(p0,p1,p2,p3,t){const t2=t*t,t3=t2*t;return [0,1].map(i=>.5*(2*p1[i]+(-p0[i]+p2[i])*t+(2*p0[i]-5*p1[i]+4*p2[i]-p3[i])*t2+(-p0[i]+3*p1[i]-3*p2[i]+p3[i])*t3));}
+function samplePts(raw,smooth){
+  if(!smooth||raw.length<3)return raw;
+  const out=[raw[0]];
+  for(let i=0;i<raw.length-1;i++){const p0=raw[i-1]||raw[i],p1=raw[i],p2=raw[i+1],p3=raw[i+2]||raw[i+1];for(let t=1;t<=12;t++)out.push(cr(p0,p1,p2,p3,t/12));}
+  return out;
+}
+function zigzag(raw){
+  const out=[raw[0]];
+  for(let i=0;i<raw.length-1;i++){
+    const a=raw[i],b=raw[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);if(L<.01)continue;
+    const n=Math.max(2,Math.round(L/.8)),px=-dy/L,py=dx/L;
+    for(let j=1;j<n;j++){const f=j/n,o=(j%2?1:-1)*.38;out.push([a[0]+dx*f+px*o,a[1]+dy*f+py*o]);}
+    out.push(b);
+  }
+  return out;
+}
+const pathD=pts=>'M'+pts.map(p=>r2(p[0])+' '+r2(p[1])).join(' L');
+function lineGeom(line,play,pos){
+  const raw=[startOf(line,play,pos),...line.pts];
+  const drawn=line.style==='zigzag'?zigzag(raw):samplePts(raw,line.smooth);
+  return {raw,drawn,motion:samplePts(raw,line.smooth)};
+}
+function capSvg(line,drawn,raw,color){
+  if(line.cap==='none'||raw.length<2)return '';
+  const src=line.style==='zigzag'?raw:drawn;
+  const E=src[src.length-1];let A=src[src.length-2];
+  for(let i=src.length-2;i>=0&&Math.hypot(E[0]-src[i][0],E[1]-src[i][1])<.05;i--)A=src[i-1]||A;
+  const dx=E[0]-A[0],dy=E[1]-A[1],L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,nx=-uy,ny=ux;
+  if(line.cap==='arrow'){const t=[E[0]+ux*.45,E[1]+uy*.45],l=[E[0]-ux*.5+nx*.5,E[1]-uy*.5+ny*.5],r=[E[0]-ux*.5-nx*.5,E[1]-uy*.5-ny*.5];
+    return `<polygon points="${[t,l,r].map(p=>r2(p[0])+','+r2(p[1])).join(' ')}" fill="${color}"/>`;}
+  if(line.cap==='t')return `<line x1="${r2(E[0]+nx*.8)}" y1="${r2(E[1]+ny*.8)}" x2="${r2(E[0]-nx*.8)}" y2="${r2(E[1]-ny*.8)}" stroke="${color}" stroke-width=".26" stroke-linecap="round"/>`;
+  if(line.cap==='dot')return `<circle cx="${r2(E[0])}" cy="${r2(E[1])}" r=".38" fill="${color}"/>`;
+  return '';
+}
+
+/* ---------- rendering ---------- */
+function flagFieldSvg(){
+  const W=30;let s=`<rect x="-1.6" y="-26" width="${W+3.2}" height="38" fill="#dfe6df"/><rect x="0" y="-26" width="${W}" height="38" fill="#fbfcf8"/>`;
+  for(let y=-25;y<=10;y+=5)if(y)s+=`<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="#cfd8d1" stroke-width=".12"/>`;
+  for(let y=-26;y<=12;y++){if(y%5===0)continue;s+=`<line x1=".3" x2="1" y1="${y}" y2="${y}" stroke="#d6ddd8" stroke-width=".1"/><line x1="${W-1}" x2="${W-.3}" y1="${y}" y2="${y}" stroke="#d6ddd8" stroke-width=".1"/>`;}
+  for(const y of [-20,-15,-10,-5,5])s+=`<text x="2.4" y="${y}" dominant-baseline="central" font-size="1" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="600" fill="#b3beb6">${y<0?'+'+(-y):'-'+y}</text>`;
+  s+=`<line x1="0" x2="${W}" y1="-7" y2="-7" stroke="#e8590c" stroke-width=".12" stroke-dasharray=".6 .45" opacity=".55"/><text x="${W/2}" y="-6.5" text-anchor="middle" font-size=".8" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="600" fill="#e8590c" opacity=".75">7-YD RUSH LINE</text>`;
+  s+=`<line x1="0" x2="${W}" y1="0" y2="0" stroke="#74a6d8" stroke-width=".16"/>`;
+  return s;
+}
+function fieldSvg(){
+  let s=`<rect x="-1.6" y="-26" width="56.53" height="38" fill="#dfe6df"/><rect x="0" y="-26" width="${FW}" height="38" fill="#fbfcf8"/>`;
+  for(let y=-25;y<=10;y+=5)s+=`<line x1="0" x2="${FW}" y1="${y}" y2="${y}" stroke="#cfd8d1" stroke-width=".12"/>`;
+  for(let y=-26;y<=12;y++){if(y%5===0)continue;
+    for(const [a,b] of [[.4,1.1],[17.42,18.12],[35.21,35.91],[52.23,52.93]])s+=`<line x1="${a}" x2="${b}" y1="${y}" y2="${y}" stroke="#d6ddd8" stroke-width=".1"/>`;}
+  for(const y of [-25,-15,-5,5]){let yd=35-y;if(yd>50)yd=100-yd;
+    s+=`<text x="7.6" y="${y}" transform="rotate(90 7.6 ${y})" text-anchor="middle" dominant-baseline="central" font-size="2.3" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="600" fill="#c3ccc5">${yd}</text>`;
+    s+=`<text x="45.7" y="${y}" transform="rotate(-90 45.7 ${y})" text-anchor="middle" dominant-baseline="central" font-size="2.3" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="600" fill="#c3ccc5">${yd}</text>`;}
+  s+=`<line x1="0" x2="${FW}" y1="0" y2="0" stroke="#74a6d8" stroke-width=".16"/>`;
+  return s;
+}
+const FIELD=fieldSvg(), FLAG_FIELD=flagFieldSvg();
+function playSvgInner(play,o={}){
+  const pos=o.pos||null, faded=!!pos;
+  let s=play.size===5?FLAG_FIELD:FIELD;
+  for(const l of play.lines){
+    const g=lineGeom(l,play,pos),c=COLORS[l.color]||COLORS.ink,on=o.interactive&&st.sel&&st.sel.type==='line'&&st.sel.id===l.id;
+    s+=`<g data-k="line" data-id="${l.id}" opacity="${faded?.3:1}">`;
+    if(o.interactive)s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="transparent" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`;
+    if(on)s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="#f9c74f" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>`;
+    s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="${c}" stroke-width=".22" stroke-linecap="round" stroke-linejoin="round"${l.style==='dashed'?' stroke-dasharray=".7 .55"':''}/>`;
+    s+=capSvg(l,g.drawn,g.raw,c)+'</g>';
+  }
+  if(o.interactive&&st.preview&&st.drawing){
+    const l=play.lines.find(x=>x.id===st.drawing);
+    if(l){const last=l.pts.length?l.pts[l.pts.length-1]:startOf(l,play);
+      s+=`<line x1="${r2(last[0])}" y1="${r2(last[1])}" x2="${r2(st.preview[0])}" y2="${r2(st.preview[1])}" stroke="${COLORS[l.color]}" stroke-width=".18" stroke-dasharray=".4 .35" opacity=".7"/>`;}
+  }
+  for(const lb of play.labels){
+    const on=o.interactive&&st.sel&&st.sel.type==='label'&&st.sel.id===lb.id;
+    s+=`<g data-k="label" data-id="${lb.id}">${on?`<rect x="${r2(lb.x-lb.text.length*.29-.4)}" y="${r2(lb.y-.95)}" width="${r2(lb.text.length*.58+.8)}" height="1.9" rx=".3" fill="none" stroke="var(--sel)" stroke-width=".1" stroke-dasharray=".3 .2"/>`:''}<text x="${r2(lb.x)}" y="${r2(lb.y)}" text-anchor="middle" dominant-baseline="central" font-size="1.15" font-weight="600" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="#1f2f57">${esc(lb.text)}</text></g>`;
+  }
+  for(const p of play.players){
+    const q=pos&&pos[p.id],x=r2(q?q[0]:p.x),y=r2(q?q[1]:p.y),stroke=KIND_STROKE[p.kind]||KIND_STROKE.skill;
+    const on=o.interactive&&st.sel&&st.sel.type==='player'&&st.sel.id===p.id;
+    const fs=p.label.length>2?.62:p.label.length>1?.78:1;
+    s+=`<g data-k="player" data-id="${p.id}">`;
+    if(on)s+=`<circle cx="${x}" cy="${y}" r="1.45" fill="none" stroke="#24407a" stroke-width=".12" stroke-dasharray=".35 .25"/>`;
+    if(p.shape==='def'){
+      s+=`<circle cx="${x}" cy="${y}" r="1" fill="transparent"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${p.label.length>1?1.05:1.35}" font-weight="700" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="${stroke}">${esc(p.label)}</text>`;
+    }else{
+      s+=p.shape==='square'?`<rect x="${r2(x-.9)}" y="${r2(y-.9)}" width="1.8" height="1.8" fill="#fff" stroke="${stroke}" stroke-width=".2"/>`
+        :`<circle cx="${x}" cy="${y}" r=".95" fill="#fff" stroke="${stroke}" stroke-width=".2"/>`;
+      s+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="${stroke}">${esc(p.label)}</text>`;
+    }
+    s+='</g>';
+  }
+  if(o.interactive&&st.sel&&st.sel.type==='line'&&!pos){
+    const l=play.lines.find(x=>x.id===st.sel.id);
+    if(l)l.pts.forEach((p,i)=>{s+=`<circle data-k="vertex" data-id="${l.id}" data-idx="${i}" cx="${r2(p[0])}" cy="${r2(p[1])}" r=".5" fill="#fff" stroke="#24407a" stroke-width=".14"/>`;});
+    if(l&&!l.playerId)s+=`<circle data-k="vertex" data-id="${l.id}" data-idx="-1" cx="${r2(l.start[0])}" cy="${r2(l.start[1])}" r=".5" fill="#fff" stroke="#24407a" stroke-width=".14"/>`;
+  }
+  return s;
+}
+const thumbSvg=(play,cls='',vb)=>`<svg viewBox="${vb||vbOf(play)}" class="${cls}" aria-hidden="true">${playSvgInner(play)}</svg>`;
+function fitVB(play){
+  const ys=[];play.players.forEach(p=>ys.push(p.y));play.labels.forEach(l=>ys.push(l.y));
+  play.lines.forEach(l=>{l.pts.forEach(q=>ys.push(q[1]));if(l.start)ys.push(l.start[1]);});
+  let lo=Math.max(-26,Math.min(...ys)-2),hi=Math.min(12,Math.max(...ys)+2);
+  if(hi-lo<14){const m=(hi+lo)/2;lo=Math.max(-26,m-7);hi=Math.min(12,lo+14);}
+  return `-0.5 ${r2(lo)} ${r2(fwOf(play)+1)} ${r2(hi-lo)}`;
+}
+
+const $=id=>document.getElementById(id);
+const svg=$('field');
+function renderCanvas(){
+  const c=cur(),vb=vbOf(c);
+  if(svg.getAttribute('viewBox')!==vb){svg.setAttribute('viewBox',vb);svg.style.aspectRatio=`${r2(fwOf(c)+3.2)}/38`;}
+  svg.innerHTML=playSvgInner(c,{interactive:true,pos:st.anim&&st.anim.pos});
+  svg.classList.toggle('draw',st.mode==='draw');svg.classList.toggle('text',st.mode==='text');
+}
+function renderList(){
+  const c=cur();
+  $('playList').innerHTML=pb.plays.map((p,i)=>`<li class="pitem${p.id===c.id?' on':''}" data-play="${p.id}">${thumbSvg(p)}<div><div class="pname">${esc(p.name)}</div><div class="pmeta">${esc(p.category)} · ${SIZE_NAME[p.size]}</div><div class="pacts"><button class="mini" data-act="dup" data-id="${p.id}">Duplicate</button><button class="mini danger" data-act="del" data-id="${p.id}">${st.confirmDel===p.id?'Confirm delete':'Delete'}</button></div></div></li>`).join('');
+  $('sampleChip').hidden=!pb.sample;
+}
+function renderToolbar(){
+  document.querySelectorAll('#modeSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===st.mode)));
+  $('undoBtn').disabled=!st.undo.length;$('redoBtn').disabled=!st.redo.length;
+  const c=cur(),opts=['None',...Object.keys(DEFENSES[c.size])];
+  $('defSel').innerHTML=opts.map(o=>`<option${o===c.defense?' selected':''}>${o}</option>`).join('');
+  $('animBtn').textContent=st.anim?'Stop':'Run play';
+  $('snapChk').checked=st.snap;
+  let h='';
+  if(st.anim)h='Running the play. Players follow their first route.';
+  else if(st.mode==='select')h='Drag players or labels to move them. Tap a route to edit its style or drag its points.';
+  else if(st.mode==='draw')h=st.drawing?'Tap the field to add points. Tap the last point again, double-tap, or press Enter to finish. <button class="btn primary" id="finishBtn">Finish route</button>'
+    :'Tap a player, then tap the field to draw their route. You can also drag from a player. Tap empty field to draw a free line.';
+  else h='Tap the field to place a text label.';
+  $('hint').innerHTML=h;
+  const fb=$('finishBtn');if(fb)fb.onclick=finishDrawing;
+}
+function seg(set,opts,val){return `<div class="seg" role="group">${opts.map(([v,t])=>`<button data-set="${set}" data-val="${v}" aria-pressed="${String(v===val)}">${t}</button>`).join('')}</div>`;}
+function lineControls(l){
+  return `<div class="isec"><h3>Line style</h3>${seg('style',[['solid','Solid'],['dashed','Dashed'],['zigzag','Zigzag']],l.style)}</div>
+  <div class="isec"><h3>End</h3>${seg('cap',[['arrow','Arrow'],['t','Block (T)'],['dot','Dot'],['none','None']],l.cap)}</div>
+  <div class="isec"><h3>Shape</h3>${seg('smooth',[['0','Straight'],['1','Smooth']],l.smooth?'1':'0')}</div>
+  <div class="isec"><h3>Color</h3><div class="swatches">${Object.entries(COLORS).map(([k,v])=>`<button class="sw" data-set="color" data-val="${k}" aria-pressed="${String(l.color===k)}" style="background:${v}" aria-label="${k}"></button>`).join('')}</div></div>`;
+}
+function renderInspector(){
+  const c=cur(),s=st.sel,el=$('inspector');let h='';
+  if(s&&s.type==='line'){const l=c.lines.find(x=>x.id===s.id);if(!l){st.sel=null;return renderInspector();}
+    const p=l.playerId&&playerById(c,l.playerId);
+    h=`<div class="isec"><h2>${p?esc(p.label)+' route':'Free line'}</h2><span class="pmeta">${l.pts.length} point${l.pts.length===1?'':'s'}. Drag the white handles to reshape.</span></div>${lineControls(l)}
+    <div class="row"><button class="btn warn" data-do="delSel">Delete line</button></div>`;
+  }else if(s&&s.type==='player'){const p=playerById(c,s.id);if(!p){st.sel=null;return renderInspector();}
+    h=`<div class="isec"><h2>Player</h2><label class="f">Label<input class="inp" id="plLabel" maxlength="3" value="${esc(p.label)}"></label></div>
+    <div class="row"><button class="btn primary" data-do="drawFrom">Draw route</button><button class="btn" data-do="clearRoutes">Clear routes</button></div>
+    <div class="row"><button class="btn warn" data-do="delSel">Remove player</button></div>`;
+  }else if(s&&s.type==='label'){const lb=c.labels.find(x=>x.id===s.id);if(!lb){st.sel=null;return renderInspector();}
+    h=`<div class="isec"><h2>Text label</h2><label class="f">Text<input class="inp" id="lbText" maxlength="40" value="${esc(lb.text)}"></label></div>
+    <div class="row"><button class="btn warn" data-do="delSel">Delete label</button></div>`;
+  }else{
+    h=`<div class="isec"><h2>Play</h2>
+    <label class="f">Name<input class="inp" id="playName" value="${esc(c.name)}"></label>
+    <label class="f">Category<select class="inp" id="playCat">${CATS.map(k=>`<option${k===c.category?' selected':''}>${k}</option>`).join('')}</select></label>
+    <label class="f">Coaching notes<textarea class="inp" id="playNotes" placeholder="Reads, blocking rules, coaching points">${esc(c.notes||'')}</textarea></label>
+    <span class="pmeta">${esc(c.formation)} · ${SIZE_NAME[c.size]}</span></div>
+    <div class="isec"><h2>Formations</h2>
+    <label class="f">Save this alignment as a formation<input class="inp" id="fmName" maxlength="30" placeholder="e.g. Trips Right Tight"></label>
+    <div class="row"><button class="btn" data-do="saveForm">Save formation</button><span class="pmeta" id="fmMsg"></span></div>
+    ${(pb.customFormations||[]).filter(f=>f.size===c.size).map(f=>`<div class="row" style="justify-content:space-between;align-items:center"><span>${esc(f.name)}</span><button class="mini danger" data-do="delForm" data-id="${f.id}">Delete</button></div>`).join('')||'<span class="pmeta">Saved formations show up under New play.</span>'}</div>
+    <div class="isec"><h2>Next line</h2><span class="pmeta">New routes start with these settings.</span></div>${lineControls(st.lineDefaults)}
+    <div class="isec"><h2>Quick keys</h2><ul class="tips"><li><span class="kbd">Enter</span> finishes a route</li><li><span class="kbd">Delete</span> removes the selected item</li><li><span class="kbd">Ctrl/Cmd Z</span> undo</li></ul></div>`;
+  }
+  el.innerHTML=h;
+}
+function renderAll(){if(typeof buildFormOpts==='function')buildFormOpts();renderCanvas();renderList();renderToolbar();renderInspector();$('pbName').value=pb.name;}
+
+/* ---------- edits ---------- */
+function commit(opts={}){markEdited();save();renderCanvas();if(opts.list!==false)renderList();renderToolbar();if(opts.insp)renderInspector();}
+const clampX=x=>Math.min(fwOf(cur())-.5,Math.max(.5,x)), clampY=y=>Math.min(11.4,Math.max(-25.4,y));
+const snap=v=>st.snap?Math.round(v*2)/2:r2(v);
+function toSvg(e){const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const m=svg.getScreenCTM();if(!m)return[0,0];const r=pt.matrixTransform(m.inverse());return [r.x,r.y];}
+function setMode(m){if(st.drawing)finishDrawing();st.mode=m;renderCanvas();renderToolbar();}
+function startLineFrom(playerId,startPt){
+  pushUndo();const d=st.lineDefaults;
+  const l={id:uid(),playerId:playerId||null,start:playerId?null:[snap(clampX(startPt[0])),snap(clampY(startPt[1]))],pts:[],style:d.style,cap:d.cap,smooth:d.smooth,color:d.color};
+  cur().lines.push(l);st.drawing=l.id;st.sel={type:'line',id:l.id};return l;
+}
+function finishDrawing(){
+  const c=cur(),l=c.lines.find(x=>x.id===st.drawing);
+  if(l&&!l.pts.length){c.lines=c.lines.filter(x=>x!==l);st.sel=null;st.undo.pop();}
+  st.drawing=null;st.preview=null;commit({insp:true});
+}
+function deleteSel(){
+  const c=cur(),s=st.sel;if(!s)return;pushUndo();
+  if(s.type==='line')c.lines=c.lines.filter(l=>l.id!==s.id);
+  if(s.type==='label')c.labels=c.labels.filter(l=>l.id!==s.id);
+  if(s.type==='player'){c.players=c.players.filter(p=>p.id!==s.id);c.lines=c.lines.filter(l=>l.playerId!==s.id);}
+  st.sel=null;commit({insp:true});
+}
+
+/* ---------- pointer handling ---------- */
+svg.addEventListener('pointerdown',e=>{
+  if(st.anim)return;
+  const pt=toSvg(e),t=e.target.closest('[data-k]'),k=t&&t.dataset.k,id=t&&t.dataset.id,c=cur();
+  svg.setPointerCapture(e.pointerId);st.down=pt;
+  if(st.mode==='select'){
+    if(k==='vertex'){st.drag={type:'vertex',id,idx:+t.dataset.idx,pushed:false};}
+    else if(k==='player'||k==='label'){
+      const obj=k==='player'?playerById(c,id):c.labels.find(x=>x.id===id);
+      st.sel={type:k,id};st.drag={type:k,id,dx:obj.x-pt[0],dy:obj.y-pt[1],pushed:false};
+    }else if(k==='line'){st.sel={type:'line',id};}
+    else st.sel=null;
+    renderCanvas();renderInspector();
+  }else if(st.mode==='draw'){
+    if(!st.drawing){
+      if(k==='player'){startLineFrom(id);st.justStarted=true;}
+      else{startLineFrom(null,pt);st.justStarted=true;}
+      renderCanvas();renderToolbar();renderInspector();
+    }else st.justStarted=false;
+  }else if(st.mode==='text'){
+    pushUndo();const lb={id:uid(),x:snap(clampX(pt[0])),y:snap(clampY(pt[1])),text:'Label'};
+    c.labels.push(lb);st.sel={type:'label',id:lb.id};st.mode='select';commit({insp:true});
+    const i=$('lbText');if(i){i.focus();i.select();}
+  }
+});
+svg.addEventListener('pointermove',e=>{
+  const pt=toSvg(e),c=cur();
+  if(st.drag){
+    const d=st.drag;
+    if(!d.pushed){if(st.down&&Math.hypot(pt[0]-st.down[0],pt[1]-st.down[1])<.15)return;pushUndo();d.pushed=true;}
+    if(d.type==='player'||d.type==='label'){
+      const obj=d.type==='player'?playerById(c,d.id):c.labels.find(x=>x.id===d.id);
+      obj.x=snap(clampX(pt[0]+d.dx));obj.y=snap(clampY(pt[1]+d.dy));
+    }else if(d.type==='vertex'){
+      const l=c.lines.find(x=>x.id===d.id),np=[snap(clampX(pt[0])),snap(clampY(pt[1]))];
+      if(d.idx<0)l.start=np;else l.pts[d.idx]=np;
+    }
+    renderCanvas();
+  }else if(st.drawing){st.preview=[snap(clampX(pt[0])),snap(clampY(pt[1]))];renderCanvas();}
+});
+svg.addEventListener('pointerup',e=>{
+  const pt=toSvg(e),c=cur();
+  if(st.drag){const moved=st.drag.pushed;st.drag=null;if(moved)commit();return;}
+  if(st.mode==='draw'&&st.drawing){
+    const l=c.lines.find(x=>x.id===st.drawing);if(!l)return;
+    const np=[snap(clampX(pt[0])),snap(clampY(pt[1]))];
+    const moved=st.down&&Math.hypot(pt[0]-st.down[0],pt[1]-st.down[1])>1;
+    if(st.justStarted){if(moved){l.pts.push(np);}st.justStarted=false;commit({insp:true});return;}
+    const last=l.pts.length?l.pts[l.pts.length-1]:startOf(l,c);
+    if(Math.hypot(np[0]-last[0],np[1]-last[1])<.7){finishDrawing();return;}
+    l.pts.push(np);commit({insp:true});
+  }
+});
+svg.addEventListener('dblclick',()=>{if(st.drawing)finishDrawing();});
+
+document.addEventListener('keydown',e=>{
+  const tag=(document.activeElement&&document.activeElement.tagName)||'';
+  const typing=/INPUT|TEXTAREA|SELECT/.test(tag);
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'&&!typing){e.preventDefault();e.shiftKey?restore(st.redo,st.undo):restore(st.undo,st.redo);return;}
+  if(typing)return;
+  if((e.key==='Enter'||e.key==='Escape')&&st.drawing){e.preventDefault();finishDrawing();return;}
+  if(e.key==='Escape'&&st.sel){st.sel=null;renderCanvas();renderInspector();return;}
+  if((e.key==='Delete'||e.key==='Backspace')&&st.sel){e.preventDefault();deleteSel();}
+});
+
+/* ---------- inspector events ---------- */
+$('inspector').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const c=cur();
+  if(b.dataset.set){
+    const target=st.sel&&st.sel.type==='line'?c.lines.find(l=>l.id===st.sel.id):st.lineDefaults;
+    let v=b.dataset.val;if(b.dataset.set==='smooth')v=v==='1';
+    if(target!==st.lineDefaults)pushUndo();
+    target[b.dataset.set]=v;
+    if(target!==st.lineDefaults){st.lineDefaults[b.dataset.set]=v;commit({insp:true});}else renderInspector();
+    return;
+  }
+  const act=b.dataset.do;
+  if(act==='delSel')deleteSel();
+  if(act==='saveForm'){
+    const nm=($('fmName').value||'').trim();if(!nm){$('fmMsg').textContent='Give it a name first.';$('fmName').focus();return;}
+    pushUndo();pb.customFormations=pb.customFormations||[];
+    const players=c.players.filter(p=>p.kind!=='def').map(({label,x,y,kind,shape})=>({label,x,y,kind,shape}));
+    const ex=pb.customFormations.find(f=>f.name.toLowerCase()===nm.toLowerCase()&&f.size===c.size);
+    if(ex)ex.players=players;else pb.customFormations.push({id:uid(),name:nm,size:c.size,players});
+    c.formation=nm;buildFormOpts();commit({insp:true});const m=$('fmMsg');if(m)m.textContent=ex?'Formation updated.':'Formation saved.';
+  }
+  if(act==='delForm'){pushUndo();pb.customFormations=(pb.customFormations||[]).filter(f=>f.id!==b.dataset.id);buildFormOpts();commit({insp:true});}
+  if(act==='clearRoutes'){pushUndo();c.lines=c.lines.filter(l=>l.playerId!==st.sel.id);commit({insp:true});}
+  if(act==='drawFrom'){const pid=st.sel.id;st.mode='draw';startLineFrom(pid);st.justStarted=false;commit({insp:true});}
+});
+let typingUndo=null;
+$('inspector').addEventListener('focusin',e=>{if(e.target.matches('input,textarea'))typingUndo=JSON.stringify(pb);});
+$('inspector').addEventListener('input',e=>{
+  const c=cur(),t=e.target;
+  if(t.id==='fmName')return;
+  if(typingUndo){st.undo.push(typingUndo);st.redo=[];typingUndo=null;}
+  if(t.id==='plLabel'){const p=playerById(c,st.sel.id);p.label=t.value.toUpperCase().slice(0,3)||'?';}
+  else if(t.id==='lbText'){const lb=c.labels.find(x=>x.id===st.sel.id);lb.text=t.value||' ';}
+  else if(t.id==='playName')c.name=t.value||'Untitled play';
+  else if(t.id==='playNotes'){c.notes=t.value;markEdited();save();return;}
+  else return;
+  commit();
+});
+$('inspector').addEventListener('change',e=>{if(e.target.id==='playCat'){pushUndo();cur().category=e.target.value;commit();}});
+
+/* ---------- toolbar ---------- */
+$('modeSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.mode);});
+$('undoBtn').onclick=()=>restore(st.undo,st.redo);
+$('redoBtn').onclick=()=>restore(st.redo,st.undo);
+$('flipBtn').onclick=()=>{
+  const c=cur(),W=fwOf(c);pushUndo();
+  c.players.forEach(p=>p.x=r2(W-p.x));
+  c.lines.forEach(l=>{l.pts=l.pts.map(p=>[r2(W-p[0]),p[1]]);if(l.start)l.start=[r2(W-l.start[0]),l.start[1]];});
+  c.labels.forEach(l=>l.x=r2(W-l.x));
+  if(/Right/.test(c.formation))c.formation=c.formation.replace('Right','Left');else if(/Left/.test(c.formation))c.formation=c.formation.replace('Left','Right');
+  commit({insp:true});
+};
+$('defSel').onchange=e=>{pushUndo();applyDefense(cur(),e.target.value);st.sel=null;commit({insp:true});};
+$('snapChk').onchange=e=>{st.snap=e.target.checked;};
+$('pbName').addEventListener('input',e=>{pb.name=e.target.value||'Untitled playbook';markEdited();save();$('sampleChip').hidden=!pb.sample;});
+
+/* ---------- animation ---------- */
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function runPlay(){
+  if(st.anim){cancelAnimationFrame(st.anim.raf);st.anim=null;renderCanvas();renderToolbar();return;}
+  if(st.drawing)finishDrawing();
+  const c=cur(),tracks=[];
+  for(const p of c.players){
+    const l=c.lines.find(x=>x.playerId===p.id);if(!l||!l.pts.length)continue;
+    const pts=lineGeom(l,c).motion,cum=[0];
+    for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+    tracks.push({id:p.id,pts,cum,len:cum[cum.length-1]});
+  }
+  if(!tracks.length)return;
+  const speed=reduceMotion?1000:7.5,t0=performance.now();
+  const maxT=Math.max(...tracks.map(t=>t.len/speed));
+  st.anim={pos:{},raf:0};
+  const step=now=>{
+    const t=(now-t0)/1000;
+    for(const tr of tracks){
+      const d=Math.min(tr.len,t*speed);let i=1;while(i<tr.cum.length-1&&tr.cum[i]<d)i++;
+      const a=tr.pts[i-1],b=tr.pts[i],seg=(tr.cum[i]-tr.cum[i-1])||1,f=Math.max(0,Math.min(1,(d-tr.cum[i-1])/seg));
+      st.anim.pos[tr.id]=[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];
+    }
+    renderCanvas();
+    if(t<maxT+1.2)st.anim.raf=requestAnimationFrame(step);else{st.anim=null;renderCanvas();renderToolbar();}
+  };
+  renderToolbar();st.anim.raf=requestAnimationFrame(step);
+}
+$('animBtn').onclick=runPlay;
+
+/* ---------- play list ---------- */
+$('playList').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]');
+  if(b){
+    const p=pb.plays.find(x=>x.id===b.dataset.id);
+    if(b.dataset.act==='dup'){pushUndo();const cp=JSON.parse(JSON.stringify(p));cp.id=uid();cp.name=p.name+' (copy)';
+      const map={};cp.players.forEach(pl=>{const n=uid();map[pl.id]=n;pl.id=n;});cp.lines.forEach(l=>{l.id=uid();if(l.playerId)l.playerId=map[l.playerId];});cp.labels.forEach(l=>l.id=uid());
+      pb.plays.splice(pb.plays.indexOf(p)+1,0,cp);pb.currentId=cp.id;st.sel=null;markEdited();save();renderAll();}
+    if(b.dataset.act==='del'){
+      if(pb.plays.length===1){b.textContent='Keep at least one';return;}
+      if(st.confirmDel!==p.id){st.confirmDel=p.id;renderList();setTimeout(()=>{if(st.confirmDel===p.id){st.confirmDel=null;renderList();}},3000);return;}
+      pushUndo();st.confirmDel=null;pb.plays=pb.plays.filter(x=>x!==p);if(pb.currentId===p.id)pb.currentId=pb.plays[0].id;st.sel=null;markEdited();save();renderAll();}
+    return;
+  }
+  const li=e.target.closest('[data-play]');if(!li)return;
+  if(st.anim)runPlay();if(st.drawing)finishDrawing();
+  pb.currentId=li.dataset.play;st.sel=null;save();renderAll();
+});
+const npForm=$('newPlayForm');
+function buildFormOpts(){
+  const mine=pb.customFormations||[];
+  $('npForm').innerHTML=(mine.length?`<optgroup label="Your formations">${mine.map(f=>`<option value="${f.size}|custom:${f.id}">${esc(f.name)} (${SIZE_NAME[f.size]})</option>`).join('')}</optgroup>`:'')+
+    [11,7,5].map(n=>`<optgroup label="${SIZE_NAME[n]}">${Object.keys(FORMATIONS[n]).map(f=>`<option value="${n}|${f}">${f}</option>`).join('')}</optgroup>`).join('');
+}
+buildFormOpts();
+$('npCat').innerHTML=CATS.map(c=>`<option>${c}</option>`).join('');
+$('newPlayBtn').onclick=()=>{npForm.hidden=!npForm.hidden;if(!npForm.hidden)$('npName').focus();};
+$('npCancel').onclick=()=>{npForm.hidden=true;};
+npForm.addEventListener('submit',e=>{
+  e.preventDefault();const v=$('npForm').value,n=v.slice(0,v.indexOf('|')),f=v.slice(v.indexOf('|')+1);
+  pushUndo();const p=makePlay($('npName').value.trim()||'New play',$('npCat').value,+n,f);
+  pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='draw';markEdited();save();npForm.reset();npForm.hidden=true;renderAll();
+});
+
+/* ---------- reset ---------- */
+let resetArmed=false;
+$('resetBtn').onclick=e=>{
+  if(!resetArmed){resetArmed=true;e.target.textContent='Click again to reset';e.target.classList.add('warn');
+    setTimeout(()=>{resetArmed=false;e.target.textContent='Reset sample';e.target.classList.remove('warn');},3000);return;}
+  pushUndo();pb=samplePlaybook();st.sel=null;resetArmed=false;e.target.textContent='Reset sample';e.target.classList.remove('warn');save();renderAll();
+};
+
+/* ---------- print ---------- */
+let sheetType='plays';
+function renderSheets(){
+  document.querySelectorAll('#sheetSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sheet===sheetType)));
+  document.querySelectorAll('.pv-opts').forEach(o=>o.hidden=o.dataset.for!==sheetType);
+  if(sheetType==='wrist')return renderWrist();
+  if(sheetType==='call')return renderCall();
+  const per=+$('perPage').value,cols=per===1?1:2,rows=Math.ceil(per/cols);let h='';
+  for(let i=0;i<pb.plays.length;i+=per){
+    h+=`<div class="sheet" style="grid-template-columns:repeat(${cols},minmax(0,1fr));grid-template-rows:repeat(${rows},minmax(0,1fr))">`;
+    pb.plays.slice(i,i+per).forEach((p,j)=>{h+=`<div class="cell"><h4>${i+j+1}. ${esc(p.name)}<span>${esc(p.category)} · ${esc(p.formation)}</span></h4>${thumbSvg(p)}${per<=2&&p.notes?`<p>${esc(p.notes)}</p>`:''}</div>`;});
+    h+='</div>';
+  }
+  $('sheets').innerHTML=h;
+}
+const framed=(()=>{try{return window.self!==window.top}catch(e){return true}})();
+$('printBtn').onclick=()=>{if(st.drawing)finishDrawing();renderSheets();
+  $('pvNote').textContent=framed?'Printing is blocked inside this preview. Open the playband.html file in a browser to print or save a PDF.':'Letter, landscape. Choose "Save as PDF" in the print dialog for a PDF.';
+  $('printView').hidden=false;};
+$('closePrint').onclick=()=>{$('printView').hidden=true;};
+$('perPage').onchange=renderSheets;
+$('sheetSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b){sheetType=b.dataset.sheet;renderSheets();}});
+['wbSize','wbW','wbH','wbMode','wbGrid','wbCopies','callDiag'].forEach(id=>$(id).addEventListener('input',renderSheets));
+const PAGE_W=10.3,PAGE_H=7.7;
+function wbDims(){
+  const v=$('wbSize').value;$('wbCustom').hidden=v!=='custom';
+  let [w,h]=v==='custom'?[+$('wbW').value,+$('wbH').value]:v.split('x').map(Number);
+  w=Math.min(PAGE_W,Math.max(1.5,w||4));h=Math.min(PAGE_H,Math.max(1,h||2.5));return [w,h];
+}
+function renderWrist(){
+  const [w,h]=wbDims(),[gc,gr]=$('wbGrid').value.split('x').map(Number),per=gc*gr,list=$('wbMode').value==='list';
+  const copies=Math.min(30,Math.max(1,+$('wbCopies').value||1));
+  const cards=[];
+  for(let i=0;i<pb.plays.length;i+=per){
+    let inner='';
+    for(let k=0;k<per;k++){
+      const idx=i+k,p=pb.plays[idx];
+      if(list){inner+=p?`<div class="wl" style="font-size:${r2(Math.max(5,Math.min(11,(h/gr)*72*.48)))}pt"><i>${idx+1}</i>${esc(p.name)}</div>`:'<div class="wl"></div>';}
+      else inner+=p?`<div class="win"><b>${idx+1}</b>${thumbSvg(p,'',fitVB(p))}</div>`:'<div class="win"></div>';
+    }
+    const style=`width:${w}in;height:${h}in;grid-template-columns:repeat(${gc},minmax(0,1fr));grid-template-rows:repeat(${gr},minmax(0,1fr));grid-auto-flow:${list?'column':'row'}`;
+    const card=`<div class="wb" style="${style}">${inner}</div>`;
+    for(let c=0;c<copies;c++)cards.push(card);
+  }
+  const perPage=Math.max(1,Math.floor(PAGE_W/w)*Math.floor(PAGE_H/h));
+  let out='';
+  for(let i=0;i<cards.length;i+=perPage)out+=`<div class="page wb-page">${cards.slice(i,i+perPage).join('')}<span class="page-cap">${esc(pb.name)} · wristbands ${w} × ${h} in · cut on dashed lines</span></div>`;
+  $('sheets').innerHTML=out;
+}
+function renderCall(){
+  const groups={};pb.plays.forEach((p,i)=>{(groups[p.category]=groups[p.category]||[]).push([i+1,p]);});
+  let cols='';
+  for(const cat of CATS.concat(Object.keys(groups).filter(k=>!CATS.includes(k)))){
+    if(!groups[cat])continue;
+    cols+=`<div class="cgroup"><h4>${esc(cat)}</h4>${groups[cat].map(([n,p])=>`<div class="crow"><b>${n}</b><div>${esc(p.name)}<small>${esc(p.formation)} · ${SIZE_NAME[p.size]}${p.defense&&p.defense!=='None'?' · vs '+esc(p.defense):''}</small></div></div>`).join('')}</div>`;
+  }
+  let out=`<div class="page call"><h3>${esc(pb.name)} <span>Coach call sheet · numbers match the wristbands</span></h3><div class="call-cols">${cols}</div></div>`;
+  if($('callDiag').checked){
+    for(let i=0;i<pb.plays.length;i+=16){
+      out+=`<div class="page call"><h3>${esc(pb.name)} <span>Diagrams ${i+1}–${Math.min(pb.plays.length,i+16)}</span></h3><div class="cdiag">${pb.plays.slice(i,i+16).map((p,j)=>`<div class="win"><b>${i+j+1}</b>${thumbSvg(p,'',fitVB(p))}</div>`).join('')}</div></div>`;
+    }
+  }
+  $('sheets').innerHTML=out;
+}
+$('doPrint').onclick=()=>window.print();
+
+/* ---------- backup / restore ---------- */
+const num=(v,lo,hi,d)=>{v=Number(v);return Number.isFinite(v)?Math.min(hi,Math.max(lo,r2(v))):d;};
+const str=(v,n,d='')=>(typeof v==='string'?v:d).slice(0,n);
+const pick=(v,arr,d)=>arr.includes(v)?v:d;
+const normPt=q=>Array.isArray(q)?[num(q[0],-5,60,0),num(q[1],-30,15,0)]:null;
+function normPlayers(arr,map){
+  return (Array.isArray(arr)?arr:[]).slice(0,30).map(p=>{const id=uid();if(map&&p&&typeof p.id==='string')map[p.id]=id;
+    return {id,label:str(p&&p.label,3,'?')||'?',x:num(p&&p.x,0,54,10),y:num(p&&p.y,-26,12,1),kind:pick(p&&p.kind,['qb','skill','ol','def'],'skill'),shape:pick(p&&p.shape,['circle','square','def'],'circle')};});
+}
+function normPlaybook(o){
+  const src=o&&o.playbook?o.playbook:o;
+  if(!src||!Array.isArray(src.plays))throw new Error('bad');
+  const plays=src.plays.slice(0,300).map(p=>{
+    if(!p||typeof p!=='object')return null;
+    const size=pick(Number(p.size),[11,7,5],11),map={},players=normPlayers(p.players,map);
+    const lines=(Array.isArray(p.lines)?p.lines:[]).slice(0,80).map(l=>{
+      if(!l)return null;const pid=typeof l.playerId==='string'?map[l.playerId]:null,start=pid?null:normPt(l.start);
+      if(!pid&&!start)return null;
+      return {id:uid(),playerId:pid||null,start,pts:(Array.isArray(l.pts)?l.pts:[]).slice(0,60).map(normPt).filter(Boolean),style:pick(l.style,['solid','dashed','zigzag'],'solid'),cap:pick(l.cap,['arrow','t','dot','none'],'arrow'),smooth:!!l.smooth,color:pick(l.color,Object.keys(COLORS),'ink')};
+    }).filter(Boolean);
+    const labels=(Array.isArray(p.labels)?p.labels:[]).slice(0,40).map(l=>l?{id:uid(),x:num(l.x,0,54,10),y:num(l.y,-26,12,0),text:str(l.text,40,'Label')||' '}:null).filter(Boolean);
+    return {id:uid(),name:str(p.name,60,'Untitled play')||'Untitled play',category:pick(p.category,CATS,'Run'),size,formation:str(p.formation,40,'Custom'),notes:str(p.notes,2000),
+      defense:pick(p.defense,Object.keys(DEFENSES[size]),'None'),players,lines,labels};
+  }).filter(Boolean);
+  if(!plays.length)throw new Error('empty');
+  const customFormations=(Array.isArray(src.customFormations)?src.customFormations:[]).slice(0,100).map(f=>f?{id:uid(),name:str(f.name,30,'Formation')||'Formation',size:pick(Number(f.size),[11,7,5],11),
+    players:normPlayers(f.players).map(({label,x,y,kind,shape})=>({label,x,y,kind,shape}))}:null).filter(f=>f&&f.players.length);
+  return {name:str(src.name,60,'My Playbook')||'My Playbook',sample:false,v:2,currentId:plays[0].id,plays,customFormations};
+}
+const backupText=()=>JSON.stringify({app:'playband',format:1,exported:new Date().toISOString(),playbook:pb});
+function flash(id,msg){const el=$(id);el.textContent=msg;clearTimeout(el._t);el._t=setTimeout(()=>{el.textContent='';},6000);}
+$('dataBtn').onclick=()=>{if(st.drawing)finishDrawing();rsArmed=false;$('rsGo').textContent='Restore';$('rsGo').classList.remove('warn');$('dataView').hidden=false;$('dataClose').focus();};
+$('dataClose').onclick=()=>{$('dataView').hidden=true;};
+$('dataView').addEventListener('click',e=>{if(e.target.id==='dataView')$('dataView').hidden=true;});
+$('bkDownload').onclick=()=>{
+  if(framed){$('rsText').value=backupText();flash('bkMsg','Downloads are blocked in this preview. The backup text is in the box below: copy it and save it in a note or file.');return;}
+  try{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([backupText()],{type:'application/json'}));
+    a.href=url;a.download='playband-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+    flash('bkMsg','Backup file saved to your downloads.');}
+  catch(e){$('rsText').value=backupText();flash('bkMsg','Could not download here. The backup text is in the box below.');}
+};
+$('bkCopy').onclick=()=>{const t=backupText();
+  const fail=()=>{$('rsText').value=t;$('rsText').focus();$('rsText').select();flash('bkMsg','Copy was blocked. The text is selected below: copy it from there.');};
+  try{navigator.clipboard.writeText(t).then(()=>flash('bkMsg','Backup text copied. Paste it into a note or email to yourself.'),fail);}catch(e){fail();}
+};
+$('rsFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;
+  if(f.size>5e6){flash('rsMsg','That file is too large to be a PlayBand backup.');return;}
+  const rd=new FileReader();rd.onload=()=>{$('rsText').value=String(rd.result||'');flash('rsMsg','File loaded. Tap Restore to use it.');};rd.onerror=()=>flash('rsMsg','Could not read that file.');rd.readAsText(f);});
+let rsArmed=false;
+$('rsText').addEventListener('input',()=>{rsArmed=false;$('rsGo').textContent='Restore';$('rsGo').classList.remove('warn');});
+$('rsGo').onclick=()=>{
+  const raw=$('rsText').value.trim();if(!raw){flash('rsMsg','Choose a backup file or paste backup text first.');return;}
+  let next;try{next=normPlaybook(JSON.parse(raw));}catch(e){flash('rsMsg','That does not look like a PlayBand backup. Check that you pasted all of it.');return;}
+  if(!rsArmed){rsArmed=true;$('rsGo').textContent='Replace what I have now with '+next.plays.length+(next.plays.length===1?' play':' plays');$('rsGo').classList.add('warn');return;}
+  pushUndo();pb=next;st.sel=null;rsArmed=false;$('rsGo').textContent='Restore';$('rsGo').classList.remove('warn');$('rsText').value='';$('rsFile').value='';
+  save();renderAll();flash('rsMsg','Restored '+next.plays.length+(next.plays.length===1?' play':' plays')+'. Undo brings back what you had.');
+};
+$('fbCopy').onclick=e=>{const b=e.target,done=m=>{b.textContent=m;setTimeout(()=>{b.textContent='Copy';},2500);};
+  try{navigator.clipboard.writeText('info@treviweb.com').then(()=>done('Copied'),()=>done('Select the address to copy'));}catch(err){done('Select the address to copy');}};
+
+function openHelp(){$('helpView').hidden=false;$('helpClose').focus();}
+function closeHelp(){$('helpView').hidden=true;try{localStorage.setItem('playcard.helpSeen','1')}catch(e){}}
+$('helpBtn').onclick=openHelp;$('helpClose').onclick=closeHelp;
+$('helpView').addEventListener('click',e=>{if(e.target.id==='helpView')closeHelp();});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('helpView').hidden)closeHelp();else if(!$('dataView').hidden)$('dataView').hidden=true;},true);
+let seen=null;try{seen=localStorage.getItem('playcard.helpSeen')}catch(e){}
+renderAll();
+if(!seen)openHelp();
+})();
+</script>
+
+</body>
+</html>
