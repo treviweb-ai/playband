@@ -174,6 +174,9 @@ textarea.inp{resize:vertical;min-height:70px}
   padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
 #helpView[hidden],#dataView[hidden],#authView[hidden],#libView[hidden],#fbView[hidden]{display:none}
 #fbView [hidden]{display:none}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1f1f1f;border-color:#747775;width:100%;min-height:46px;font-weight:600}
+.orline{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.orline::before,.orline::after{content:"";flex:1;height:1px;background:var(--rule)}
 #fbText{min-height:130px;resize:vertical}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 #authView [hidden]{display:none}
@@ -453,6 +456,10 @@ body.viewer #field{cursor:default}
     <div class="help-head"><h2 id="authTitle">Your account</h2><button class="btn" id="authClose">Close</button></div>
     <div id="authOut" class="isec">
       <p class="help-note">A free account saves your plays online, so they are on every phone and computer you sign in on. Plays already in this browser move into your account.</p>
+      <div id="auGBox" class="isec" hidden>
+        <button type="button" class="btn gbtn" id="auGoogle"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A8.97 8.97 0 0 0 9 0 9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>Continue with Google</button>
+        <div class="orline"><span>or use email</span></div>
+      </div>
       <div class="seg" id="authSeg" role="group" aria-label="Sign in or create account"><button type="button" data-auth="in" aria-pressed="true">Sign in</button><button type="button" data-auth="up" aria-pressed="false">Create account</button></div>
       <form id="authForm" class="isec">
         <label class="f">Email<input class="inp" id="auEmail" type="email" autocomplete="email" required></label>
@@ -1539,6 +1546,7 @@ function renderAccount(){
   $('footSave').textContent=u?'Signed in as '+u.email+'. Your plays save to your PlayBand account.':'Your plays are saved only in this browser. Sign in to save them to a free account.';
   $('promo').hidden=!!u||framed||!!cloud.promoOff;
   const rec=cloud.recover;
+  $('auGBox').hidden=!cloud.google;
   $('authOut').hidden=!!u||rec;$('authIn').hidden=!u||rec;$('authNew').hidden=!rec;
   if(u){$('auWho').textContent=u.email;$('auSync').textContent=txt+'. Changes save automatically as you work.';}
   document.querySelectorAll('#authSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.auth===cloud.mode)));
@@ -1607,6 +1615,7 @@ function onSession(ev,session){
   if(user){
     if(cloud.user&&cloud.user.id===user.id){cloud.user=user;renderAccount();return;}
     cloud.user=user;auMsg('');loadCloud(user);
+    try{if(sessionStorage.getItem('pb.g')){sessionStorage.removeItem('pb.g');track('login',{method:'google'});}}catch(e){}
   }else if(cloud.user){
     cloud.user=null;clearTimeout(cloud.t);lsSet(OWNER,null);lsSet(DIRTY,null);cloud.status='off';adopt(samplePlaybook());renderAccount();
   }else renderAccount();
@@ -1671,6 +1680,12 @@ try{cloud.promoOff=sessionStorage.getItem('playband.promoOff')==='1';}catch(e){}
 $('promoGo').onclick=()=>{cloud.mode='up';$('acctBtn').click();};
 $('promoX').onclick=()=>{cloud.promoOff=true;try{sessionStorage.setItem('playband.promoOff','1');}catch(e){}renderAccount();};
 $('authView').addEventListener('click',e=>{if(e.target.id==='authView')$('authView').hidden=true;});
+$('auGoogle').onclick=async()=>{
+  const no=()=>auMsg('Google sign-in is not available right now. Use your email and password instead.');
+  if(!cloud.sb){no();return;}
+  auMsg('Opening Google…');try{sessionStorage.setItem('pb.g','1')}catch(e){}
+  try{const r=await cloud.sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});if(r&&r.error)no();}catch(e){no();}
+};
 /* ---------- feedback ---------- */
 let fbLast=0;const fbMsg=t=>{$('fbMsg').textContent=t||'';};
 $('fbOpen').onclick=()=>{if(st.drawing)finishDrawing();fbMsg('');$('fbMail').hidden=true;
@@ -1736,6 +1751,7 @@ if(!framed&&!shareId){
       if(wantSignup){wantSignup=false;try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}
         if(!session&&ev!=='PASSWORD_RECOVERY'){cloud.mode='up';$('acctBtn').click();}}},0);});
   }catch(e){cloud.libFail=true;}};
+  fetch(SB_URL+'/auth/v1/settings',{headers:{apikey:SB_KEY}}).then(r=>r.ok?r.json():null).then(j=>{cloud.google=!!(j&&j.external&&j.external.google);renderAccount();}).catch(()=>{});
   sc.onerror=()=>{cloud.libFail=true;};
   document.head.appendChild(sc);
 }
