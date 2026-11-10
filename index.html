@@ -121,7 +121,13 @@ textarea.inp{resize:vertical;min-height:70px}
   padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .pv-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 .pv-note{font-size:13px;color:var(--muted);max-width:65ch}
-.sheet{background:#fff;color:#111;width:100%;max-width:1000px;aspect-ratio:11/8.5;margin:0 auto 16px;padding:2.5%;display:grid;gap:2%;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.sheet{background:#fff;color:#111;width:100%;max-width:1000px;aspect-ratio:11/8.5;margin:0 auto 16px;padding:2.5%;display:flex;flex-direction:column;gap:1.2%;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.sh-head{display:flex;align-items:center;gap:10px;font:700 18px var(--display);letter-spacing:.02em;border-bottom:2px solid #111;padding-bottom:4px}
+.sh-head img,.call h3 img{height:34px;width:auto;max-width:90px;object-fit:contain}
+.sh-head span{margin-left:auto;font:500 11px var(--body);color:#666}
+.sh-grid{flex:1;min-height:0;display:grid;gap:2%}
+.cell .asg{margin:3px 0 0;font-size:10.5px;line-height:1.3;color:#222}
+.cell .asg b{font-family:var(--display)}
 .cell{display:flex;flex-direction:column;min-height:0;border:1px solid #cfd6d1;border-radius:4px;padding:6px}
 .cell h4{margin:0 0 4px;font-family:var(--display);font-size:15px;display:flex;justify-content:space-between;gap:8px}
 .cell h4 span{color:#666;font-weight:500}
@@ -146,7 +152,8 @@ textarea.inp{resize:vertical;min-height:70px}
 .wl{display:flex;align-items:center;gap:4pt;padding:0 3pt;line-height:1.25;font-family:var(--display);font-weight:600;white-space:nowrap;overflow:hidden;border-bottom:.5pt solid #ccc}
 .wl i{font-style:normal;font-weight:700;min-width:1.6em}
 .call{padding:.3in;display:flex;flex-direction:column;gap:.12in}
-.call h3{color:#111;font-size:16pt;letter-spacing:.02em;display:flex;justify-content:space-between;align-items:baseline}
+.call h3{color:#111;font-size:16pt;letter-spacing:.02em;display:flex;gap:10px;align-items:center}
+.call h3 span{margin-left:auto}
 .call h3 span{font-size:9pt;color:#666;font-family:var(--body);text-transform:none;letter-spacing:0}
 .call-cols{columns:3;column-gap:.25in;column-rule:.5pt solid #ddd;flex:1;min-height:0}
 .cgroup{break-inside:avoid;margin-bottom:.14in}
@@ -434,6 +441,7 @@ textarea.inp{resize:vertical;min-height:70px}
     <span class="pv-opts" data-for="call" hidden>
       <label class="tool"><input type="checkbox" id="callDiag" checked> Add diagram page</label>
     </span>
+    <button class="btn" id="logoBtn">Add team logo</button><button class="mini" id="logoDel" hidden>Remove logo</button><input type="file" id="logoFile" accept="image/png,image/jpeg" hidden>
     <button class="btn" id="pickBtn" aria-expanded="false" aria-controls="pickPanel">Choose plays</button>
     <button class="btn primary" id="doPrint">Print / Save as PDF</button>
     <button class="btn" id="closePrint">Back to editor</button>
@@ -441,6 +449,8 @@ textarea.inp{resize:vertical;min-height:70px}
   </div>
   <div class="panel" id="pickPanel" hidden>
     <div class="row" style="align-items:center"><h3>Plays to print</h3><button class="btn sm" id="pickAll">Select all</button><button class="btn sm" id="pickNone">Clear all</button><span class="pv-note">Unticked plays are left off every sheet. Numbers stay matched between wristbands and the coach sheet.</span></div>
+    <div class="row" style="align-items:center"><select class="inp" id="setSel" aria-label="Saved sets" style="width:auto"></select><button class="btn sm" id="setDel" hidden>Delete set</button>
+      <input class="inp" id="setName" maxlength="30" placeholder="Name this selection, e.g. Game day" aria-label="Set name" style="width:auto;flex:1 1 200px;max-width:280px"><button class="btn sm" id="setSave">Save as set</button><span class="pmeta" id="setMsg" role="status"></span></div>
     <div id="pickList"></div>
   </div>
   <div id="sheets"></div>
@@ -741,9 +751,7 @@ function renderToolbar(){
 const QICON={go:'M12 21V3',slant:'M7 21v-5L18 6',out:'M15 21V9H5',in:'M8 21V9h11',post:'M8 21V11l9-8',corner:'M15 21V11L7 3',hitch:'M12 21V6l-4 5',comeback:'M10 21V4l6 7',flat:'M8 20q2-5 12-5',wheel:'M6 20q8 0 9-7V3',drag:'M5 20l2-4h13',block:'M12 21v-9M6 12h12'};
 const qIcon=k=>{const d=QICON[k],m=d.match(/^M(\d+) (\d+)/);return `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${m[1]}" cy="${m[2]}" r="2.6" fill="currentColor"/></svg>`;};
 const QUICK=[['go','Go'],['slant','Slant'],['out','Out'],['in','In'],['post','Post'],['corner','Corner'],['hitch','Hitch'],['comeback','Comeback'],['flat','Flat'],['wheel','Wheel'],['drag','Drag'],['block','Block']];
-function applyQuickRoute(pid,name){
-  const c=cur(),p=playerById(c,pid);if(!p)return;
-  const flip=!!(st.lastQuick&&st.lastQuick.pid===pid&&st.lastQuick.name===name&&!st.lastQuick.flip);
+function quickLine(c,p,name,flip,color){
   const W=fwOf(c),k=c.size===5?.6:1,d=c.size===5?.8:1,X=p.x;
   let inn=Math.abs(W/2-X)<1.5?-1:Math.sign(W/2-X);if(flip)inn=-inn;const out=-inn;
   const R={
@@ -759,10 +767,16 @@ function applyQuickRoute(pid,name){
     wheel:{pts:[[X+out*5*k,Math.min(p.y-1,-.5)],[X+out*7*k,-5],[X+out*7*k,-16*d]],smooth:true},
     drag:{pts:[[X,-2],[X+inn*14*k,-3.5]]},
     block:{pts:[[X,p.y-1.8]],cap:'t'}
-  }[name];if(!R)return;
+  }[name];if(!R)return null;
+  return {id:uid(),playerId:p.id,route:(QUICK.find(q=>q[0]===name)||[])[1]||'',start:null,pts:R.pts.map(q=>[r2(Math.min(W-.8,Math.max(.8,q[0]))),r2(Math.min(11.4,Math.max(-25.4,q[1])))]),style:'solid',cap:R.cap||'arrow',smooth:!!R.smooth,color:color||'ink'};
+}
+function applyQuickRoute(pid,name){
+  const c=cur(),p=playerById(c,pid);if(!p)return;
+  const flip=!!(st.lastQuick&&st.lastQuick.pid===pid&&st.lastQuick.name===name&&!st.lastQuick.flip);
+  const l=quickLine(c,p,name,flip,st.lineDefaults.color);if(!l)return;
   pushUndo();
-  c.lines=c.lines.filter(l=>l.playerId!==pid);
-  c.lines.push({id:uid(),playerId:pid,start:null,pts:R.pts.map(q=>[r2(Math.min(W-.8,Math.max(.8,q[0]))),r2(clampY(q[1]))]),style:'solid',cap:R.cap||'arrow',smooth:!!R.smooth,color:st.lineDefaults.color});
+  c.lines=c.lines.filter(x=>x.playerId!==pid);
+  c.lines.push(l);
   st.lastQuick={pid,name,flip};
   commit({insp:true});
 }
@@ -853,7 +867,8 @@ function renderInspector(){
     h=`<div class="isec"><h2>${p?esc(p.label)+' route':'Free line'}</h2><span class="pmeta">${l.pts.length} point${l.pts.length===1?'':'s'}. Drag the white handles to reshape.</span></div>${lineControls(l)}
     <div class="row"><button class="btn warn" data-do="delSel">Delete line</button></div>`;
   }else if(s&&s.type==='player'){const p=playerById(c,s.id);if(!p){st.sel=null;return renderInspector();}
-    h=`<div class="isec"><h2>Player</h2><label class="f">Label<input class="inp" id="plLabel" maxlength="3" value="${esc(p.label)}"></label></div>
+    h=`<div class="isec"><h2>Player</h2><label class="f">Label<input class="inp" id="plLabel" maxlength="3" value="${esc(p.label)}"></label>
+    ${p.kind!=='def'?`<label class="f">Player name<input class="inp" id="plName" maxlength="20" placeholder="Optional, e.g. Jake" value="${esc((pb.roster||{})[p.label]||'')}"></label><span class="pmeta">The name follows this position on every play and prints on play sheets.</span>`:''}</div>
     ${p.kind!=='def'?`<div class="isec"><h3>Ready-made routes</h3><div class="qr">${QUICK.map(([k,t])=>`<button class="btn sm" data-route="${k}" aria-pressed="${String(!!(st.lastQuick&&st.lastQuick.pid===p.id&&st.lastQuick.name===k))}">${qIcon(k)}<span>${t}</span></button>`).join('')}</div>
     <span class="pmeta">Tap a route to give it to this player. Tap the same one again to flip its direction. It replaces the route they have.</span></div>`:''}
     <div class="row"><button class="btn${p.kind!=='def'?'':' primary'}" data-do="drawFrom">Draw my own</button><button class="btn" data-do="clearRoutes">Clear routes</button></div>
@@ -867,7 +882,8 @@ function renderInspector(){
     <label class="f">Category<select class="inp" id="playCat">${CATS.map(k=>`<option${k===c.category?' selected':''}>${k}</option>`).join('')}</select></label>
     <label class="f">Folder<input class="inp" id="playFolder" list="folderList" maxlength="30" placeholder="Optional, e.g. Red zone" value="${esc(c.folder||'')}"></label><datalist id="folderList">${foldersOf().map(f=>`<option value="${esc(f)}">`).join('')}</datalist>
     <label class="f">Coaching notes<textarea class="inp" id="playNotes" placeholder="Reads, blocking rules, coaching points">${esc(c.notes||'')}</textarea></label>
-    <span class="pmeta">${esc(c.formation)} · ${SIZE_NAME[c.size]}</span></div>
+    <span class="pmeta">${esc(c.formation)} · ${SIZE_NAME[c.size]}</span>
+    <div class="row" style="align-items:center"><button class="btn sm" data-do="savePng">Save play as image</button><span class="pmeta" id="pngMsg" role="status"></span></div></div>
     ${(pb.customFormations||[]).some(f=>f.size===c.size)?`<div class="isec"><h2>Your formations</h2>${pb.customFormations.filter(f=>f.size===c.size).map(f=>`<div class="row" style="justify-content:space-between;align-items:center"><span>${esc(f.name)}</span><button class="mini danger" data-do="delForm" data-id="${f.id}">Delete</button></div>`).join('')}</div>`:''}
     <div class="isec"><h2>Next line</h2><span class="pmeta">New routes start with these settings.</span></div>${lineControls(st.lineDefaults)}
     <div class="isec"><h2>Quick keys</h2><ul class="tips"><li><span class="kbd">Enter</span> finishes a route</li><li><span class="kbd">Delete</span> removes the selected item</li><li><span class="kbd">Ctrl/Cmd Z</span> undo</li></ul></div>`;
@@ -998,6 +1014,29 @@ document.addEventListener('keydown',e=>{
   if((e.key==='Delete'||e.key==='Backspace')&&st.sel){e.preventDefault();deleteSel();}
 });
 
+/* ---------- image export ---------- */
+function savePng(){
+  const c=cur(),vb=fitVB(c).split(' ').map(Number),W=1400,H=Math.round(W*vb[3]/vb[2]),top=96;
+  const src=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="${vb.join(' ')}">${playSvgInner(c)}</svg>`;
+  const img=new Image(),say=m=>{const el=$('pngMsg');if(el)el.textContent=m;};
+  img.onload=()=>{
+    const cv=document.createElement('canvas');cv.width=W;cv.height=H+top;const g=cv.getContext('2d');
+    g.fillStyle='#fff';g.fillRect(0,0,W,H+top);g.fillStyle='#15211b';g.font='700 46px "Barlow Condensed","Arial Narrow",Arial,sans-serif';g.textBaseline='middle';g.fillText(c.name,28,top/2-4,W-360);
+    g.font='500 24px Barlow,Arial,sans-serif';g.fillStyle='#5b6a62';g.textAlign='right';g.fillText(pb.name+' · PlayBand',W-28,top/2-2,320);
+    g.drawImage(img,0,top,W,H);
+    cv.toBlob(async blob=>{
+      if(!blob){say('Could not make the image.');return;}
+      const name=(c.name.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'')||'play')+'.png';
+      try{const file=new File([blob],name,{type:'image/png'});
+        if(mqDrawer.matches&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:c.name});say('');return;}}catch(e){if(e&&e.name==='AbortError')return;}
+      if(framed){say('Downloads are blocked in this preview. Use the live site.');return;}
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000);say('Image saved.');
+    },'image/png');
+  };
+  img.onerror=()=>say('Could not make the image.');
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(src);
+}
+
 /* ---------- inspector events ---------- */
 $('inspector').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;const c=cur();
@@ -1011,6 +1050,7 @@ $('inspector').addEventListener('click',e=>{
   }
   if(b.dataset.route){applyQuickRoute(st.sel.id,b.dataset.route);return;}
   const act=b.dataset.do;
+  if(act==='savePng'){savePng();return;}
   if(act==='delSel')deleteSel();
   if(act==='delForm'){pushUndo();pb.customFormations=(pb.customFormations||[]).filter(f=>f.id!==b.dataset.id);buildFormOpts();commit({insp:true});}
   if(act==='clearRoutes'){pushUndo();c.lines=c.lines.filter(l=>l.playerId!==st.sel.id);commit({insp:true});}
@@ -1022,6 +1062,7 @@ $('inspector').addEventListener('input',e=>{
   const c=cur(),t=e.target;
   if(t.id==='fmName')return;
   if(typingUndo){st.undo.push(typingUndo);st.redo=[];typingUndo=null;}
+  if(t.id==='plName'){const p=playerById(c,st.sel.id),v=t.value.trim().slice(0,20);pb.roster=pb.roster||{};if(v)pb.roster[p.label]=v;else delete pb.roster[p.label];markEdited();save();return;}
   if(t.id==='plLabel'){const p=playerById(c,st.sel.id);p.label=t.value.toUpperCase().slice(0,3)||'?';}
   else if(t.id==='lbText'){const lb=c.labels.find(x=>x.id===st.sel.id);lb.text=t.value||' ';}
   else if(t.id==='playName')c.name=t.value||'Untitled play';
@@ -1132,6 +1173,18 @@ $('resetBtn').onclick=e=>{
 /* ---------- print ---------- */
 let sheetType='plays';
 let PP=[];
+const logoImg=()=>pb.logo?`<img src="${esc(pb.logo)}" alt="">`:'';
+function asgHtml(p){
+  const r=pb.roster||{},items=p.players.filter(q=>q.kind!=='def').map(q=>{const l=p.lines.find(x=>x.playerId===q.id&&x.pts.length),nm=r[q.label];
+    if(!nm&&!(l&&l.route))return '';return `<b>${esc(q.label)}</b>${nm?' '+esc(nm):''}${l&&l.route?': '+esc(l.route):''}`;}).filter(Boolean);
+  return items.length?`<p class="asg">${items.join(' &nbsp;·&nbsp; ')}</p>`:'';
+}
+function renderSets(){
+  const sets=pb.printSets||[];
+  $('setSel').innerHTML='<option value="">Saved sets…</option>'+sets.map(x=>`<option value="${x.id}"${st.setId===x.id?' selected':''}>${esc(x.name)} (${x.ids.length})</option>`).join('');
+  $('setSel').hidden=!sets.length;$('setDel').hidden=!sets.some(x=>x.id===st.setId);
+  $('logoDel').hidden=!pb.logo;$('logoBtn').textContent=pb.logo?'Change team logo':'Add team logo';
+}
 function renderPick(){
   const n=pb.plays.length,k=pb.plays.filter(p=>!st.skip.has(p.id)).length;
   $('pickBtn').textContent=k===n?'Choose plays (all '+n+')':'Choose plays ('+k+' of '+n+')';
@@ -1139,7 +1192,7 @@ function renderPick(){
 }
 function renderSheets(){
   if(!st.skip)st.skip=new Set();
-  PP=pb.plays.filter(p=>!st.skip.has(p.id));renderPick();
+  PP=pb.plays.filter(p=>!st.skip.has(p.id));renderPick();renderSets();
   if(!PP.length){document.querySelectorAll('#sheetSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sheet===sheetType)));document.querySelectorAll('.pv-opts').forEach(o=>o.hidden=o.dataset.for!==sheetType);$('sheets').innerHTML='<p class="pv-note" style="margin:24px auto;text-align:center">No plays are selected. Tick at least one play under Choose plays.</p>';return;}
   document.querySelectorAll('#sheetSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sheet===sheetType)));
   document.querySelectorAll('.pv-opts').forEach(o=>o.hidden=o.dataset.for!==sheetType);
@@ -1147,9 +1200,9 @@ function renderSheets(){
   if(sheetType==='call')return renderCall();
   const per=+$('perPage').value,cols=per===1?1:2,rows=Math.ceil(per/cols);let h='';
   for(let i=0;i<PP.length;i+=per){
-    h+=`<div class="sheet" style="grid-template-columns:repeat(${cols},minmax(0,1fr));grid-template-rows:repeat(${rows},minmax(0,1fr))">`;
-    PP.slice(i,i+per).forEach((p,j)=>{h+=`<div class="cell"><h4>${i+j+1}. ${esc(p.name)}<span>${esc(p.category)} · ${esc(p.formation)}</span></h4>${thumbSvg(p)}${per<=2&&p.notes?`<p>${esc(p.notes)}</p>`:''}</div>`;});
-    h+='</div>';
+    h+=`<div class="sheet"><div class="sh-head">${logoImg()}${esc(pb.name)}<span>Page ${i/per+1} of ${Math.ceil(PP.length/per)}</span></div><div class="sh-grid" style="grid-template-columns:repeat(${cols},minmax(0,1fr));grid-template-rows:repeat(${rows},minmax(0,1fr))">`;
+    PP.slice(i,i+per).forEach((p,j)=>{h+=`<div class="cell"><h4>${i+j+1}. ${esc(p.name)}<span>${esc(p.category)} · ${esc(p.formation)}</span></h4>${thumbSvg(p)}${per<=4?asgHtml(p):''}${per<=2&&p.notes?`<p>${esc(p.notes)}</p>`:''}</div>`;});
+    h+='</div></div>';
   }
   $('sheets').innerHTML=h;
 }
@@ -1187,6 +1240,7 @@ function renderWrist(){
   for(let i=0;i<cards.length;i+=perPage)out+=`<div class="page wb-page">${cards.slice(i,i+perPage).join('')}<span class="page-cap">${esc(pb.name)} · wristbands ${w} × ${h} in · cut on dashed lines</span></div>`;
   $('sheets').innerHTML=out;
 }
+const rosterHtml=()=>{const r=pb.roster||{},k=Object.keys(r);return k.length?`<p style="margin:0;font-size:9pt">${k.map(l=>`<b>${esc(l)}</b> ${esc(r[l])}`).join(' &nbsp;·&nbsp; ')}</p>`:'';};
 function renderCall(){
   const groups={};PP.forEach((p,i)=>{(groups[p.category]=groups[p.category]||[]).push([i+1,p]);});
   let cols='';
@@ -1194,7 +1248,7 @@ function renderCall(){
     if(!groups[cat])continue;
     cols+=`<div class="cgroup"><h4>${esc(cat)}</h4>${groups[cat].map(([n,p])=>`<div class="crow"><b>${n}</b><div>${esc(p.name)}<small>${esc(p.formation)} · ${SIZE_NAME[p.size]}${p.defense&&p.defense!=='None'?' · vs '+esc(p.defense):''}</small></div></div>`).join('')}</div>`;
   }
-  let out=`<div class="page call"><h3>${esc(pb.name)} <span>Coach call sheet · numbers match the wristbands</span></h3><div class="call-cols">${cols}</div></div>`;
+  let out=`<div class="page call"><h3>${logoImg()}${esc(pb.name)} <span>Coach call sheet · numbers match the wristbands</span></h3>${rosterHtml()}<div class="call-cols">${cols}</div></div>`;
   if($('callDiag').checked){
     for(let i=0;i<PP.length;i+=16){
       out+=`<div class="page call"><h3>${esc(pb.name)} <span>Diagrams ${i+1}–${Math.min(PP.length,i+16)}</span></h3><div class="cdiag">${PP.slice(i,i+16).map((p,j)=>`<div class="win"><b>${i+j+1}</b>${thumbSvg(p,'',fitVB(p))}</div>`).join('')}</div></div>`;
@@ -1205,6 +1259,23 @@ function renderCall(){
 $('doPrint').onclick=()=>window.print();
 $('pickBtn').onclick=()=>{const on=$('pickPanel').hidden;$('pickPanel').hidden=!on;$('pickBtn').setAttribute('aria-expanded',String(on));};
 $('pickList').addEventListener('change',e=>{const id=e.target.dataset.pick;if(!id)return;e.target.checked?st.skip.delete(id):st.skip.add(id);const y=$('pickList').scrollTop;renderSheets();$('pickList').scrollTop=y;const el=$('pickList').querySelector('[data-pick="'+id+'"]');if(el)el.focus();});
+$('setSave').onclick=()=>{const name=$('setName').value.trim();if(!name){flash('setMsg','Type a name for this set first.');$('setName').focus();return;}
+  if(!PP.length){flash('setMsg','Tick at least one play first.');return;}
+  pushUndo();pb.printSets=pb.printSets||[];const ex=pb.printSets.find(x=>x.name.toLowerCase()===name.toLowerCase()),ids=PP.map(p=>p.id);
+  if(ex){ex.ids=ids;st.setId=ex.id;}else{const x={id:uid(),name,ids};pb.printSets.push(x);st.setId=x.id;}
+  $('setName').value='';markEdited();save();renderSets();flash('setMsg','Saved "'+name+'" with '+ids.length+(ids.length===1?' play.':' plays.'));};
+$('setSel').addEventListener('change',e=>{const x=(pb.printSets||[]).find(q=>q.id===e.target.value);st.setId=x?x.id:null;if(x){const keep=new Set(x.ids);st.skip=new Set(pb.plays.filter(p=>!keep.has(p.id)).map(p=>p.id));}renderSheets();});
+$('setDel').onclick=()=>{pushUndo();pb.printSets=(pb.printSets||[]).filter(x=>x.id!==st.setId);st.setId=null;markEdited();save();renderSets();};
+$('logoBtn').onclick=()=>$('logoFile').click();
+$('logoDel').onclick=()=>{pushUndo();pb.logo='';markEdited();save();renderSheets();};
+$('logoFile').addEventListener('change',e=>{const file=e.target.files[0];e.target.value='';if(!file)return;
+  const img=new Image(),url=URL.createObjectURL(file);
+  img.onload=()=>{const k=Math.min(1,240/Math.max(img.width,img.height)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(img.width*k));cv.height=Math.max(1,Math.round(img.height*k));
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(url);let d='';try{d=cv.toDataURL('image/png');}catch(err){}
+    if(!d||d.length>190000){$('pvNote').textContent='That image could not be used. Try a smaller PNG or JPG.';return;}
+    pushUndo();pb.logo=d;markEdited();save();renderSheets();};
+  img.onerror=()=>{URL.revokeObjectURL(url);$('pvNote').textContent='That file is not an image we can read. Use a PNG or JPG.';};
+  img.src=url;});
 $('pickAll').onclick=()=>{st.skip.clear();renderSheets();};
 $('pickNone').onclick=()=>{pb.plays.forEach(p=>st.skip.add(p.id));renderSheets();};
 
@@ -1220,22 +1291,28 @@ function normPlayers(arr,map){
 function normPlaybook(o){
   const src=o&&o.playbook?o.playbook:o;
   if(!src||!Array.isArray(src.plays))throw new Error('bad');
+  const pmap={};
   const plays=src.plays.slice(0,300).map(p=>{
     if(!p||typeof p!=='object')return null;
     const size=pick(Number(p.size),[11,7,5],11),map={},players=normPlayers(p.players,map);
     const lines=(Array.isArray(p.lines)?p.lines:[]).slice(0,80).map(l=>{
       if(!l)return null;const pid=typeof l.playerId==='string'?map[l.playerId]:null,start=pid?null:normPt(l.start);
       if(!pid&&!start)return null;
-      return {id:uid(),playerId:pid||null,start,pts:(Array.isArray(l.pts)?l.pts:[]).slice(0,60).map(normPt).filter(Boolean),style:pick(l.style,['solid','dashed','zigzag'],'solid'),cap:pick(l.cap,['arrow','t','dot','none'],'arrow'),smooth:!!l.smooth,color:pick(l.color,Object.keys(COLORS),'ink')};
+      return {id:uid(),playerId:pid||null,start,pts:(Array.isArray(l.pts)?l.pts:[]).slice(0,60).map(normPt).filter(Boolean),route:str(l.route,12),style:pick(l.style,['solid','dashed','zigzag'],'solid'),cap:pick(l.cap,['arrow','t','dot','none'],'arrow'),smooth:!!l.smooth,color:pick(l.color,Object.keys(COLORS),'ink')};
     }).filter(Boolean);
     const labels=(Array.isArray(p.labels)?p.labels:[]).slice(0,40).map(l=>l?{id:uid(),x:num(l.x,0,54,10),y:num(l.y,-26,12,0),text:str(l.text,40,'Label')||' '}:null).filter(Boolean);
-    return {id:uid(),name:str(p.name,60,'Untitled play')||'Untitled play',category:pick(p.category,CATS,'Run'),size,formation:str(p.formation,40,'Custom'),notes:str(p.notes,2000),folder:str(p.folder,30).trim(),
+    const nid=uid();if(typeof p.id==='string')pmap[p.id]=nid;
+    return {id:nid,name:str(p.name,60,'Untitled play')||'Untitled play',category:pick(p.category,CATS,'Run'),size,formation:str(p.formation,40,'Custom'),notes:str(p.notes,2000),folder:str(p.folder,30).trim(),
       defense:pick(p.defense,Object.keys(DEFENSES[size]),'None'),players,lines,labels};
   }).filter(Boolean);
   if(!plays.length)throw new Error('empty');
   const customFormations=(Array.isArray(src.customFormations)?src.customFormations:[]).slice(0,100).map(f=>f?{id:uid(),name:str(f.name,30,'Formation')||'Formation',size:pick(Number(f.size),[11,7,5],11),
     players:normPlayers(f.players).map(({label,x,y,kind,shape})=>({label,x,y,kind,shape}))}:null).filter(f=>f&&f.players.length);
-  return {name:str(src.name,60,'My Playbook')||'My Playbook',sample:false,v:2,currentId:plays[0].id,plays,customFormations};
+  const roster={};if(src.roster&&typeof src.roster==='object')Object.keys(src.roster).slice(0,40).forEach(k=>{const v=str(src.roster[k],20).trim();if(v&&k.length<=3)roster[k]=v;});
+  const logo=typeof src.logo==='string'&&src.logo.length<200000&&/^data:image\/(png|jpeg);base64,[A-Za-z0-9+\/=]+$/.test(src.logo)?src.logo:'';
+  const live=new Set(plays.map(p=>p.id));
+  const printSets=(Array.isArray(src.printSets)?src.printSets:[]).slice(0,30).map(x=>x&&Array.isArray(x.ids)?{id:uid(),name:str(x.name,30,'Set')||'Set',ids:x.ids.map(i=>pmap[i]).filter(i=>live.has(i))}:null).filter(x=>x&&x.ids.length);
+  return {name:str(src.name,60,'My Playbook')||'My Playbook',sample:false,v:2,currentId:live.has(pmap[src.currentId])?pmap[src.currentId]:plays[0].id,plays,customFormations,roster,logo,printSets};
 }
 const backupText=()=>JSON.stringify({app:'playband',format:1,exported:new Date().toISOString(),playbook:pb});
 function flash(id,msg){const el=$(id);el.textContent=msg;clearTimeout(el._t);el._t=setTimeout(()=>{el.textContent='';},6000);}
