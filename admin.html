@@ -59,6 +59,11 @@ tr:last-child td{border-bottom:0}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 td small{display:block;color:var(--muted);font-size:12px}
 td.email{overflow-wrap:anywhere;font-weight:600}
+.addcard{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.addrow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.addrow label{flex:1 1 220px}
+#addPass{font-family:ui-monospace,Menlo,monospace}
+#addMsg b{color:var(--ink);user-select:all;-webkit-user-select:all;font-family:ui-monospace,Menlo,monospace}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 @media (max-width:700px){
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -94,10 +99,21 @@ td.email{overflow-wrap:anywhere;font-weight:600}
     <div class="stats" id="stats"></div>
     <div class="tools">
       <input class="inp" id="q" type="search" placeholder="Search by email or playbook name" aria-label="Search users">
+      <button class="btn primary" id="addBtn" aria-expanded="false" aria-controls="addCard">Add user</button>
       <button class="btn" id="refresh">Refresh</button>
       <button class="btn" id="csv">Download CSV</button>
       <span class="msg" id="mainMsg" role="status"></span>
     </div>
+    <form class="card addcard" id="addCard" hidden>
+      <h2>Add a user</h2>
+      <p class="msg">Creates the account right away. Send the coach their email and temporary password. They can change the password under Account in the app.</p>
+      <div class="addrow">
+        <label class="f">Email<input class="inp" id="addEmail" type="email" autocomplete="off" required></label>
+        <label class="f">Temporary password<input class="inp" id="addPass" type="text" minlength="8" autocomplete="off" spellcheck="false" required></label>
+      </div>
+      <div class="addrow"><button class="btn primary" type="submit" id="addGo">Create account</button><button class="btn" type="button" id="addNewPass">New password</button><button class="btn" type="button" id="addCancel">Close</button></div>
+      <p class="msg" id="addMsg" role="status"></p>
+    </form>
     <div class="tablewrap">
       <table>
         <thead><tr>
@@ -175,6 +191,25 @@ $('inForm').addEventListener('submit',async e=>{
 });
 $('outBtn').onclick=async()=>{try{await sb.auth.signOut();}catch(e){}};
 $('refresh').onclick=load;
+function tempPass(){const a='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=new Uint32Array(12);crypto.getRandomValues(r);return Array.from(r,n=>a[n%a.length]).join('');}
+function setAdd(on){$('addCard').hidden=!on;$('addBtn').setAttribute('aria-expanded',String(on));if(on){$('addMsg').textContent='';$('addPass').value=tempPass();$('addEmail').focus();}}
+$('addBtn').onclick=()=>setAdd($('addCard').hidden);
+$('addCancel').onclick=()=>setAdd(false);
+$('addNewPass').onclick=()=>{$('addPass').value=tempPass();};
+$('addCard').addEventListener('submit',async e=>{
+  e.preventDefault();if(!sb)return;
+  const email=$('addEmail').value.trim(),password=$('addPass').value,go=$('addGo');go.disabled=true;$('addMsg').textContent='Creating the account…';
+  try{
+    const tmp=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:'playband-admin-create'}});
+    const r=await tmp.auth.signUp({email,password});
+    if(r.error)$('addMsg').textContent=/already/i.test(r.error.message)?'An account with that email already exists.':r.error.message;
+    else if(r.data&&r.data.user&&r.data.user.identities&&r.data.user.identities.length===0)$('addMsg').textContent='An account with that email already exists.';
+    else{$('addMsg').innerHTML='Account created for <b>'+esc(email)+'</b>. Temporary password: <b>'+esc(password)+'</b>. Copy it now, it is not shown again.';
+      $('addEmail').value='';$('addPass').value=tempPass();load();}
+    try{await tmp.auth.signOut({scope:'local'});}catch(err){}
+  }catch(err){$('addMsg').textContent='Could not reach the server. Check your connection and try again.';}
+  go.disabled=false;
+});
 $('q').addEventListener('input',renderRows);
 document.querySelector('thead').addEventListener('click',e=>{const b=e.target.closest('button[data-sort]');if(!b)return;
   const k=b.dataset.sort;sort=sort.key===k?{key:k,dir:-sort.dir}:{key:k,dir:k==='email'?1:-1};renderRows();});

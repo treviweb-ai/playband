@@ -363,12 +363,12 @@ textarea.inp{resize:vertical;min-height:70px}
     <div id="authIn" class="isec" hidden>
       <p class="help-intro">Signed in as <b id="auWho"></b></p>
       <p class="help-note" id="auSync"></p>
-      <div class="row"><button class="btn" id="auBackup">Back up / Restore</button><button class="btn" id="auOut">Sign out</button></div>
+      <div class="row"><button class="btn" id="auBackup">Back up / Restore</button><button class="btn" id="auPw">Change password</button><button class="btn" id="auOut">Sign out</button></div>
     </div>
     <form id="authNew" class="isec" hidden>
       <p class="help-note">Choose a new password for your account.</p>
       <label class="f">New password<input class="inp" id="auNewPass" type="password" minlength="8" autocomplete="new-password" required></label>
-      <div class="row"><button class="btn primary" type="submit">Save new password</button></div>
+      <div class="row"><button class="btn primary" type="submit">Save new password</button><button class="btn" type="button" id="auPwCancel">Cancel</button></div>
     </form>
     <p class="help-note" id="auMsg" role="status"></p>
   </div>
@@ -1309,6 +1309,8 @@ $('acctBtn').onclick=()=>{
   $('authView').hidden=false;renderAccount();(cloud.user?$('authClose'):$('auEmail')).focus();
 };
 $('authClose').onclick=()=>{$('authView').hidden=true;};
+$('auPw').onclick=()=>{cloud.recover=true;auMsg('');renderAccount();$('auNewPass').focus();};
+$('auPwCancel').onclick=()=>{cloud.recover=false;$('auNewPass').value='';auMsg('');renderAccount();};
 try{cloud.promoOff=sessionStorage.getItem('playband.promoOff')==='1';}catch(e){}
 $('promoGo').onclick=()=>{cloud.mode='up';$('acctBtn').click();};
 $('promoX').onclick=()=>{cloud.promoOff=true;try{sessionStorage.setItem('playband.promoOff','1');}catch(e){}renderAccount();};
