@@ -161,13 +161,68 @@ textarea.inp{resize:vertical;min-height:70px}
 .help-steps b{color:var(--ink)}
 .help-steps li::marker{font-family:var(--display);font-weight:700;color:var(--accent)}
 .help-note{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
+.m-only{display:none}
+.n{display:none}
+#pbSlot{display:none}
+#pbHome{display:contents}
+#scrim{display:none}
+.fieldwrap{position:relative}
+#zoomBtn{position:absolute;top:6px;right:6px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+#zoomBtn[hidden]{display:none}
 @media (max-width:960px){
   html,body{height:auto}
+  .m-only{display:inline-flex;align-items:center}
   .app{grid-template-columns:minmax(0,1fr)}
-  .editor{order:1} .inspector{order:2} .plays{order:3}
   .fieldwrap{flex:none}
-  #field{height:auto;aspect-ratio:56.6/38;max-height:75vh}
-  #playList{max-height:none}
+  #field{height:auto;aspect-ratio:56.6/38;max-height:none}
+  .plays{position:fixed;top:0;bottom:0;left:0;width:min(86vw,340px);z-index:26;border-radius:0 12px 12px 0;border-left:0;
+    transform:translateX(-105%);visibility:hidden;transition:transform .2s ease,visibility .2s;
+    padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:4px 0 24px rgba(0,0,0,.25)}
+  body.plays-open .plays{transform:none;visibility:visible}
+  body.plays-open #scrim{display:block;position:fixed;inset:0;z-index:25;background:rgba(10,18,14,.5)}
+  body.plays-open{overflow:hidden}
+  #playList{max-height:none;flex:1}
+  #pbSlot{display:flex;gap:8px;align-items:center;padding:12px 12px 0}
+  #pbSlot #pbName{flex:1;width:auto;border-color:var(--rule);background:var(--panel-2)}
+  .plays-head{gap:8px}
+  .plays-head h2{margin-right:auto}
+}
+@media (max-width:700px){
+  body{padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+  input,select,textarea{font-size:16px!important}
+  .bar{gap:6px;padding-block:8px}
+  .brand b{font-size:21px}
+  .bar .chip.beta{display:none}
+  .w{display:none}.n{display:inline}
+  .btn,.seg button{min-height:40px}
+  .btn.sm{min-height:36px}
+  .mini{min-height:32px;padding:4px 8px;font-size:13px}
+  .bar .btn{padding:6px 10px}
+  .app{display:flex;flex-direction:column;gap:8px}
+  .editor{display:contents}
+  .toolbar{order:1;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px;margin-inline:-8px;padding-inline:8px;
+    -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+  .toolbar::-webkit-scrollbar{display:none}
+  .toolbar>*{flex:none}
+  .toolbar::after{content:"";flex:none;width:22px}
+  .tsep{display:none}
+  #modeSeg{order:-2} #animBtn{order:-1}
+  .hint{order:2;min-height:0;font-size:12.5px;line-height:1.35;padding-inline:2px}
+  .fieldwrap{order:3;margin-inline:-8px}
+  #field{border-radius:0}
+  .formbar{order:5;background:var(--panel);border-radius:12px;padding:10px}
+  .inspector{order:6;padding:12px;gap:12px;overflow:visible}
+  .inspector[data-sel=player],.inspector[data-sel=line],.inspector[data-sel=label]{order:4}
+  .plays{order:7}
+  .qr .btn{padding:8px 4px}
+  .sw{width:34px;height:34px}
+  .help-card{padding:16px}
+  #helpView,#dataView{padding-left:8px;padding-right:8px}
+}
+@media (max-width:360px){
+  .bar{gap:4px}
+  .brand b{font-size:18px}
+  .bar .btn{padding:6px 7px;font-size:13px}
 }
 @media print{
   @page{size:letter landscape;margin:.35in}
@@ -184,18 +239,21 @@ textarea.inp{resize:vertical;min-height:70px}
 </style>
 
 <header class="bar">
+  <button class="btn primary m-only" id="playsBtn" aria-expanded="false" aria-controls="playsPanel">Plays</button>
   <div class="brand"><b>Play<span>Band</span></b><span class="chip beta">Free beta</span></div>
-  <input id="pbName" aria-label="Playbook name" value="Sample Playbook">
-  <span class="chip" id="sampleChip">Sample plays</span>
+  <span id="pbHome"><input id="pbName" aria-label="Playbook name" value="Sample Playbook">
+  <span class="chip" id="sampleChip">Sample plays</span></span>
   <div class="spacer"></div>
-  <button class="btn" id="helpBtn">How to use</button>
-  <button class="btn" id="dataBtn">Back up / Restore</button>
-  <button class="btn" id="printBtn">Print sheets</button>
+  <button class="btn" id="helpBtn"><span class="w">How to use</span><span class="n">Help</span></button>
+  <button class="btn" id="dataBtn"><span class="w">Back up / Restore</span><span class="n">Backup</span></button>
+  <button class="btn" id="printBtn"><span class="w">Print sheets</span><span class="n">Print</span></button>
 </header>
 
+<div id="scrim"></div>
 <div class="app">
-  <aside class="panel plays">
-    <div class="plays-head"><h2>Plays</h2><button class="btn primary" id="newPlayBtn">+ New play</button></div>
+  <aside class="panel plays" id="playsPanel" aria-label="Plays">
+    <div id="pbSlot"></div>
+    <div class="plays-head"><h2>Plays</h2><button class="btn primary" id="newPlayBtn">+ New play</button><button class="btn m-only" id="playsClose">Close</button></div>
     <form id="newPlayForm" hidden>
       <label class="f">Play name<input class="inp" id="npName" placeholder="e.g. Inside Zone Left" required></label>
       <div class="f"><span id="npSizeLbl">Game type</span>
@@ -227,7 +285,7 @@ textarea.inp{resize:vertical;min-height:70px}
     </div>
     <div class="formbar" id="formbar"></div>
     <div class="hint" id="hint"></div>
-    <div class="fieldwrap"><svg id="field" viewBox="-1.6 -26 56.53 38" aria-label="Play diagram"></svg></div>
+    <div class="fieldwrap"><svg id="field" viewBox="-1.6 -26 56.53 38" aria-label="Play diagram"></svg><button class="btn sm" id="zoomBtn" hidden>Zoom in</button></div>
   </main>
 
   <aside class="panel inspector" id="inspector"></aside>
@@ -551,9 +609,18 @@ function fitVB(play){
 
 const $=id=>document.getElementById(id);
 const svg=$('field');
+const mqDrawer=matchMedia('(max-width:960px)'),mqPhone=matchMedia('(max-width:700px)');
+const ZW=30,ZH=26;
+const zoomOn=c=>!!(st.zoom&&mqPhone.matches&&fwOf(c)>40);
+function vbCur(c){
+  if(!zoomOn(c))return vbOf(c);
+  st.vx=Math.min(fwOf(c)+1.6-ZW,Math.max(-1.6,st.vx||0));st.vy=Math.min(12-ZH,Math.max(-26,st.vy==null?-18:st.vy));
+  return `${r2(st.vx)} ${r2(st.vy)} ${ZW} ${ZH}`;
+}
 function renderCanvas(){
-  const c=cur(),vb=vbOf(c);
-  if(svg.getAttribute('viewBox')!==vb){svg.setAttribute('viewBox',vb);svg.style.aspectRatio=`${r2(fwOf(c)+3.2)}/38`;}
+  const c=cur(),vb=vbCur(c);
+  if(svg.getAttribute('viewBox')!==vb){svg.setAttribute('viewBox',vb);const a=vb.split(' ');svg.style.aspectRatio=`${a[2]}/${a[3]}`;}
+  const zb=$('zoomBtn');zb.hidden=!(mqPhone.matches&&fwOf(c)>40);zb.textContent=zoomOn(c)?'Whole field':'Zoom in';
   svg.innerHTML=playSvgInner(c,{interactive:true,pos:st.anim&&st.anim.pos});
   svg.classList.toggle('draw',st.mode==='draw');svg.classList.toggle('text',st.mode==='text');
 }
@@ -571,7 +638,7 @@ function renderToolbar(){
   $('snapChk').checked=st.snap;
   let h='';
   if(st.anim)h='Running the play. Players follow their first route.';
-  else if(st.mode==='select')h=c.lines.length?'Tap a player to pick a ready-made route, or drag to move them. Tap a route to restyle or reshape it.'
+  else if(st.mode==='select')h=zoomOn(c)?'Zoomed in. Drag an empty spot to slide the field. Tap a player for routes, or drag to move them.':c.lines.length?'Tap a player to pick a ready-made route, or drag to move them. Tap a route to restyle or reshape it.'
     :'<b>Step 1:</b> drag players to set your lineup. <b>Step 2:</b> tap a player and pick a route, or tap <b>Draw</b> to draw your own.';
   else if(st.mode==='draw')h=st.drawing?'Tap the field to add points. Tap the last point again, double-tap, or press Enter to finish. <button class="btn primary" id="finishBtn">Finish route</button>'
     :'Tap a player, then tap the field to draw their route. You can also drag from a player. Tap empty field to draw a free line.';
@@ -687,6 +754,7 @@ function lineControls(l){
   <div class="isec"><h3>Color</h3><div class="swatches">${Object.entries(COLORS).map(([k,v])=>`<button class="sw" data-set="color" data-val="${k}" aria-pressed="${String(l.color===k)}" style="background:${v}" aria-label="${k}"></button>`).join('')}</div></div>`;
 }
 function renderInspector(){
+  $('inspector').dataset.sel=st.sel?st.sel.type:'';
   const c=cur(),s=st.sel,el=$('inspector');let h='';
   if(s&&s.type==='line'){const l=c.lines.find(x=>x.id===s.id);if(!l){st.sel=null;return renderInspector();}
     const p=l.playerId&&playerById(c,l.playerId);
@@ -740,17 +808,34 @@ function deleteSel(){
 }
 
 /* ---------- pointer handling ---------- */
+function hitAt(e,pt){
+  const t=e.target.closest('[data-k]'),c=cur();
+  if(t&&t.dataset.k!=='line')return {k:t.dataset.k,id:t.dataset.id,idx:t.dataset.idx};
+  if(e.pointerType!=='mouse'){
+    const m=svg.getScreenCTM(),tol=Math.max(1.2,22/((m&&m.a)||10));let best=null,bd=tol;
+    if(st.mode==='select'&&st.sel&&st.sel.type==='line'){
+      const l=c.lines.find(x=>x.id===st.sel.id);
+      if(l){l.pts.forEach((q,i)=>{const d=Math.hypot(q[0]-pt[0],q[1]-pt[1]);if(d<bd){bd=d;best={k:'vertex',id:l.id,idx:i};}});
+        if(!l.playerId&&l.start){const d=Math.hypot(l.start[0]-pt[0],l.start[1]-pt[1]);if(d<bd){bd=d;best={k:'vertex',id:l.id,idx:-1};}}}
+      if(best)return best;
+    }
+    bd=t?tol*.5:tol;
+    for(const p of c.players){const d=Math.hypot(p.x-pt[0],p.y-pt[1]);if(d<bd){bd=d;best={k:'player',id:p.id};}}
+    if(best)return best;
+  }
+  return t?{k:'line',id:t.dataset.id}:{};
+}
 svg.addEventListener('pointerdown',e=>{
   if(st.anim)return;
-  const pt=toSvg(e),t=e.target.closest('[data-k]'),k=t&&t.dataset.k,id=t&&t.dataset.id,c=cur();
+  const pt=toSvg(e),t=hitAt(e,pt),k=t.k,id=t.id,c=cur();
   svg.setPointerCapture(e.pointerId);st.down=pt;
   if(st.mode==='select'){
-    if(k==='vertex'){st.drag={type:'vertex',id,idx:+t.dataset.idx,pushed:false};}
+    if(k==='vertex'){st.drag={type:'vertex',id,idx:+t.idx,pushed:false};}
     else if(k==='player'||k==='label'){
       const obj=k==='player'?playerById(c,id):c.labels.find(x=>x.id===id);
       st.sel={type:k,id};st.drag={type:k,id,dx:obj.x-pt[0],dy:obj.y-pt[1],pushed:false};
     }else if(k==='line'){st.sel={type:'line',id};}
-    else st.sel=null;
+    else{st.sel=null;if(zoomOn(c))st.pan={x:e.clientX,y:e.clientY,vx:st.vx,vy:st.vy,s:ZW/svg.getBoundingClientRect().width};}
     renderCanvas();renderInspector();
   }else if(st.mode==='draw'){
     if(!st.drawing){
@@ -765,6 +850,7 @@ svg.addEventListener('pointerdown',e=>{
   }
 });
 svg.addEventListener('pointermove',e=>{
+  if(st.pan){const p=st.pan;st.vx=p.vx-(e.clientX-p.x)*p.s;st.vy=p.vy-(e.clientY-p.y)*p.s;svg.setAttribute('viewBox',vbCur(cur()));return;}
   const pt=toSvg(e),c=cur();
   if(st.drag){
     const d=st.drag;
@@ -779,7 +865,21 @@ svg.addEventListener('pointermove',e=>{
     renderCanvas();
   }else if(st.drawing){st.preview=[snap(clampX(pt[0])),snap(clampY(pt[1]))];renderCanvas();}
 });
+svg.addEventListener('pointercancel',()=>{st.pan=null;});
+$('zoomBtn').onclick=()=>{
+  const c=cur();st.zoom=!zoomOn(c);
+  if(st.zoom){const p=st.sel&&st.sel.type==='player'&&playerById(c,st.sel.id);st.vx=(p?p.x:fwOf(c)/2)-ZW/2;st.vy=-18;}
+  renderCanvas();renderToolbar();
+};
+function setDrawer(on){document.body.classList.toggle('plays-open',on);$('playsBtn').setAttribute('aria-expanded',String(on));if(on)$('playsClose').focus();}
+function placePb(){(mqDrawer.matches?$('pbSlot'):$('pbHome')).append($('pbName'),$('sampleChip'));}
+$('playsBtn').onclick=()=>setDrawer(true);
+$('playsClose').onclick=$('scrim').onclick=()=>setDrawer(false);
+mqDrawer.addEventListener('change',()=>{placePb();setDrawer(false);});
+mqPhone.addEventListener('change',()=>{renderCanvas();renderToolbar();});
+placePb();
 svg.addEventListener('pointerup',e=>{
+  if(st.pan){st.pan=null;return;}
   const pt=toSvg(e),c=cur();
   if(st.drag){const moved=st.drag.pushed;st.drag=null;if(moved)commit();return;}
   if(st.mode==='draw'&&st.drawing){
@@ -800,6 +900,7 @@ document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'&&!typing){e.preventDefault();e.shiftKey?restore(st.redo,st.undo):restore(st.undo,st.redo);return;}
   if(typing)return;
   if((e.key==='Enter'||e.key==='Escape')&&st.drawing){e.preventDefault();finishDrawing();return;}
+  if(e.key==='Escape'&&document.body.classList.contains('plays-open')){setDrawer(false);$('playsBtn').focus();return;}
   if(e.key==='Escape'&&st.sel){st.sel=null;renderCanvas();renderInspector();return;}
   if((e.key==='Delete'||e.key==='Backspace')&&st.sel){e.preventDefault();deleteSel();}
 });
@@ -899,7 +1000,7 @@ $('playList').addEventListener('click',e=>{
   }
   const li=e.target.closest('[data-play]');if(!li)return;
   if(st.anim)runPlay();if(st.drawing)finishDrawing();
-  pb.currentId=li.dataset.play;st.sel=null;st.fbSaving=false;$('formbar').innerHTML='';save();renderAll();
+  pb.currentId=li.dataset.play;st.sel=null;st.fbSaving=false;$('formbar').innerHTML='';save();renderAll();setDrawer(false);
 });
 const npForm=$('newPlayForm');
 function buildFormOpts(){
@@ -916,7 +1017,7 @@ $('npCancel').onclick=()=>{npForm.hidden=true;};
 npForm.addEventListener('submit',e=>{
   e.preventDefault();const f=$('npForm').value,n=st.npSize||cur().size;
   pushUndo();const p=makePlay($('npName').value.trim()||'New play',$('npCat').value,+n,f);
-  pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='select';st.fbSaving=false;$('formbar').innerHTML='';markEdited();save();npForm.reset();npForm.hidden=true;renderAll();
+  pb.plays.push(p);pb.currentId=p.id;st.sel=null;st.mode='select';st.fbSaving=false;$('formbar').innerHTML='';markEdited();save();npForm.reset();npForm.hidden=true;renderAll();setDrawer(false);
 });
 
 /* ---------- reset ---------- */
