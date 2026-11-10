@@ -121,6 +121,14 @@ textarea.inp{resize:vertical;min-height:70px}
 .cell svg{flex:1;min-height:0;width:100%}
 .num{width:64px;border:1px solid var(--rule);background:var(--panel-2);border-radius:8px;padding:5px 6px;color:var(--ink)}
 #sheets{overflow-x:auto;padding-bottom:8px}
+#pickPanel{padding:12px;gap:10px;margin-bottom:12px}
+#pickPanel[hidden]{display:none}
+#pickList{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 12px;max-height:40vh;overflow:auto}
+.pk{display:flex;gap:8px;align-items:flex-start;padding:6px 4px;border-radius:6px;cursor:pointer;min-height:40px}
+.pk:hover{background:var(--panel-2)}
+.pk input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--accent)}
+.pk span{font-weight:600;line-height:1.25;overflow-wrap:anywhere}
+.pk small{display:block;font-weight:400;color:var(--muted);font-size:12px}
 .page{background:#fff;color:#111;width:10.3in;height:7.7in;margin:0 auto 16px;box-shadow:0 1px 4px rgba(0,0,0,.15);overflow:hidden;position:relative}
 .page-cap{position:absolute;right:.1in;bottom:.05in;font-size:7pt;color:#888}
 .wb-page{display:flex;flex-wrap:wrap;align-content:flex-start;gap:0}
@@ -237,7 +245,7 @@ textarea.inp{resize:vertical;min-height:70px}
   body{padding:0;background:#fff;display:block}
   body>*:not(#printView){display:none!important}
   #printView{position:static;padding:0;background:#fff}
-  .pv-bar{display:none}
+  .pv-bar,#pickPanel{display:none!important}
   .sheet{box-shadow:none;margin:0;max-width:none;width:100%;break-after:page;padding:0;border-radius:0}
   #sheets{overflow:visible}
   .page{box-shadow:none;margin:0;break-after:page}
@@ -398,9 +406,14 @@ textarea.inp{resize:vertical;min-height:70px}
     <span class="pv-opts" data-for="call" hidden>
       <label class="tool"><input type="checkbox" id="callDiag" checked> Add diagram page</label>
     </span>
+    <button class="btn" id="pickBtn" aria-expanded="false" aria-controls="pickPanel">Choose plays</button>
     <button class="btn primary" id="doPrint">Print / Save as PDF</button>
     <button class="btn" id="closePrint">Back to editor</button>
     <span class="pv-note" id="pvNote"></span>
+  </div>
+  <div class="panel" id="pickPanel" hidden>
+    <div class="row" style="align-items:center"><h3>Plays to print</h3><button class="btn sm" id="pickAll">Select all</button><button class="btn sm" id="pickNone">Clear all</button><span class="pv-note">Unticked plays are left off every sheet. Numbers stay matched between wristbands and the coach sheet.</span></div>
+    <div id="pickList"></div>
   </div>
   <div id="sheets"></div>
 </div>
@@ -1075,15 +1088,24 @@ $('resetBtn').onclick=e=>{
 
 /* ---------- print ---------- */
 let sheetType='plays';
+let PP=[];
+function renderPick(){
+  const n=pb.plays.length,k=pb.plays.filter(p=>!st.skip.has(p.id)).length;
+  $('pickBtn').textContent=k===n?'Choose plays (all '+n+')':'Choose plays ('+k+' of '+n+')';
+  $('pickList').innerHTML=pb.plays.map((p,i)=>`<label class="pk"><input type="checkbox" data-pick="${p.id}"${st.skip.has(p.id)?'':' checked'}> <span>${esc(p.name)}<small>${esc(p.category)} · ${SIZE_NAME[p.size]}</small></span></label>`).join('');
+}
 function renderSheets(){
+  if(!st.skip)st.skip=new Set();
+  PP=pb.plays.filter(p=>!st.skip.has(p.id));renderPick();
+  if(!PP.length){document.querySelectorAll('#sheetSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sheet===sheetType)));document.querySelectorAll('.pv-opts').forEach(o=>o.hidden=o.dataset.for!==sheetType);$('sheets').innerHTML='<p class="pv-note" style="margin:24px auto;text-align:center">No plays are selected. Tick at least one play under Choose plays.</p>';return;}
   document.querySelectorAll('#sheetSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sheet===sheetType)));
   document.querySelectorAll('.pv-opts').forEach(o=>o.hidden=o.dataset.for!==sheetType);
   if(sheetType==='wrist')return renderWrist();
   if(sheetType==='call')return renderCall();
   const per=+$('perPage').value,cols=per===1?1:2,rows=Math.ceil(per/cols);let h='';
-  for(let i=0;i<pb.plays.length;i+=per){
+  for(let i=0;i<PP.length;i+=per){
     h+=`<div class="sheet" style="grid-template-columns:repeat(${cols},minmax(0,1fr));grid-template-rows:repeat(${rows},minmax(0,1fr))">`;
-    pb.plays.slice(i,i+per).forEach((p,j)=>{h+=`<div class="cell"><h4>${i+j+1}. ${esc(p.name)}<span>${esc(p.category)} · ${esc(p.formation)}</span></h4>${thumbSvg(p)}${per<=2&&p.notes?`<p>${esc(p.notes)}</p>`:''}</div>`;});
+    PP.slice(i,i+per).forEach((p,j)=>{h+=`<div class="cell"><h4>${i+j+1}. ${esc(p.name)}<span>${esc(p.category)} · ${esc(p.formation)}</span></h4>${thumbSvg(p)}${per<=2&&p.notes?`<p>${esc(p.notes)}</p>`:''}</div>`;});
     h+='</div>';
   }
   $('sheets').innerHTML=h;
@@ -1106,10 +1128,10 @@ function renderWrist(){
   const [w,h]=wbDims(),[gc,gr]=$('wbGrid').value.split('x').map(Number),per=gc*gr,list=$('wbMode').value==='list';
   const copies=Math.min(30,Math.max(1,+$('wbCopies').value||1));
   const cards=[];
-  for(let i=0;i<pb.plays.length;i+=per){
+  for(let i=0;i<PP.length;i+=per){
     let inner='';
     for(let k=0;k<per;k++){
-      const idx=i+k,p=pb.plays[idx];
+      const idx=i+k,p=PP[idx];
       if(list){inner+=p?`<div class="wl" style="font-size:${r2(Math.max(5,Math.min(11,(h/gr)*72*.48)))}pt"><i>${idx+1}</i>${esc(p.name)}</div>`:'<div class="wl"></div>';}
       else inner+=p?`<div class="win"><b>${idx+1}</b>${thumbSvg(p,'',fitVB(p))}</div>`:'<div class="win"></div>';
     }
@@ -1123,7 +1145,7 @@ function renderWrist(){
   $('sheets').innerHTML=out;
 }
 function renderCall(){
-  const groups={};pb.plays.forEach((p,i)=>{(groups[p.category]=groups[p.category]||[]).push([i+1,p]);});
+  const groups={};PP.forEach((p,i)=>{(groups[p.category]=groups[p.category]||[]).push([i+1,p]);});
   let cols='';
   for(const cat of CATS.concat(Object.keys(groups).filter(k=>!CATS.includes(k)))){
     if(!groups[cat])continue;
@@ -1131,13 +1153,17 @@ function renderCall(){
   }
   let out=`<div class="page call"><h3>${esc(pb.name)} <span>Coach call sheet · numbers match the wristbands</span></h3><div class="call-cols">${cols}</div></div>`;
   if($('callDiag').checked){
-    for(let i=0;i<pb.plays.length;i+=16){
-      out+=`<div class="page call"><h3>${esc(pb.name)} <span>Diagrams ${i+1}–${Math.min(pb.plays.length,i+16)}</span></h3><div class="cdiag">${pb.plays.slice(i,i+16).map((p,j)=>`<div class="win"><b>${i+j+1}</b>${thumbSvg(p,'',fitVB(p))}</div>`).join('')}</div></div>`;
+    for(let i=0;i<PP.length;i+=16){
+      out+=`<div class="page call"><h3>${esc(pb.name)} <span>Diagrams ${i+1}–${Math.min(PP.length,i+16)}</span></h3><div class="cdiag">${PP.slice(i,i+16).map((p,j)=>`<div class="win"><b>${i+j+1}</b>${thumbSvg(p,'',fitVB(p))}</div>`).join('')}</div></div>`;
     }
   }
   $('sheets').innerHTML=out;
 }
 $('doPrint').onclick=()=>window.print();
+$('pickBtn').onclick=()=>{const on=$('pickPanel').hidden;$('pickPanel').hidden=!on;$('pickBtn').setAttribute('aria-expanded',String(on));};
+$('pickList').addEventListener('change',e=>{const id=e.target.dataset.pick;if(!id)return;e.target.checked?st.skip.delete(id):st.skip.add(id);const y=$('pickList').scrollTop;renderSheets();$('pickList').scrollTop=y;const el=$('pickList').querySelector('[data-pick="'+id+'"]');if(el)el.focus();});
+$('pickAll').onclick=()=>{st.skip.clear();renderSheets();};
+$('pickNone').onclick=()=>{pb.plays.forEach(p=>st.skip.add(p.id));renderSheets();};
 
 /* ---------- backup / restore ---------- */
 const num=(v,lo,hi,d)=>{v=Number(v);return Number.isFinite(v)?Math.min(hi,Math.max(lo,r2(v))):d;};
