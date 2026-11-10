@@ -843,8 +843,8 @@ function deleteSel(){
 function hitAt(e,pt){
   const t=e.target.closest('[data-k]'),c=cur();
   if(t&&t.dataset.k!=='line')return {k:t.dataset.k,id:t.dataset.id,idx:t.dataset.idx};
-  if(e.pointerType!=='mouse'){
-    const m=svg.getScreenCTM(),tol=Math.max(1.2,22/((m&&m.a)||10));let best=null,bd=tol;
+  {
+    const m=svg.getScreenCTM(),tol=e.pointerType==='mouse'?1.4:Math.max(1.4,22/((m&&m.a)||10));let best=null,bd=tol;
     if(st.mode==='select'&&st.sel&&st.sel.type==='line'){
       const l=c.lines.find(x=>x.id===st.sel.id);
       if(l){l.pts.forEach((q,i)=>{const d=Math.hypot(q[0]-pt[0],q[1]-pt[1]);if(d<bd){bd=d;best={k:'vertex',id:l.id,idx:i};}});
@@ -993,8 +993,10 @@ function runPlay(){
   if(st.drawing)finishDrawing();
   const c=cur(),tracks=[];
   for(const p of c.players){
-    const l=c.lines.find(x=>x.playerId===p.id);if(!l||!l.pts.length)continue;
-    const pts=lineGeom(l,c).motion,cum=[0];
+    const l=c.lines.find(x=>x.playerId===p.id&&x.pts.length)||c.lines.find(x=>!x.playerId&&x.start&&x.pts.length&&Math.hypot(x.start[0]-p.x,x.start[1]-p.y)<1.6&&!c.players.some(q=>q!==p&&Math.hypot(x.start[0]-q.x,x.start[1]-q.y)<Math.hypot(x.start[0]-p.x,x.start[1]-p.y)));
+    if(!l)continue;
+    const pts=lineGeom(l,c).motion.slice(),cum=[0];
+    if(!l.playerId)pts[0]=[p.x,p.y];
     for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
     tracks.push({id:p.id,pts,cum,len:cum[cum.length-1]});
   }
