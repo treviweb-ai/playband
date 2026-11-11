@@ -26,8 +26,10 @@ a{color:inherit}
 :focus-visible{outline:3px solid #f9c74f;outline-offset:3px}
 .wrap{max-width:1120px;margin:0 auto;padding-inline:max(20px,env(safe-area-inset-left,0px)) max(20px,env(safe-area-inset-right,0px))}
 .top{background:var(--field);color:#fff;position:relative;overflow:hidden}
+.top{background:linear-gradient(90deg,rgba(17,26,21,.94) 0%,rgba(17,26,21,.82) 45%,rgba(17,26,21,.45) 100%),url(/img/gear-hero.jpg) center 40%/cover no-repeat,var(--field)}
 .top::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
-  background:repeating-linear-gradient(to bottom,transparent 0 79px,rgba(233,238,233,.09) 79px 81px)}
+  background:repeating-linear-gradient(to bottom,transparent 0 79px,rgba(233,238,233,.06) 79px 81px)}
+@media (max-width:700px){.top{background:linear-gradient(rgba(17,26,21,.76),rgba(17,26,21,.88)),url(/img/gear-hero-960.jpg) center/cover no-repeat,var(--field)}}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px;position:relative}
 .logo{font-family:var(--display);font-weight:700;font-size:30px;text-decoration:none;letter-spacing:.02em;color:#fff}
 .logo span{color:#ff7b39}
@@ -37,7 +39,7 @@ a{color:inherit}
 .btn.primary:hover{background:var(--accent-d)}
 .btn.line{border-color:var(--ink);color:var(--ink);background:#fff}
 .btn.line:hover{background:var(--ink);color:#fff}
-.hero{position:relative;padding-block:28px 52px;max-width:46em}
+.hero{position:relative;padding-block:40px 72px;max-width:46em}
 h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.05;margin:0;letter-spacing:.01em}
 h1{font-size:clamp(40px,5.6vw,62px);text-transform:uppercase}
 h1 em{font-style:normal;color:#ff7b39}
