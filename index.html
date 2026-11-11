@@ -69,6 +69,8 @@ p{margin:0}
 
 /* header + hero share the dark field */
 .top{background:var(--field);color:#fff;position:relative;overflow:hidden}
+.top{background:linear-gradient(90deg,rgba(17,26,21,.94) 0%,rgba(17,26,21,.84) 45%,rgba(17,26,21,.6) 100%),url(/img/gear-hero.jpg) center 40%/cover no-repeat,var(--field)}
+@media (max-width:700px){.top{background:linear-gradient(rgba(17,26,21,.78),rgba(17,26,21,.9)),url(/img/gear-hero-960.jpg) center top/cover no-repeat,var(--field)}}
 .top::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
   background:repeating-linear-gradient(to bottom,transparent 0 79px,rgba(233,238,233,.09) 79px 81px)}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px;position:relative}
