@@ -1,0 +1,25 @@
+# PlayBand
+
+> PlayBand is a free, browser-based football play designer and wristband maker for youth and volunteer coaches. Coaches draw plays for 5v5 flag, 7v7 and 11-man tackle football, then print play-call wristband inserts and a matching coach call sheet. It works on phones, tablets and computers with nothing to install. Free while in beta. Made by Trevi Web Co. (https://treviweb.com) in Birmingham, Michigan.
+
+## Key facts
+
+- Price: free during the beta. No credit card.
+- Account: optional. Plays are kept in the browser without one; a free account (email or Google sign-in) saves plays online so they follow the coach to any device.
+- Football types: 5v5 flag, 7v7 and 11-man tackle, each with its own field, formations and starter plays (19 ready-made starter plays).
+- Drawing: drag players, draw routes, blocks and pre-snap motion, pick from ready-made routes, animate the play.
+- Printing: wristband inserts from youth 3 x 2 inch up to QB/coach 5 x 3 inch plus custom sizes, as diagrams or a numbered play list; a coach call sheet that matches the wristband numbers; save a play as a PNG.
+- Sharing: view-only share links for players and assistant coaches.
+- Organizing: folders, search, reorder, player names, team logo on prints.
+
+## Pages
+
+- [Home](https://sports.treviweb.com/): what PlayBand does, screenshots and FAQ
+- [Play designer app](https://sports.treviweb.com/app): the editor itself
+- [Coach gear](https://sports.treviweb.com/gear): wristbands, footballs and practice gear we suggest (Amazon affiliate links)
+- [Privacy policy](https://sports.treviweb.com/privacy)
+
+## Contact
+
+- Feedback and questions: info@treviweb.com
+- Maker: [Trevi Web Co.](https://treviweb.com)
