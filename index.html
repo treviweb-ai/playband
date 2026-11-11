@@ -294,5 +294,18 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <span><a href="mailto:info@treviweb.com?subject=PlayBand%20feedback">info@treviweb.com</a> · <a href="/gear">Coach gear</a> · <a href="/privacy">Privacy</a></span>
   </div>
 </footer>
+<script>
+/* Gentle scroll movement on the hero screenshot: it starts slightly tilted and floats up as the page scrolls. Off for reduced motion and narrow screens. */
+(function(){var el=document.querySelector('.hero .shot');if(!el||!window.matchMedia)return;
+  var rm=matchMedia('(prefers-reduced-motion: reduce)'),wide=matchMedia('(min-width: 901px)'),tick=false;
+  function apply(){tick=false;
+    if(rm.matches||!wide.matches){el.style.transform='';return;}
+    var p=Math.min(Math.max(window.scrollY/600,0),1);
+    el.style.transform='perspective(1400px) translateY('+(-40*p).toFixed(1)+'px) rotateX('+(5*(1-p)).toFixed(2)+'deg) rotateY('+(-6*(1-p)).toFixed(2)+'deg) scale('+(1+.04*p).toFixed(3)+')';}
+  function req(){if(!tick){tick=true;requestAnimationFrame(apply);}}
+  el.style.transition='transform .15s ease-out';el.style.willChange='transform';
+  window.addEventListener('scroll',req,{passive:true});window.addEventListener('resize',req);apply();
+})();
+</script>
 </body>
 </html>
