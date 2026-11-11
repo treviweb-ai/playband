@@ -161,6 +161,23 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   .logo{font-size:26px}
   .lede{font-size:18px}
 }
+.watch{display:inline-flex;align-items:center;gap:12px;margin-top:22px;color:#fff;text-decoration:none;font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:.04em;text-transform:uppercase}
+.watch .pl{width:46px;height:46px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 0 0 6px rgba(255,255,255,.18);transition:box-shadow .2s}
+.watch .pl::before{content:"";margin-left:4px;border-left:15px solid var(--accent);border-block:9px solid transparent}
+.watch:hover .pl{box-shadow:0 0 0 9px rgba(255,255,255,.28)}
+.watch small{display:block;font-family:var(--body);font-weight:400;text-transform:none;letter-spacing:0;font-size:15px;color:#cfd8d1}
+.vsec{background:var(--field);color:#fff}.vsec .sec-head p{color:#cfd8d1}.vsec .sec-head .eyebrow{color:#ff7b39}.vsec .vid p{color:#cfd8d1}.vsec .vids-more a{color:#ff9a66}.vsec .yt{box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.vids{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
+.vid h3{font-size:24px;margin-top:14px}.vid p{color:var(--muted);font-size:16px;margin-top:4px}
+.yt{position:relative;display:block;width:100%;aspect-ratio:16/9;border:0;padding:0;border-radius:14px;overflow:hidden;background:#0b120e;cursor:pointer;box-shadow:0 14px 34px rgba(21,33,27,.16)}
+.yt img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.yt:hover img{transform:scale(1.03)}
+.yt .pl{position:absolute;left:50%;top:50%;width:76px;height:54px;margin:-27px 0 0 -38px;border-radius:14px;background:var(--accent);display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.yt .pl::before{content:"";margin-left:5px;border-left:22px solid #fff;border-block:13px solid transparent}
+.yt:hover .pl{background:var(--accent-d)}
+.yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vids-more{margin-top:26px;font-weight:600}.vids-more a{color:var(--accent)}
+@media (max-width:800px){.vids{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </head>
@@ -169,7 +186,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   <div class="wrap">
     <header class="nav">
       <a class="logo" href="/?home" aria-label="PlayBand home">Play<span>Band</span></a>
-      <div class="nav-acts"><a class="navlink" href="/app">Open the app</a><a class="btn primary" href="/app?signup" onclick="window.gtag&&gtag('event','signup_click')">Create free account</a></div>
+      <div class="nav-acts"><a class="navlink" href="#videos">Videos</a><a class="navlink" href="/app">Open the app</a><a class="btn primary" href="/app?signup" onclick="window.gtag&&gtag('event','signup_click')">Create free account</a></div>
     </header>
     <div class="hero">
       <div class="hero-copy">
@@ -181,6 +198,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
           <a class="btn ghost" href="/app" onclick="window.gtag&&gtag('event','start_click')">Try it first</a>
           <small>Free while in beta. No credit card. Just an email and a password.</small>
         </div>
+        <a class="watch" href="#videos" data-play="intro" onclick="window.gtag&&gtag('event','video_click',{video:'intro_hero'})"><span class="pl" aria-hidden="true"></span><span>Watch the 1-minute intro<small>See PlayBand draw, run and print a play</small></span></a>
         <ul class="chips" aria-label="Game types"><li>5v5 flag</li><li>7v7</li><li>11-man</li></ul>
       </div>
       <div class="shot"><img src="/img/editor.png" width="2560" height="1520" alt="The PlayBand editor showing a 5v5 flag play called Mesh, a list of plays on the left and ready-made routes on the right" fetchpriority="high"></div>
@@ -197,6 +215,19 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <li><h3>Print</h3><p>Choose the plays for this week. Print wristband inserts in your size, play sheets for practice, and a coach call sheet where every number matches.</p></li>
       <li><h3>Share</h3><p>Send players and parents a view-only link. They can watch each play run on their phone before practice.</p></li>
     </ol>
+  </div>
+</section>
+
+<section class="vsec" id="videos">
+  <div class="wrap">
+    <div class="sec-head"><p class="eyebrow">Watch it work</p><h2>See PlayBand in action</h2><p>A quick look at what it does, then a full walkthrough of building your first play.</p></div>
+    <div class="vids">
+      <div class="vid"><button class="yt" type="button" data-id="CuRoNFO0T-E" data-name="intro" aria-label="Play video: PlayBand in one minute"><img src="/img/yt-intro.jpg" width="960" height="540" loading="lazy" alt="Draw it. Run it. Print it. PlayBand intro video"><span class="pl" aria-hidden="true"></span></button>
+        <h3>PlayBand in one minute</h3><p>Draw a play, watch it run, print wristbands and a call sheet.</p></div>
+      <div class="vid"><button class="yt" type="button" data-id="rJHA1R6rpiY" data-name="howto" aria-label="Play video: Build a play in 2 minutes"><img src="/img/yt-howto.jpg" width="960" height="540" loading="lazy" alt="How-to: build a play fast in 2 minutes"><span class="pl" aria-hidden="true"></span></button>
+        <h3>Build a play in 2 minutes</h3><p>Step by step: starter plays, routes, motion, defense and printing.</p></div>
+    </div>
+    <p class="vids-more">More coaching videos on our <a href="https://www.youtube.com/@PlayBandsports" target="_blank" rel="noopener" onclick="window.gtag&&gtag('event','youtube_click')">YouTube channel</a>.</p>
   </div>
 </section>
 
@@ -300,6 +331,16 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <span><a href="mailto:info@treviweb.com?subject=PlayBand%20feedback">info@treviweb.com</a> · <a href="https://www.youtube.com/@PlayBandsports" target="_blank" rel="noopener" onclick="window.gtag&&gtag('event','youtube_click')">YouTube</a> · <a href="/gear">Coach gear</a> · <a href="/privacy">Privacy</a></span>
   </div>
 </footer>
+<script>
+/* Videos load from YouTube only when a visitor presses play (privacy-enhanced mode, no YouTube cookies before that). */
+(function(){function play(b){if(!b||b.querySelector('iframe'))return;var f=document.createElement('iframe');
+  f.src='https://www.youtube-nocookie.com/embed/'+b.dataset.id+'?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+  f.title=b.getAttribute('aria-label').replace('Play video: ','');f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';f.allowFullscreen=true;
+  b.appendChild(f);window.gtag&&gtag('event','video_play',{video:b.dataset.name});}
+  document.querySelectorAll('.yt').forEach(function(b){b.addEventListener('click',function(){play(b)})});
+  var w=document.querySelector('.watch');if(w)w.addEventListener('click',function(){setTimeout(function(){play(document.querySelector('.yt[data-name=intro]'))},450)});
+})();
+</script>
 <script>
 /* Gentle scroll movement on the hero screenshot: it starts slightly tilted and floats up as the page scrolls. Off for reduced motion and narrow screens. */
 (function(){var el=document.querySelector('.hero .shot');if(!el||!window.matchMedia)return;
