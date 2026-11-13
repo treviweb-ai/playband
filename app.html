@@ -524,7 +524,9 @@ body.viewer #field{cursor:default}
       <span id="wbCustom" hidden><label class="tool">W <input id="wbW" type="number" min="1.5" max="8" step="0.25" value="4" class="num"></label>
         <label class="tool">H <input id="wbH" type="number" min="1" max="6" step="0.25" value="2.5" class="num"> in</label></span>
       <label class="tool">Show <select id="wbMode"><option value="diagram">Diagrams</option><option value="list">Play list</option></select></label>
-      <label class="tool">Grid <select id="wbGrid"><option value="2x2">2 × 2</option><option value="3x2" selected>3 × 2</option><option value="3x3">3 × 3</option><option value="4x2">4 × 2</option><option value="4x3">4 × 3</option><option value="1x8">1 × 8 (list)</option><option value="2x6">2 × 6 (list)</option><option value="2x8">2 × 8 (list)</option></select></label>
+      <label class="tool">Plays per band <select id="wbGrid"></select></label>
+      <span id="wbDiagOpts"><label class="tool">Zoom <select id="wbZoom"><option value="fit" selected>Zoom in on the play</option><option value="field">Whole field width</option></select></label>
+      <label class="tool">Players <select id="wbPs"><option value="1">Normal</option><option value="1.3" selected>Large</option><option value="1.6">Extra large</option></select></label></span>
       <label class="tool">Copies <input id="wbCopies" type="number" min="1" max="30" value="2" class="num"></label>
     </span>
     <span class="pv-opts" data-for="call" hidden>
@@ -707,16 +709,16 @@ function lineGeom(line,play,pos){
   const drawn=line.style==='zigzag'?zigzag(raw):samplePts(raw,line.smooth);
   return {raw,drawn,motion:samplePts(raw,line.smooth)};
 }
-function capSvg(line,drawn,raw,color){
+function capSvg(line,drawn,raw,color,k=1){
   if(line.cap==='none'||raw.length<2)return '';
   const src=line.style==='zigzag'?raw:drawn;
   const E=src[src.length-1];let A=src[src.length-2];
   for(let i=src.length-2;i>=0&&Math.hypot(E[0]-src[i][0],E[1]-src[i][1])<.05;i--)A=src[i-1]||A;
   const dx=E[0]-A[0],dy=E[1]-A[1],L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,nx=-uy,ny=ux;
-  if(line.cap==='arrow'){const t=[E[0]+ux*.45,E[1]+uy*.45],l=[E[0]-ux*.5+nx*.5,E[1]-uy*.5+ny*.5],r=[E[0]-ux*.5-nx*.5,E[1]-uy*.5-ny*.5];
+  if(line.cap==='arrow'){const t=[E[0]+ux*.45*k,E[1]+uy*.45*k],l=[E[0]-ux*.5*k+nx*.5*k,E[1]-uy*.5*k+ny*.5*k],r=[E[0]-ux*.5*k-nx*.5*k,E[1]-uy*.5*k-ny*.5*k];
     return `<polygon points="${[t,l,r].map(p=>r2(p[0])+','+r2(p[1])).join(' ')}" fill="${color}"/>`;}
-  if(line.cap==='t')return `<line x1="${r2(E[0]+nx*.8)}" y1="${r2(E[1]+ny*.8)}" x2="${r2(E[0]-nx*.8)}" y2="${r2(E[1]-ny*.8)}" stroke="${color}" stroke-width=".26" stroke-linecap="round"/>`;
-  if(line.cap==='dot')return `<circle cx="${r2(E[0])}" cy="${r2(E[1])}" r=".38" fill="${color}"/>`;
+  if(line.cap==='t')return `<line x1="${r2(E[0]+nx*.8*k)}" y1="${r2(E[1]+ny*.8*k)}" x2="${r2(E[0]-nx*.8*k)}" y2="${r2(E[1]-ny*.8*k)}" stroke="${color}" stroke-width="${r2(.26*k)}" stroke-linecap="round"/>`;
+  if(line.cap==='dot')return `<circle cx="${r2(E[0])}" cy="${r2(E[1])}" r="${r2(.38*k)}" fill="${color}"/>`;
   return '';
 }
 
@@ -744,6 +746,8 @@ function fieldSvg(){
 const FIELD=fieldSvg(), FLAG_FIELD=flagFieldSvg();
 function playSvgInner(play,o={}){
   const pos=o.pos||null, faded=!!pos;
+  /* ps and lw make players and routes bigger on small printed wristband windows. */
+  const ps=o.ps||1, lw=o.lw||1;
   let s=play.size===5?FLAG_FIELD:FIELD;
   for(const l of play.lines){
     /* Routes stay where they were drawn while Run play moves the players along them. */
@@ -751,8 +755,8 @@ function playSvgInner(play,o={}){
     s+=`<g data-k="line" data-id="${l.id}" opacity="${faded?.3:1}">`;
     if(o.interactive)s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="transparent" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`;
     if(on)s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="#f9c74f" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>`;
-    s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="${c}" stroke-width=".22" stroke-linecap="round" stroke-linejoin="round"${l.style==='dashed'?' stroke-dasharray=".7 .55"':''}/>`;
-    s+=capSvg(l,g.drawn,g.raw,c)+'</g>';
+    s+=`<path d="${pathD(g.drawn)}" fill="none" stroke="${c}" stroke-width="${r2(.22*lw)}" stroke-linecap="round" stroke-linejoin="round"${l.style==='dashed'?` stroke-dasharray="${r2(.7*lw)} ${r2(.55*lw)}"`:''}/>`;
+    s+=capSvg(l,g.drawn,g.raw,c,lw)+'</g>';
   }
   if(o.interactive&&st.preview&&st.drawing){
     const l=play.lines.find(x=>x.id===st.drawing);
@@ -761,19 +765,21 @@ function playSvgInner(play,o={}){
   }
   for(const lb of play.labels){
     const on=o.interactive&&st.sel&&st.sel.type==='label'&&st.sel.id===lb.id;
-    s+=`<g data-k="label" data-id="${lb.id}">${on?`<rect x="${r2(lb.x-lb.text.length*.29-.4)}" y="${r2(lb.y-.95)}" width="${r2(lb.text.length*.58+.8)}" height="1.9" rx=".3" fill="none" stroke="var(--sel)" stroke-width=".1" stroke-dasharray=".3 .2"/>`:''}<text x="${r2(lb.x)}" y="${r2(lb.y)}" text-anchor="middle" dominant-baseline="central" font-size="1.15" font-weight="600" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="#1f2f57">${esc(lb.text)}</text></g>`;
+    s+=`<g data-k="label" data-id="${lb.id}">${on?`<rect x="${r2(lb.x-lb.text.length*.29-.4)}" y="${r2(lb.y-.95)}" width="${r2(lb.text.length*.58+.8)}" height="1.9" rx=".3" fill="none" stroke="var(--sel)" stroke-width=".1" stroke-dasharray=".3 .2"/>`:''}<text x="${r2(lb.x)}" y="${r2(lb.y)}" text-anchor="middle" dominant-baseline="central" font-size="${r2(1.15*ps)}" font-weight="600" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="#1f2f57">${esc(lb.text)}</text></g>`;
   }
   for(const p of play.players){
     const q=pos&&pos[p.id],x=r2(q?q[0]:p.x),y=r2(q?q[1]:p.y),stroke=KIND_STROKE[p.kind]||KIND_STROKE.skill;
     const on=o.interactive&&st.sel&&st.sel.type==='player'&&st.sel.id===p.id;
-    const fs=p.label.length>2?.62:p.label.length>1?.78:1;
+    /* A bigger player never grows into its neighbor, so a tight offensive line stays readable. */
+    let pp=ps;if(ps>1){let d=1e9;for(const z of play.players)if(z!==p&&z.shape!=='def'&&p.shape!=='def')d=Math.min(d,Math.hypot(z.x-p.x,z.y-p.y));pp=Math.max(1,Math.min(ps,d/1.95));}
+    const fs=r2((p.label.length>2?.62:p.label.length>1?.78:1)*pp);
     s+=`<g data-k="player" data-id="${p.id}">`;
     if(on)s+=`<circle cx="${x}" cy="${y}" r="1.45" fill="none" stroke="#24407a" stroke-width=".12" stroke-dasharray=".35 .25"/>`;
     if(p.shape==='def'){
-      s+=`<circle cx="${x}" cy="${y}" r="1" fill="transparent"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${p.label.length>1?1.05:1.35}" font-weight="700" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="${stroke}">${esc(p.label)}</text>`;
+      s+=`<circle cx="${x}" cy="${y}" r="1" fill="transparent"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${r2((p.label.length>1?1.05:1.35)*pp)}" font-weight="700" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="${stroke}">${esc(p.label)}</text>`;
     }else{
-      s+=p.shape==='square'?`<rect x="${r2(x-.9)}" y="${r2(y-.9)}" width="1.8" height="1.8" fill="#fff" stroke="${stroke}" stroke-width=".2"/>`
-        :`<circle cx="${x}" cy="${y}" r=".95" fill="#fff" stroke="${stroke}" stroke-width=".2"/>`;
+      s+=p.shape==='square'?`<rect x="${r2(x-.9*pp)}" y="${r2(y-.9*pp)}" width="${r2(1.8*pp)}" height="${r2(1.8*pp)}" fill="#fff" stroke="${stroke}" stroke-width="${r2(.2*lw)}"/>`
+        :`<circle cx="${x}" cy="${y}" r="${r2(.95*pp)}" fill="#fff" stroke="${stroke}" stroke-width="${r2(.2*lw)}"/>`;
       s+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" font-family="Barlow Condensed,Arial Narrow,sans-serif" fill="${stroke}">${esc(p.label)}</text>`;
     }
     s+='</g>';
@@ -785,7 +791,26 @@ function playSvgInner(play,o={}){
   }
   return s;
 }
-const thumbSvg=(play,cls='',vb)=>`<svg viewBox="${vb||vbOf(play)}" class="${cls}" aria-hidden="true">${playSvgInner(play)}</svg>`;
+const thumbSvg=(play,cls='',vb,o)=>`<svg viewBox="${vb||vbOf(play)}" class="${cls}" aria-hidden="true">${playSvgInner(play,o)}</svg>`;
+/* Wristband zoom: crop to the players and routes, then widen or deepen the crop to the window's shape so no paper is wasted. */
+function playBox(play,ps){
+  const xs=[],ys=[],m=1*ps+.5;
+  play.players.forEach(p=>{xs.push(p.x);ys.push(p.y);});
+  play.labels.forEach(l=>{const hw=l.text.length*.29*ps;xs.push(l.x-hw,l.x+hw);ys.push(l.y);});
+  play.lines.forEach(l=>{lineGeom(l,play).drawn.forEach(q=>{xs.push(q[0]);ys.push(q[1]);});});
+  if(!xs.length)return null;
+  const grow=(a,b,min)=>b-a<min?[(a+b-min)/2,(a+b+min)/2]:[a,b];
+  return [...grow(Math.min(...xs)-m,Math.max(...xs)+m,12),...grow(Math.min(...ys)-m,Math.max(...ys)+m,9)];
+}
+function zoomVB(play,aspect,ps){
+  const b=playBox(play,ps);if(!b)return fitVB(play);
+  let [x0,x1,y0,y1]=b;
+  if((x1-x0)/(y1-y0)<aspect){const d=((y1-y0)*aspect-(x1-x0))/2;x0-=d;x1+=d;}
+  else{const d=(x1-x0)/aspect-(y1-y0);y0-=d/2;y1+=d/2;
+    /* Keep the extra depth on the field where there is room. */
+    if(y1>12&&y0-(y1-12)>=-26){y0-=y1-12;y1=12;}else if(y0<-26&&y1+(-26-y0)<=12){y1+=-26-y0;y0=-26;}}
+  return `${r2(x0)} ${r2(y0)} ${r2(x1-x0)} ${r2(y1-y0)}`;
+}
 function fitVB(play){
   const ys=[];play.players.forEach(p=>ys.push(p.y));play.labels.forEach(l=>ys.push(l.y));
   play.lines.forEach(l=>{l.pts.forEach(q=>ys.push(q[1]));if(l.start)ys.push(l.start[1]);});
@@ -1347,7 +1372,27 @@ $('printBtn').onclick=()=>{if(st.drawing)finishDrawing();renderSheets();
 $('closePrint').onclick=()=>{$('printView').hidden=true;};
 $('perPage').onchange=renderSheets;
 $('sheetSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b){sheetType=b.dataset.sheet;renderSheets();}});
-['wbSize','wbW','wbH','wbMode','wbGrid','wbCopies','callDiag'].forEach(id=>$(id).addEventListener('input',renderSheets));
+const WB_KEYS=['wbSize','wbW','wbH','wbMode','wbGrid','wbZoom','wbPs','wbCopies'];
+/* Plays per band. Value is columns x rows. Two and three plays stack so each window stays wide like a football play. */
+const WB_GRIDS={diagram:[['1','1 play'],['2','2 plays'],['3','3 plays'],['4','4 plays'],['6','6 plays'],['8','8 plays'],['9','9 plays'],['12','12 plays']],
+  list:[['1x6','6 plays'],['1x8','8 plays'],['2x6','12 plays'],['2x8','16 plays'],['2x10','20 plays']]};
+/* Ways to arrange each count as columns x rows. The print picks whichever draws this set of plays biggest. */
+const WB_LAY={1:[[1,1]],2:[[1,2],[2,1]],3:[[1,3],[3,1]],4:[[2,2],[1,4]],6:[[3,2],[2,3]],8:[[4,2],[2,4]],9:[[3,3]],12:[[4,3],[3,4]]};
+function wbGridOpts(want){
+  const list=$('wbMode').value==='list',o=WB_GRIDS[list?'list':'diagram'],g=$('wbGrid');
+  g.innerHTML=o.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+  g.value=o.some(x=>x[0]===want)?want:(list?'1x8':'6');
+  $('wbDiagOpts').hidden=list;
+}
+(function(){
+  let sv={};try{sv=JSON.parse(lsGetSafe('playband.wb')||'{}')||{}}catch(e){}
+  WB_KEYS.forEach(id=>{if(id!=='wbGrid'&&sv[id]!=null){const el=$(id);el.value=sv[id];if(el.tagName==='SELECT'&&el.selectedIndex<0)el.selectedIndex=[...el.options].findIndex(x=>x.defaultSelected);}});
+  wbGridOpts(sv.wbGrid);
+})();
+function lsGetSafe(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function wbRemember(){const o={};WB_KEYS.forEach(id=>o[id]=$(id).value);try{localStorage.setItem('playband.wb',JSON.stringify(o))}catch(e){}}
+$('wbMode').addEventListener('input',()=>wbGridOpts());
+[...WB_KEYS,'callDiag'].forEach(id=>$(id).addEventListener('input',()=>{wbRemember();renderSheets();}));
 const PAGE_W=10.3,PAGE_H=7.7;
 function wbDims(){
   const v=$('wbSize').value;$('wbCustom').hidden=v!=='custom';
@@ -1355,7 +1400,20 @@ function wbDims(){
   w=Math.min(PAGE_W,Math.max(1.5,w||4));h=Math.min(PAGE_H,Math.max(1,h||2.5));return [w,h];
 }
 function renderWrist(){
-  const [w,h]=wbDims(),[gc,gr]=$('wbGrid').value.split('x').map(Number),per=gc*gr,list=$('wbMode').value==='list';
+  const [w,h]=wbDims(),list=$('wbMode').value==='list';
+  const ps=+$('wbPs').value||1,zoom=$('wbZoom').value!=='field',o={ps,lw:1+(ps-1)*.7};
+  /* Window size in inches, after the band's padding and the gaps between windows. */
+  const cell=(c,r)=>[(w-.08-(c-1)*.03)/c,(h-.08-(r-1)*.03)/r];
+  let gc,gr;
+  if(list)[gc,gr]=$('wbGrid').value.split('x').map(Number);
+  else{
+    const boxes=PP.map(p=>{if(zoom){const b=playBox(p,ps);if(b)return [b[1]-b[0],b[3]-b[2]];}const v=fitVB(p).split(' ');return [+v[2],+v[3]];});
+    let best=-1;
+    for(const [c,r] of WB_LAY[$('wbGrid').value]||[[3,2]]){const [cw,ch]=cell(c,r);
+      const sc=boxes.reduce((a,b)=>a+Math.min(cw/b[0],ch/b[1]),0)*(c>=r?1.05:1);
+      if(sc>best){best=sc;gc=c;gr=r;}}
+  }
+  const per=gc*gr,[cw,ch]=cell(gc,gr),aspect=cw/ch;
   const copies=Math.min(30,Math.max(1,+$('wbCopies').value||1));
   const cards=[];
   for(let i=0;i<PP.length;i+=per){
@@ -1363,7 +1421,7 @@ function renderWrist(){
     for(let k=0;k<per;k++){
       const idx=i+k,p=PP[idx];
       if(list){inner+=p?`<div class="wl" style="font-size:${r2(Math.max(5,Math.min(11,(h/gr)*72*.48)))}pt"><i>${idx+1}</i>${esc(p.name)}</div>`:'<div class="wl"></div>';}
-      else inner+=p?`<div class="win"><b>${idx+1}</b>${thumbSvg(p,'',fitVB(p))}</div>`:'<div class="win"></div>';
+      else inner+=p?`<div class="win"><b>${idx+1}</b>${thumbSvg(p,'',zoom?zoomVB(p,aspect,ps):fitVB(p),o)}</div>`:'<div class="win"></div>';
     }
     const style=`width:${w}in;height:${h}in;grid-template-columns:repeat(${gc},minmax(0,1fr));grid-template-rows:repeat(${gr},minmax(0,1fr));grid-auto-flow:${list?'column':'row'}`;
     const card=`<div class="wb" style="${style}">${inner}</div>`;
